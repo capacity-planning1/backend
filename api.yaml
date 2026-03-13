@@ -1,0 +1,1265 @@
+openapi: 3.0.3
+info:
+  title: Capacity Planning API
+  version: 1.0.0
+  description: API визуального планировщика ресурсов для студенческих проектных команд
+
+servers:
+  - url: http://localhost:8000
+
+tags:
+  - name: Students
+    description: Работа со студентами
+  - name: Projects
+    description: Работа с проектами
+  - name: ProjectMembers
+    description: Работа с участниками проектов
+  - name: Teams
+    description: Работа с командами
+  - name: TeamMembership
+    description: Работа с составом команд
+
+paths:
+  /students/profile:
+    get:
+      tags: [Students]
+      summary: Получить профиль текущего студента
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Профиль текущего студента
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /students:
+    get:
+      tags: [Students]
+      summary: Получить список студентов
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/StudentEmailFilter'
+        - $ref: '#/components/parameters/StudentFirstNameFilter'
+        - $ref: '#/components/parameters/StudentLastNameFilter'
+        - $ref: '#/components/parameters/StudentSkillsFilter'
+      responses:
+        '200':
+          description: Список студентов
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /students/{student_id}:
+    get:
+      tags: [Students]
+      summary: Получить информацию о студенте
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+      responses:
+        '200':
+          description: Информация о студенте
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Students]
+      summary: Обновить данные студента
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+      requestBody:
+        $ref: '#/components/requestBodies/StudentUpdateBody'
+      responses:
+        '200':
+          description: Данные студента обновлены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [Students]
+      summary: Удалить студента
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+      responses:
+        '204':
+          description: Студент удален
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /projects:
+    get:
+      tags: [Projects]
+      summary: Получить список проектов
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/ProjectNameFilter'
+        - $ref: '#/components/parameters/ProjectOwnerStudentIdFilter'
+        - $ref: '#/components/parameters/ProjectCreatedFromFilter'
+        - $ref: '#/components/parameters/ProjectCreatedToFilter'
+      responses:
+        '200':
+          description: Список проектов
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Projects]
+      summary: Создать проект
+      security:
+        - bearerAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/ProjectCreateBody'
+      responses:
+        '201':
+          description: Проект создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /projects/join:
+    post:
+      tags: [Projects]
+      summary: Вступить в проект
+      security:
+        - bearerAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/ProjectJoinBody'
+      responses:
+        '201':
+          description: Студент добавлен в проект
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectMemberResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /projects/{project_id}:
+    get:
+      tags: [Projects]
+      summary: Получить информацию о проекте
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Информация о проекте
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Projects]
+      summary: Обновить проект
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        $ref: '#/components/requestBodies/ProjectUpdateBody'
+      responses:
+        '200':
+          description: Проект обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [Projects]
+      summary: Удалить проект
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '204':
+          description: Проект удален
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /projects/{project_id}/members:
+    get:
+      tags: [ProjectMembers]
+      summary: Получить список участников проекта
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/ProjectMemberStudentIdFilter'
+        - $ref: '#/components/parameters/ProjectMemberRoleFilter'
+        - $ref: '#/components/parameters/ProjectMemberIsActiveFilter'
+        - $ref: '#/components/parameters/ProjectMemberJoinDateFromFilter'
+        - $ref: '#/components/parameters/ProjectMemberJoinDateToFilter'
+      responses:
+        '200':
+          description: Список участников проекта
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectMemberListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [ProjectMembers]
+      summary: Добавить участника в проект
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        $ref: '#/components/requestBodies/ProjectMemberCreateByProjectBody'
+      responses:
+        '201':
+          description: Участник добавлен в проект
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectMemberResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /projects/{project_id}/members/{student_id}:
+    get:
+      tags: [ProjectMembers]
+      summary: Получить информацию об участнике проекта
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/StudentId'
+      responses:
+        '200':
+          description: Информация об участнике проекта
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectMemberResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [ProjectMembers]
+      summary: Обновить данные участника проекта
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/StudentId'
+      requestBody:
+        $ref: '#/components/requestBodies/ProjectMemberUpdateByProjectBody'
+      responses:
+        '200':
+          description: Данные участника проекта обновлены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectMemberResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [ProjectMembers]
+      summary: Удалить участника из проекта
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/StudentId'
+      responses:
+        '204':
+          description: Участник удален из проекта
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /projects/{project_id}/teams:
+    get:
+      tags: [Teams]
+      summary: Получить список команд проекта
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Список команд проекта
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [Teams]
+      summary: Создать команду внутри проекта
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        $ref: '#/components/requestBodies/TeamCreateByProjectBody'
+      responses:
+        '201':
+          description: Команда создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /projects/{project_id}/teams/{team_id}:
+    get:
+      tags: [Teams]
+      summary: Получить информацию о команде проекта
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TeamId'
+      responses:
+        '200':
+          description: Информация о команде
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Teams]
+      summary: Обновить команду проекта
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TeamId'
+      requestBody:
+        $ref: '#/components/requestBodies/TeamUpdateBody'
+      responses:
+        '200':
+          description: Команда обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [Teams]
+      summary: Удалить команду из проекта
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TeamId'
+      responses:
+        '204':
+          description: Команда удалена
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /projects/{project_id}/teams/{team_id}/members:
+    get:
+      tags: [TeamMembership]
+      summary: Получить список участников конкретной команды
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TeamId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Список участников команды
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamMembershipListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [TeamMembership]
+      summary: Добавить участника проекта в команду
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TeamId'
+      requestBody:
+        $ref: '#/components/requestBodies/TeamMembershipCreateByTeamBody'
+      responses:
+        '201':
+          description: Участник добавлен в команду
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamMembershipResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /projects/{project_id}/teams/{team_id}/members/{student_id}:
+    put:
+      tags: [TeamMembership]
+      summary: Обновить позицию участника в команде
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TeamId'
+        - $ref: '#/components/parameters/StudentId'
+      requestBody:
+        $ref: '#/components/requestBodies/TeamMembershipUpdateBody'
+      responses:
+        '200':
+          description: Позиция участника обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamMembershipResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [TeamMembership]
+      summary: Удалить участника из команды
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TeamId'
+        - $ref: '#/components/parameters/StudentId'
+      responses:
+        '204':
+          description: Участник удален из команды
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    Page:
+      name: page
+      in: query
+      required: false
+      description: Номер страницы
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+
+    PageSize:
+      name: page_size
+      in: query
+      required: false
+      description: Количество элементов на странице
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+    StudentId:
+      name: student_id
+      in: path
+      required: true
+      description: ID студента
+      schema:
+        type: integer
+        minimum: 1
+
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: ID проекта
+      schema:
+        type: integer
+        minimum: 1
+
+    TeamId:
+      name: team_id
+      in: path
+      required: true
+      description: ID команды
+      schema:
+        type: integer
+        minimum: 1
+
+    StudentEmailFilter:
+      name: email
+      in: query
+      required: false
+      description: Фильтр по email
+      schema:
+        type: string
+        format: email
+
+    StudentFirstNameFilter:
+      name: first_name
+      in: query
+      required: false
+      description: Фильтр по имени
+      schema:
+        type: string
+
+    StudentLastNameFilter:
+      name: last_name
+      in: query
+      required: false
+      description: Фильтр по фамилии
+      schema:
+        type: string
+
+    StudentSkillsFilter:
+      name: skills
+      in: query
+      required: false
+      description: Фильтр по навыкам
+      schema:
+        type: string
+
+    ProjectNameFilter:
+      name: name
+      in: query
+      required: false
+      description: Фильтр по названию проекта
+      schema:
+        type: string
+
+    ProjectOwnerStudentIdFilter:
+      name: owner_student_id
+      in: query
+      required: false
+      description: Фильтр по ID владельца проекта
+      schema:
+        type: integer
+        minimum: 1
+
+    ProjectCreatedFromFilter:
+      name: created_from
+      in: query
+      required: false
+      description: Нижняя граница даты создания проекта
+      schema:
+        type: string
+        format: date-time
+
+    ProjectCreatedToFilter:
+      name: created_to
+      in: query
+      required: false
+      description: Верхняя граница даты создания проекта
+      schema:
+        type: string
+        format: date-time
+
+    ProjectMemberStudentIdFilter:
+      name: student_id
+      in: query
+      required: false
+      description: Фильтр по ID студента
+      schema:
+        type: integer
+        minimum: 1
+
+    ProjectMemberRoleFilter:
+      name: role
+      in: query
+      required: false
+      description: Фильтр по роли участника проекта
+      schema:
+        type: string
+
+    ProjectMemberIsActiveFilter:
+      name: is_active
+      in: query
+      required: false
+      description: Фильтр по активности участника проекта
+      schema:
+        type: boolean
+
+    ProjectMemberJoinDateFromFilter:
+      name: join_date_from
+      in: query
+      required: false
+      description: Нижняя граница даты вступления в проект
+      schema:
+        type: string
+        format: date
+
+    ProjectMemberJoinDateToFilter:
+      name: join_date_to
+      in: query
+      required: false
+      description: Верхняя граница даты вступления в проект
+      schema:
+        type: string
+        format: date
+
+  requestBodies:
+    StudentUpdateBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StudentUpdateRequest'
+
+    ProjectCreateBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProjectCreateRequest'
+
+    ProjectUpdateBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProjectUpdateRequest'
+
+    ProjectJoinBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProjectJoinRequest'
+
+    ProjectMemberCreateByProjectBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProjectMemberCreateByProjectRequest'
+
+    ProjectMemberUpdateByProjectBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProjectMemberUpdateRequest'
+
+    TeamCreateByProjectBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TeamCreateByProjectRequest'
+
+    TeamUpdateBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TeamUpdateRequest'
+
+    TeamMembershipCreateByTeamBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TeamMembershipCreateByTeamRequest'
+
+    TeamMembershipUpdateBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TeamMembershipUpdateRequest'
+
+  responses:
+    BadRequest:
+      description: Некорректный запрос
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Unauthorized:
+      description: Требуется авторизация
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Сущность не найдена
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Conflict:
+      description: Конфликт данных
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    ValidationError:
+      description: Ошибка валидации входных данных
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+
+  schemas:
+    StudentResponse:
+      type: object
+      required:
+        - id
+        - email
+        - first_name
+        - last_name
+        - registered_at
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор студента
+          example: 1
+        email:
+          type: string
+          format: email
+          description: Email студента
+          example: student@example.com
+        first_name:
+          type: string
+          description: Имя студента
+          example: Иван
+        last_name:
+          type: string
+          description: Фамилия студента
+          example: Иванов
+        registered_at:
+          type: string
+          format: date-time
+          description: Дата регистрации
+          example: '2026-03-13T10:00:00Z'
+        skills:
+          type: string
+          nullable: true
+          description: Навыки студента
+          example: Python, FastAPI, PostgreSQL
+
+    StudentUpdateRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+          description: Новое имя студента
+        last_name:
+          type: string
+          description: Новая фамилия студента
+        skills:
+          type: string
+          nullable: true
+          description: Новый список навыков
+
+    StudentListResponse:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - page_size
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StudentResponse'
+        total:
+          type: integer
+          example: 100
+        page:
+          type: integer
+          example: 1
+        page_size:
+          type: integer
+          example: 20
+
+    ProjectResponse:
+      type: object
+      required:
+        - id
+        - name
+        - created_at
+        - owner_student_id
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор проекта
+          example: 10
+        name:
+          type: string
+          description: Название проекта
+          example: Capacity Planning
+        description:
+          type: string
+          nullable: true
+          description: Описание проекта
+          example: Сервис для планирования загрузки студенческой команды
+        created_at:
+          type: string
+          format: date-time
+          description: Дата создания проекта
+          example: '2026-03-13T10:00:00Z'
+        owner_student_id:
+          type: integer
+          description: ID владельца проекта
+          example: 1
+
+    ProjectCreateRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Название проекта
+          example: Capacity Planning
+        description:
+          type: string
+          nullable: true
+          description: Описание проекта
+
+    ProjectUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Новое название проекта
+        description:
+          type: string
+          nullable: true
+          description: Новое описание проекта
+
+    ProjectJoinRequest:
+      type: object
+      required:
+        - project_id
+      properties:
+        project_id:
+          type: integer
+          description: ID проекта для вступления
+          example: 10
+
+    ProjectListResponse:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - page_size
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectResponse'
+        total:
+          type: integer
+          example: 25
+        page:
+          type: integer
+          example: 1
+        page_size:
+          type: integer
+          example: 20
+
+    ProjectMemberResponse:
+      type: object
+      required:
+        - id
+        - project_id
+        - student_id
+        - role
+        - join_date
+        - is_active
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор участника проекта
+          example: 15
+        project_id:
+          type: integer
+          description: ID проекта
+          example: 10
+        student_id:
+          type: integer
+          description: ID студента
+          example: 2
+        role:
+          type: string
+          description: Роль участника в проекте
+          example: backend developer
+        join_date:
+          type: string
+          format: date
+          description: Дата вступления в проект
+          example: '2026-03-13'
+        is_active:
+          type: boolean
+          description: Является ли участник активным
+          example: true
+
+    ProjectMemberCreateByProjectRequest:
+      type: object
+      required:
+        - student_id
+        - role
+      properties:
+        student_id:
+          type: integer
+          description: ID студента
+          example: 2
+        role:
+          type: string
+          description: Роль участника проекта
+          example: tester
+
+    ProjectMemberUpdateRequest:
+      type: object
+      properties:
+        role:
+          type: string
+          description: Новая роль участника проекта
+        is_active:
+          type: boolean
+          description: Новый статус активности участника
+
+    ProjectMemberListResponse:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - page_size
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectMemberResponse'
+        total:
+          type: integer
+          example: 12
+        page:
+          type: integer
+          example: 1
+        page_size:
+          type: integer
+          example: 20
+
+    TeamResponse:
+      type: object
+      required:
+        - id
+        - project_id
+        - name
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор команды
+          example: 5
+        project_id:
+          type: integer
+          description: ID проекта
+          example: 10
+        name:
+          type: string
+          description: Название команды
+          example: Backend Team
+        description:
+          type: string
+          nullable: true
+          description: Описание команды
+          example: Команда backend-разработки
+
+    TeamCreateByProjectRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Название команды
+          example: Frontend Team
+        description:
+          type: string
+          nullable: true
+          description: Описание команды
+
+    TeamUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Новое название команды
+        description:
+          type: string
+          nullable: true
+          description: Новое описание команды
+
+    TeamListResponse:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - page_size
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamResponse'
+        total:
+          type: integer
+          example: 6
+        page:
+          type: integer
+          example: 1
+        page_size:
+          type: integer
+          example: 20
+
+    TeamMembershipResponse:
+      type: object
+      required:
+        - id
+        - team_id
+        - project_member_id
+        - position
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор членства в команде
+          example: 30
+        team_id:
+          type: integer
+          description: ID команды
+          example: 5
+        project_member_id:
+          type: integer
+          description: ID участника проекта
+          example: 15
+        position:
+          type: string
+          description: Позиция участника в команде
+          example: team lead
+
+    TeamMembershipCreateByTeamRequest:
+      type: object
+      required:
+        - project_member_id
+        - position
+      properties:
+        project_member_id:
+          type: integer
+          description: ID участника проекта
+          example: 15
+        position:
+          type: string
+          description: Позиция участника в команде
+          example: analyst
+
+    TeamMembershipUpdateRequest:
+      type: object
+      properties:
+        position:
+          type: string
+          description: Новая позиция участника в команде
+
+    TeamMembershipListResponse:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - page_size
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamMembershipResponse'
+        total:
+          type: integer
+          example: 8
+        page:
+          type: integer
+          example: 1
+        page_size:
+          type: integer
+          example: 20
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              description: Машиночитаемый код ошибки
+              example: STUDENT_NOT_FOUND
+            message:
+              type: string
+              description: Человекочитаемое описание ошибки
+              example: Student with id=1 not found
+            details:
+              type: object
+              nullable: true
+              additionalProperties: true
+              description: Дополнительная информация об ошибке
+
+    ValidationErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              example: VALIDATION_ERROR
+            message:
+              type: string
+              example: Request validation failed
+            fields:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
