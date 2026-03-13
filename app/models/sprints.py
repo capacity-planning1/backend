@@ -21,6 +21,12 @@ class TaskPriority(int, Enum):
     CRITICAL = 4
 
 
+class TaskChangeRequestStatus(str, Enum):
+    PENDING = 'pending'
+    APPROVED = 'approved'
+    REJECTED = 'rejected'
+
+
 class Sprint(SQLModel, table=True):
     id: UUID = Field(default_factory=UUID, primary_key=True)
 
@@ -61,3 +67,21 @@ class TaskAssignment(SQLModel, table=True):
     project_member_id: UUID = Field(foreign_key='projectmember.id', nullable=False)
 
     assignet_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    accepted_at: datetime | None = Field(default=None)
+
+
+class TaskChangeRequest(SQLModel, table=True):
+    id: UUID = Field(default_factory=UUID, primary_key=True)
+
+    task_assignment_id: UUID = Field(foreign_key='taskassignment.id', nullable=False)
+
+    requested_by_member_id: UUID = Field(foreign_key='projectmember.id', nullable=False)
+
+    reason: str | None = Field(default=None, sa_column=Column(Text))
+
+    status: TaskChangeRequestStatus = Field(default=TaskChangeRequestStatus.PENDING)
+
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    handled_at: datetime | None = Field(default=None)
