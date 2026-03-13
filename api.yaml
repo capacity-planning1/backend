@@ -18,6 +18,16 @@ tags:
     description: Работа с командами
   - name: TeamMembership
     description: Работа с составом команд
+  - name: Sprints
+    description: Работа со спринтами проекта
+  - name: ProjectTasks
+    description: Работа с задачами проекта
+  - name: TaskAssignments
+    description: Назначения задач участникам
+  - name: BusySlots
+    description: Слоты занятости студентов
+  - name: TaskChangeRequests
+    description: Запросы на снятие или переназначение задач
 
 paths:
   /students/profile:
@@ -555,6 +565,594 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /projects/{project_id}/sprints:
+    get:
+      tags: [Sprints]
+      summary: Получить список спринтов проекта
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Список спринтов проекта
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SprintListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [Sprints]
+      summary: Создать спринт проекта
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SprintCreateRequest'
+      responses:
+        '201':
+          description: Спринт создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SprintResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /projects/{project_id}/tasks:
+    get:
+      tags: [ProjectTasks]
+      summary: Получить список задач проекта
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Список задач проекта
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectTaskListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [ProjectTasks]
+      summary: Создать задачу проекта
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectTaskCreateRequest'
+      responses:
+        '201':
+          description: Задача создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectTaskResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /projects/{project_id}/tasks/{task_id}/assignments:
+    get:
+      tags: [TaskAssignments]
+      summary: Получить назначения задачи
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TaskId'
+      responses:
+        '200':
+          description: Назначения задачи
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskAssignmentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [TaskAssignments]
+      summary: Назначить задачу участнику
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TaskId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskAssignmentCreateRequest'
+      responses:
+        '201':
+          description: Задача назначена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskAssignmentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /students/{student_id}/busy-slots:
+    get:
+      tags: [BusySlots]
+      summary: Получить слоты занятости студента
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Список слотов занятости
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BusySlotResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [BusySlots]
+      summary: Создать слот занятости
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusySlotCreateRequest'
+      responses:
+        '201':
+          description: Слот занятости создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusySlotResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /projects/{project_id}/change-requests:
+    get:
+      tags: [TaskChangeRequests]
+      summary: Получить список запросов на изменение задач
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Список запросов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskChangeRequestResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /projects/{project_id}/tasks/{task_id}/change-requests:
+    post:
+      tags: [TaskChangeRequests]
+      summary: Создать запрос на изменение задачи
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TaskId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskChangeRequestCreateRequest'
+      responses:
+        '201':
+          description: Запрос создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskChangeRequestResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /projects/{project_id}/sprints/{sprint_id}:
+    get:
+      tags: [Sprints]
+      summary: Получить информацию о спринте
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/SprintId'
+      responses:
+        '200':
+          description: Информация о спринте
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SprintResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Sprints]
+      summary: Обновить спринт
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/SprintId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SprintCreateRequest'
+      responses:
+        '200':
+          description: Спринт обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SprintResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      tags: [Sprints]
+      summary: Удалить спринт
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/SprintId'
+      responses:
+        '204':
+          description: Спринт удален
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+
+  /projects/{project_id}/tasks/{task_id}:
+    get:
+      tags: [ProjectTasks]
+      summary: Получить информацию о задаче
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TaskId'
+      responses:
+        '200':
+          description: Информация о задаче
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectTaskResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [ProjectTasks]
+      summary: Обновить задачу проекта
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TaskId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectTaskCreateRequest'
+      responses:
+        '200':
+          description: Задача обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectTaskResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      tags: [ProjectTasks]
+      summary: Удалить задачу проекта
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TaskId'
+      responses:
+        '204':
+          description: Задача удалена
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+
+  /projects/{project_id}/tasks/{task_id}/assignments/{project_member_id}:
+    get:
+      tags: [TaskAssignments]
+      summary: Получить назначение задачи участнику
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TaskId'
+        - $ref: '#/components/parameters/ProjectMemberId'
+      responses:
+        '200':
+          description: Назначение задачи
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskAssignmentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [TaskAssignments]
+      summary: Обновить назначение задачи
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TaskId'
+        - $ref: '#/components/parameters/ProjectMemberId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskAssignmentCreateRequest'
+      responses:
+        '200':
+          description: Назначение обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskAssignmentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      tags: [TaskAssignments]
+      summary: Удалить назначение задачи
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TaskId'
+        - $ref: '#/components/parameters/ProjectMemberId'
+      responses:
+        '204':
+          description: Назначение удалено
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+
+  /students/{student_id}/busy-slots/{busy_slot_id}:
+    get:
+      tags: [BusySlots]
+      summary: Получить информацию о слоте занятости
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+        - $ref: '#/components/parameters/BusySlotId'
+      responses:
+        '200':
+          description: Информация о слоте занятости
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusySlotResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [BusySlots]
+      summary: Обновить слот занятости
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+        - $ref: '#/components/parameters/BusySlotId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusySlotCreateRequest'
+      responses:
+        '200':
+          description: Слот занятости обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusySlotResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      tags: [BusySlots]
+      summary: Удалить слот занятости
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+        - $ref: '#/components/parameters/BusySlotId'
+      responses:
+        '204':
+          description: Слот занятости удален
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+
+  /projects/{project_id}/change-requests/{request_id}:
+    get:
+      tags: [TaskChangeRequests]
+      summary: Получить информацию о запросе на изменение задачи
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '200':
+          description: Информация о запросе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskChangeRequestResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [TaskChangeRequests]
+      summary: Обновить запрос на изменение задачи
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskChangeRequestCreateRequest'
+      responses:
+        '200':
+          description: Запрос обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskChangeRequestResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      tags: [TaskChangeRequests]
+      summary: Удалить запрос на изменение задачи
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '204':
+          description: Запрос удален
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -607,6 +1205,15 @@ components:
       in: path
       required: true
       description: ID команды
+      schema:
+        type: integer
+        minimum: 1
+
+    TaskId:
+      name: task_id
+      in: path
+      required: true
+      description: ID задачи
       schema:
         type: integer
         minimum: 1
@@ -722,6 +1329,42 @@ components:
         type: string
         format: date
 
+    SprintId:
+      name: sprint_id
+      in: path
+      required: true
+      description: ID спринта
+      schema:
+        type: integer
+        minimum: 1
+
+    ProjectMemberId:
+      name: project_member_id
+      in: path
+      required: true
+      description: ID участника проекта
+      schema:
+        type: integer
+        minimum: 1
+
+    BusySlotId:
+      name: busy_slot_id
+      in: path
+      required: true
+      description: ID слота занятости
+      schema:
+        type: integer
+        minimum: 1
+
+    RequestId:
+      name: request_id
+      in: path
+      required: true
+      description: ID запроса на изменение задачи
+      schema:
+        type: integer
+        minimum: 1
+
   requestBodies:
     StudentUpdateBody:
       required: true
@@ -830,6 +1473,14 @@ components:
             $ref: '#/components/schemas/ValidationErrorResponse'
 
   schemas:
+    TaskStatus:
+      type: string
+      description: Статус задачи
+      enum:
+        - unassigned
+        - assigned
+        - in_progress
+        - done
     StudentResponse:
       type: object
       required:
@@ -1263,3 +1914,330 @@ components:
                 type: array
                 items:
                   type: string
+
+    SprintResponse:
+      type: object
+      required:
+        - id
+        - project_id
+        - name
+        - start_date
+        - end_date
+        - created_at
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор спринта
+          example: 1
+        project_id:
+          type: integer
+          description: ID проекта
+          example: 10
+        name:
+          type: string
+          description: Название спринта
+          example: Sprint 1
+        start_date:
+          type: string
+          format: date
+          description: Дата начала спринта
+        end_date:
+          type: string
+          format: date
+          description: Дата окончания спринта
+        created_at:
+          type: string
+          format: date-time
+          description: Дата создания спринта
+
+    SprintCreateRequest:
+      type: object
+      required:
+        - name
+        - start_date
+        - end_date
+      properties:
+        name:
+          type: string
+          description: Название спринта
+        start_date:
+          type: string
+          format: date
+          description: Дата начала спринта
+        end_date:
+          type: string
+          format: date
+          description: Дата окончания спринта
+
+    SprintListResponse:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - page_size
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SprintResponse'
+        total:
+          type: integer
+          example: 5
+        page:
+          type: integer
+          example: 1
+        page_size:
+          type: integer
+          example: 20
+
+    ProjectTaskResponse:
+      type: object
+      required:
+        - id
+        - project_id
+        - title
+        - status
+        - priority
+        - created_at
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор задачи
+          example: 7
+        project_id:
+          type: integer
+          description: ID проекта
+          example: 10
+        sprint_id:
+          type: integer
+          nullable: true
+          description: ID спринта
+          example: 2
+        title:
+          type: string
+          description: Название задачи
+          example: Реализовать Swagger API
+        description:
+          type: string
+          nullable: true
+          description: Описание задачи
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        priority:
+          type: integer
+          enum: [1, 2, 3, 4, 5]
+        created_at:
+          type: string
+          format: date-time
+          description: Дата создания задачи
+
+    ProjectTaskCreateRequest:
+      type: object
+      required:
+        - title
+        - status
+        - priority
+      properties:
+        sprint_id:
+          type: integer
+          nullable: true
+          description: ID спринта
+        title:
+          type: string
+          description: Название задачи
+        description:
+          type: string
+          nullable: true
+          description: Описание задачи
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        priority:
+          type: integer
+          enum: [1, 2, 3, 4, 5]
+
+    ProjectTaskListResponse:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - page_size
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectTaskResponse'
+        total:
+          type: integer
+          example: 12
+        page:
+          type: integer
+          example: 1
+        page_size:
+          type: integer
+          example: 20
+
+    TaskAssignmentResponse:
+      type: object
+      required:
+        - id
+        - project_task_id
+        - project_member_id
+        - assigned_at
+        - state
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор назначения задачи
+          example: 15
+        project_task_id:
+          type: integer
+          description: ID задачи
+        project_member_id:
+          type: integer
+          description: ID участника проекта
+        assigned_at:
+          type: string
+          format: date-time
+          description: Дата назначения задачи
+        state:
+          type: string
+          enum: [assigned, accepted, rejected, completed]
+        accepted_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Дата принятия задачи участником
+
+    TaskAssignmentCreateRequest:
+      type: object
+      required:
+        - project_member_id
+      properties:
+        project_member_id:
+          type: integer
+          description: ID участника проекта
+
+    BusySlotResponse:
+      type: object
+      required:
+        - id
+        - student_id
+        - slot_type
+        - start_datetime
+        - end_datetime
+        - created_at
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор слота занятости
+          example: 21
+        student_id:
+          type: integer
+          description: ID студента
+        slot_type:
+          type: string
+          description: Тип слота занятости
+          example: lesson
+        start_datetime:
+          type: string
+          format: date-time
+          description: Начало слота занятости
+        end_datetime:
+          type: string
+          format: date-time
+          description: Конец слота занятости
+        description:
+          type: string
+          nullable: true
+          description: Описание события
+        created_at:
+          type: string
+          format: date-time
+          description: Дата создания слота
+        task_assignment_id:
+          type: integer
+          nullable: true
+          description: ID назначения задачи
+
+    BusySlotCreateRequest:
+      type: object
+      required:
+        - slot_type
+        - start_datetime
+        - end_datetime
+      properties:
+        slot_type:
+          type: string
+          description: Тип слота занятости
+        start_datetime:
+          type: string
+          format: date-time
+        end_datetime:
+          type: string
+          format: date-time
+        description:
+          type: string
+          nullable: true
+        task_assignment_id:
+          type: integer
+          nullable: true
+
+    TaskChangeRequestResponse:
+      type: object
+      required:
+        - id
+        - task_assignment_id
+        - requested_by_id
+        - reason
+        - status
+        - created_at
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор запроса
+          example: 4
+        task_assignment_id:
+          type: integer
+          description: ID назначения задачи
+        requested_by_id:
+          type: integer
+          description: ID пользователя, создавшего запрос
+        reason:
+          type: string
+          description: Причина запроса
+        status:
+          type: string
+          description: Статус запроса
+          example: pending
+        created_at:
+          type: string
+          format: date-time
+          description: Дата создания запроса
+        handled_by_id:
+          type: integer
+          nullable: true
+          description: ID пользователя, обработавшего запрос
+        handled_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Дата обработки запроса
+
+    TaskChangeRequestCreateRequest:
+      type: object
+      required:
+        - task_assignment_id
+        - requested_by_id
+        - reason
+      properties:
+        task_assignment_id:
+          type: integer
+          description: ID назначения задачи
+        requested_by_id:
+          type: integer
+          description: ID пользователя
+        reason:
+          type: string
+          description: Причина запроса
