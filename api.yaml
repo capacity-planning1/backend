@@ -35,7 +35,7 @@ paths:
       tags: [Students]
       summary: Получить профиль текущего студента
       security:
-        - bearerAuth: []
+        - oauth2: [students:read]
       responses:
         '200':
           description: Профиль текущего студента
@@ -47,13 +47,16 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
 
   /students:
     get:
       tags: [Students]
       summary: Получить список студентов
       security:
-        - bearerAuth: []
+        - oauth2: [students:read]
       parameters:
         - $ref: '#/components/parameters/Page'
         - $ref: '#/components/parameters/PageSize'
@@ -72,13 +75,15 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /students/{student_id}:
     get:
       tags: [Students]
       summary: Получить информацию о студенте
       security:
-        - bearerAuth: []
+        - oauth2: [students:read]
       parameters:
         - $ref: '#/components/parameters/StudentId'
       responses:
@@ -92,11 +97,13 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     put:
       tags: [Students]
       summary: Обновить данные студента
       security:
-        - bearerAuth: []
+        - oauth2: [students:write]
       parameters:
         - $ref: '#/components/parameters/StudentId'
       requestBody:
@@ -118,11 +125,13 @@ paths:
           $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags: [Students]
       summary: Удалить студента
       security:
-        - bearerAuth: []
+        - oauth2: [students:write]
       parameters:
         - $ref: '#/components/parameters/StudentId'
       responses:
@@ -132,13 +141,15 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /projects:
     get:
       tags: [Projects]
       summary: Получить список проектов
       security:
-        - bearerAuth: []
+        - oauth2: [projects:read]
       parameters:
         - $ref: '#/components/parameters/Page'
         - $ref: '#/components/parameters/PageSize'
@@ -157,11 +168,13 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     post:
       tags: [Projects]
       summary: Создать проект
       security:
-        - bearerAuth: []
+        - oauth2: [projects:write]
       requestBody:
         $ref: '#/components/requestBodies/ProjectCreateBody'
       responses:
@@ -175,13 +188,15 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '422':
           $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /projects/join:
     post:
       tags: [Projects]
       summary: Вступить в проект
       security:
-        - bearerAuth: []
+        - oauth2: [projects:write]
       requestBody:
         $ref: '#/components/requestBodies/ProjectJoinBody'
       responses:
@@ -197,13 +212,15 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /projects/{project_id}:
     get:
       tags: [Projects]
       summary: Получить информацию о проекте
       security:
-        - bearerAuth: []
+        - oauth2: [projects:read]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
       responses:
@@ -217,11 +234,13 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     put:
       tags: [Projects]
       summary: Обновить проект
       security:
-        - bearerAuth: []
+        - oauth2: [projects:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
       requestBody:
@@ -241,11 +260,13 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags: [Projects]
       summary: Удалить проект
       security:
-        - bearerAuth: []
+        - oauth2: [projects:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
       responses:
@@ -255,13 +276,15 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /projects/{project_id}/members:
     get:
       tags: [ProjectMembers]
       summary: Получить список участников проекта
       security:
-        - bearerAuth: []
+        - oauth2: [projects:read]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/Page'
@@ -282,11 +305,13 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     post:
       tags: [ProjectMembers]
       summary: Добавить участника в проект
       security:
-        - bearerAuth: []
+        - oauth2: [projects:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
       requestBody:
@@ -306,13 +331,15 @@ paths:
           $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /projects/{project_id}/members/{student_id}:
     get:
       tags: [ProjectMembers]
       summary: Получить информацию об участнике проекта
       security:
-        - bearerAuth: []
+        - oauth2: [projects:read]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/StudentId'
@@ -327,11 +354,13 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     put:
       tags: [ProjectMembers]
       summary: Обновить данные участника проекта
       security:
-        - bearerAuth: []
+        - oauth2: [projects:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/StudentId'
@@ -352,11 +381,13 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags: [ProjectMembers]
       summary: Удалить участника из проекта
       security:
-        - bearerAuth: []
+        - oauth2: [projects:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/StudentId'
@@ -367,13 +398,15 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /projects/{project_id}/teams:
     get:
       tags: [Teams]
       summary: Получить список команд проекта
       security:
-        - bearerAuth: []
+        - oauth2: [teams:read]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/Page'
@@ -389,11 +422,13 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     post:
       tags: [Teams]
       summary: Создать команду внутри проекта
       security:
-        - bearerAuth: []
+        - oauth2: [teams:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
       requestBody:
@@ -411,13 +446,15 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /projects/{project_id}/teams/{team_id}:
     get:
       tags: [Teams]
       summary: Получить информацию о команде проекта
       security:
-        - bearerAuth: []
+        - oauth2: [teams:read]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/TeamId'
@@ -432,11 +469,13 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     put:
       tags: [Teams]
       summary: Обновить команду проекта
       security:
-        - bearerAuth: []
+        - oauth2: [teams:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/TeamId'
@@ -457,11 +496,13 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags: [Teams]
       summary: Удалить команду из проекта
       security:
-        - bearerAuth: []
+        - oauth2: [teams:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/TeamId'
@@ -472,13 +513,15 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /projects/{project_id}/teams/{team_id}/members:
     get:
       tags: [TeamMembership]
       summary: Получить список участников конкретной команды
       security:
-        - bearerAuth: []
+        - oauth2: [teams:read]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/TeamId'
@@ -495,11 +538,13 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     post:
       tags: [TeamMembership]
       summary: Добавить участника проекта в команду
       security:
-        - bearerAuth: []
+        - oauth2: [teams:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/TeamId'
@@ -520,13 +565,15 @@ paths:
           $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /projects/{project_id}/teams/{team_id}/members/{student_id}:
     put:
       tags: [TeamMembership]
       summary: Обновить позицию участника в команде
       security:
-        - bearerAuth: []
+        - oauth2: [teams:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/TeamId'
@@ -548,11 +595,13 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags: [TeamMembership]
       summary: Удалить участника из команды
       security:
-        - bearerAuth: []
+        - oauth2: [teams:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/TeamId'
@@ -564,13 +613,15 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /projects/{project_id}/sprints:
     get:
       tags: [Sprints]
       summary: Получить список спринтов проекта
       security:
-        - bearerAuth: []
+        - oauth2: [projects:read]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/Page'
@@ -586,11 +637,13 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     post:
       tags: [Sprints]
       summary: Создать спринт проекта
       security:
-        - bearerAuth: []
+        - oauth2: [projects:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
       requestBody:
@@ -612,13 +665,15 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /projects/{project_id}/tasks:
     get:
       tags: [ProjectTasks]
       summary: Получить список задач проекта
       security:
-        - bearerAuth: []
+        - oauth2: [tasks:read]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/Page'
@@ -634,11 +689,13 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     post:
       tags: [ProjectTasks]
       summary: Создать задачу проекта
       security:
-        - bearerAuth: []
+        - oauth2: [tasks:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
       requestBody:
@@ -660,13 +717,15 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /projects/{project_id}/tasks/{task_id}/assignments:
     get:
       tags: [TaskAssignments]
       summary: Получить назначения задачи
       security:
-        - bearerAuth: []
+        - oauth2: [tasks:read]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/TaskId'
@@ -683,11 +742,13 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     post:
       tags: [TaskAssignments]
       summary: Назначить задачу участнику
       security:
-        - bearerAuth: []
+        - oauth2: [tasks:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/TaskId'
@@ -710,13 +771,15 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /students/{student_id}/busy-slots:
     get:
       tags: [BusySlots]
       summary: Получить слоты занятости студента
       security:
-        - bearerAuth: []
+        - oauth2: [busy_slots:read]
       parameters:
         - $ref: '#/components/parameters/StudentId'
         - $ref: '#/components/parameters/Page'
@@ -734,11 +797,13 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     post:
       tags: [BusySlots]
       summary: Создать слот занятости
       security:
-        - bearerAuth: []
+        - oauth2: [busy_slots:write]
       parameters:
         - $ref: '#/components/parameters/StudentId'
       requestBody:
@@ -760,13 +825,15 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /projects/{project_id}/change-requests:
     get:
       tags: [TaskChangeRequests]
       summary: Получить список запросов на изменение задач
       security:
-        - bearerAuth: []
+        - oauth2: [change_requests:read]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
       responses:
@@ -782,13 +849,15 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /projects/{project_id}/tasks/{task_id}/change-requests:
     post:
       tags: [TaskChangeRequests]
       summary: Создать запрос на изменение задачи
       security:
-        - bearerAuth: []
+        - oauth2: [change_requests:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/TaskId'
@@ -811,12 +880,15 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   /projects/{project_id}/sprints/{sprint_id}:
     get:
       tags: [Sprints]
       summary: Получить информацию о спринте
       security:
-        - bearerAuth: []
+        - oauth2: [projects:read]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/SprintId'
@@ -831,12 +903,13 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
-
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     put:
       tags: [Sprints]
       summary: Обновить спринт
       security:
-        - bearerAuth: []
+        - oauth2: [projects:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/SprintId'
@@ -861,12 +934,13 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationError'
-
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags: [Sprints]
       summary: Удалить спринт
       security:
-        - bearerAuth: []
+        - oauth2: [projects:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/SprintId'
@@ -877,14 +951,15 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
-
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /projects/{project_id}/tasks/{task_id}:
     get:
       tags: [ProjectTasks]
       summary: Получить информацию о задаче
       security:
-        - bearerAuth: []
+        - oauth2: [tasks:read]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/TaskId'
@@ -899,12 +974,13 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
-
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     put:
       tags: [ProjectTasks]
       summary: Обновить задачу проекта
       security:
-        - bearerAuth: []
+        - oauth2: [tasks:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/TaskId'
@@ -929,12 +1005,13 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationError'
-
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags: [ProjectTasks]
       summary: Удалить задачу проекта
       security:
-        - bearerAuth: []
+        - oauth2: [tasks:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/TaskId'
@@ -945,14 +1022,15 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
-
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /projects/{project_id}/tasks/{task_id}/assignments/{project_member_id}:
     get:
       tags: [TaskAssignments]
       summary: Получить назначение задачи участнику
       security:
-        - bearerAuth: []
+        - oauth2: [tasks:read]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/TaskId'
@@ -968,12 +1046,13 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
-
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     put:
       tags: [TaskAssignments]
       summary: Обновить назначение задачи
       security:
-        - bearerAuth: []
+        - oauth2: [tasks:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/TaskId'
@@ -999,12 +1078,13 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationError'
-
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags: [TaskAssignments]
       summary: Удалить назначение задачи
       security:
-        - bearerAuth: []
+        - oauth2: [tasks:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/TaskId'
@@ -1016,14 +1096,15 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
-
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /students/{student_id}/busy-slots/{busy_slot_id}:
     get:
       tags: [BusySlots]
       summary: Получить информацию о слоте занятости
       security:
-        - bearerAuth: []
+        - oauth2: [busy_slots:read]
       parameters:
         - $ref: '#/components/parameters/StudentId'
         - $ref: '#/components/parameters/BusySlotId'
@@ -1038,12 +1119,13 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
-
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     put:
       tags: [BusySlots]
       summary: Обновить слот занятости
       security:
-        - bearerAuth: []
+        - oauth2: [busy_slots:write]
       parameters:
         - $ref: '#/components/parameters/StudentId'
         - $ref: '#/components/parameters/BusySlotId'
@@ -1068,12 +1150,13 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationError'
-
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags: [BusySlots]
       summary: Удалить слот занятости
       security:
-        - bearerAuth: []
+        - oauth2: [busy_slots:write]
       parameters:
         - $ref: '#/components/parameters/StudentId'
         - $ref: '#/components/parameters/BusySlotId'
@@ -1084,14 +1167,15 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
-
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /projects/{project_id}/change-requests/{request_id}:
     get:
       tags: [TaskChangeRequests]
       summary: Получить информацию о запросе на изменение задачи
       security:
-        - bearerAuth: []
+        - oauth2: [change_requests:read]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/RequestId'
@@ -1106,12 +1190,13 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
-
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     put:
       tags: [TaskChangeRequests]
       summary: Обновить запрос на изменение задачи
       security:
-        - bearerAuth: []
+        - oauth2: [change_requests:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/RequestId'
@@ -1136,12 +1221,13 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ValidationError'
-
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags: [TaskChangeRequests]
       summary: Удалить запрос на изменение задачи
       security:
-        - bearerAuth: []
+        - oauth2: [change_requests:write]
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - $ref: '#/components/parameters/RequestId'
@@ -1152,13 +1238,29 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
-
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+          
 components:
   securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+    oauth2:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: /auth/token
+          scopes:
+            students:read: ""
+            students:write: ""
+            projects:read: ""
+            projects:write: ""
+            teams:read: ""
+            teams:write: ""
+            tasks:read: ""
+            tasks:write: ""
+            busy_slots:read: ""
+            busy_slots:write: ""
+            change_requests:read: ""
+            change_requests:write: ""
 
   parameters:
     Page:
@@ -1471,6 +1573,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ValidationErrorResponse'
+    InternalServerError:
+      description: Внутренняя ошибка сервера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
 
   schemas:
     TaskStatus:
