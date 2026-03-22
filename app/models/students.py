@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from enum import Enum
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy import Column, Text
 from sqlmodel import Field, SQLModel
@@ -14,7 +14,7 @@ class SlotType(str, Enum):
 
 
 class Student(SQLModel, table=True):
-    id: UUID = Field(default_factory=UUID, primary_key=True)
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
     email: str = Field(index=True, nullable=False, max_length=255)
 
@@ -28,7 +28,7 @@ class Student(SQLModel, table=True):
 
 
 class BusySlot(SQLModel, table=True):
-    id: UUID = Field(default_factory=UUID, primary_key=True)
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
     student_id: UUID = Field(foreign_key='student.id')
 

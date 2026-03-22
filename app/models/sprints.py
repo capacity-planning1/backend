@@ -1,6 +1,6 @@
 from datetime import date, datetime, timezone
 from enum import Enum
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy import Column, Text
 from sqlmodel import Field, SQLModel
@@ -28,7 +28,7 @@ class TaskChangeRequestStatus(str, Enum):
 
 
 class Sprint(SQLModel, table=True):
-    id: UUID = Field(default_factory=UUID, primary_key=True)
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
     project_id: UUID = Field(foreign_key='project.id', nullable=False)
 
@@ -42,11 +42,11 @@ class Sprint(SQLModel, table=True):
 
 
 class SprintTask(SQLModel, table=True):
-    id: UUID = Field(default_factory=UUID, primary_key=True)
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
     project_id: UUID = Field(foreign_key='project.id', nullable=False)
 
-    sprint_id: int = Field(foreign_key='sripnt.id', nullable=False)
+    sprint_id: UUID = Field(foreign_key='sprint.id', nullable=False)
 
     title: str = Field(nullable=False, max_length=255)
 
@@ -60,9 +60,9 @@ class SprintTask(SQLModel, table=True):
 
 
 class TaskAssignment(SQLModel, table=True):
-    id: UUID = Field(default_factory=UUID, primary_key=True)
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
-    project_task_id: UUID = Field(foreign_key='projecttask.id', nullable=False)
+    project_task_id: UUID = Field(foreign_key='sprinttask.id', nullable=False)
 
     project_member_id: UUID = Field(foreign_key='projectmember.id', nullable=False)
 
@@ -72,7 +72,7 @@ class TaskAssignment(SQLModel, table=True):
 
 
 class TaskChangeRequest(SQLModel, table=True):
-    id: UUID = Field(default_factory=UUID, primary_key=True)
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
     task_assignment_id: UUID = Field(foreign_key='taskassignment.id', nullable=False)
 

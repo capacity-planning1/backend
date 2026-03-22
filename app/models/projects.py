@@ -1,12 +1,12 @@
 from datetime import date, datetime, timezone
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy import Column, Text
 from sqlmodel import Field, SQLModel
 
 
 class Project(SQLModel, table=True):
-    id: UUID = Field(default_factory=UUID, primary_key=True)
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
     name: str = Field(nullable=False, max_length=255)
 
@@ -18,7 +18,7 @@ class Project(SQLModel, table=True):
 
 
 class ProjectMember(SQLModel, table=True):
-    id: UUID = Field(default_factory=UUID, primary_key=True)
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
     project_id: UUID = Field(foreign_key='project.id', nullable=False)
 
@@ -32,7 +32,7 @@ class ProjectMember(SQLModel, table=True):
 
 
 class Team(SQLModel, table=True):
-    id: UUID = Field(default_factory=UUID, primary_key=True)
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
     project_id: UUID = Field(foreign_key='project.id', nullable=False)
 
@@ -42,7 +42,7 @@ class Team(SQLModel, table=True):
 
 
 class TeamMembership(SQLModel, table=True):
-    id: UUID = Field(default=None, primary_key=True)
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
     team_id: UUID = Field(foreign_key='team.id', nullable=False)
 
