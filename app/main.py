@@ -2,12 +2,12 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.database import create_db_and_tables
+from app.db.database import create_db_and_tables
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    create_db_and_tables()
+    await create_db_and_tables()
     yield
 
 
