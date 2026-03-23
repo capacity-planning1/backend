@@ -24,7 +24,7 @@ REST API на FastAPI, которое помогает тимлидам студ
 ## Переменные окружения
 | Название переменной | Тип    | Описание                                   | Значение по умолчанию |
 |---------------------|--------|--------------------------------------------|-----------------------|
-| POSTGRES_HOST       | string | Хост локальной базы PostgreSQL.            | localhost             |
+| POSTGRES_HOST       | string | Хост локальной базы PostgreSQL.            | 127.0.0.1             |
 | POSTGRES_PORT       | int    | Порт подключения к PostgreSQL.             | 5432                  |
 | POSTGRES_DB         | string | Имя базы данных для приложения.            | capacity_planning     |
 | POSTGRES_USER       | string | Пользователь PostgreSQL с правами на базу. | postgres              |
