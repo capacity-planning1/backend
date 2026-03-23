@@ -42,23 +42,23 @@ class ProjectUpdate(SQLModel):
 class ProjectModel(ProjectPublic, table=True):
     __tablename__ = "project"
 
-    owner: "StudentModel" = Relationship(
+    owner: StudentModel = Relationship(
         back_populates="owned_projects",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    members: list["ProjectMemberModel"] = Relationship(
+    members: list[ProjectMemberModel] = Relationship(
         back_populates="project",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    teams: list["TeamModel"] = Relationship(
+    teams: list[TeamModel] = Relationship(
         back_populates="project",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    sprints: list["SprintModel"] = Relationship(
+    sprints: list[SprintModel] = Relationship(
         back_populates="project",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    tasks: list["SprintTaskModel"] = Relationship(
+    tasks: list[SprintTaskModel] = Relationship(
         back_populates="project",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
@@ -89,23 +89,23 @@ class ProjectMemberUpdate(SQLModel):
 class ProjectMemberModel(ProjectMemberPublic, table=True):
     __tablename__ = "projectmember"
 
-    project: "ProjectModel" = Relationship(
+    project: ProjectModel = Relationship(
         back_populates="members",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    student: "StudentModel" = Relationship(
+    student: StudentModel = Relationship(
         back_populates="memberships",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    team_memberships: list["TeamMembershipModel"] = Relationship(
+    team_memberships: list[TeamMembershipModel] = Relationship(
         back_populates="project_member",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    assignments: list["TaskAssignmentModel"] = Relationship(
+    assignments: list[TaskAssignmentModel] = Relationship(
         back_populates="project_member",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    change_requests: list["TaskChangeRequestModel"] = Relationship(
+    change_requests: list[TaskChangeRequestModel] = Relationship(
         back_populates="requested_by_member",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
@@ -133,11 +133,11 @@ class TeamUpdate(SQLModel):
 class TeamModel(TeamPublic, table=True):
     __tablename__ = "team"
 
-    project: "ProjectModel" = Relationship(
+    project: ProjectModel = Relationship(
         back_populates="teams",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    memberships: list["TeamMembershipModel"] = Relationship(
+    memberships: list[TeamMembershipModel] = Relationship(
         back_populates="team",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
@@ -164,11 +164,11 @@ class TeamMembershipUpdate(SQLModel):
 class TeamMembershipModel(TeamMembershipPublic, table=True):
     __tablename__ = "teammembership"
 
-    team: "TeamModel" = Relationship(
+    team: TeamModel = Relationship(
         back_populates="memberships",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    project_member: "ProjectMemberModel" = Relationship(
+    project_member: ProjectMemberModel = Relationship(
         back_populates="team_memberships",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
