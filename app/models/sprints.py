@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from datetime import date, datetime, timezone
 from enum import Enum
-from typing import TYPE_CHECKING
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy import Column, Text
 from sqlmodel import Field, Relationship, SQLModel
@@ -36,11 +35,8 @@ class TaskChangeRequestStatus(str, Enum):
     REJECTED = "rejected"
 
 
-class SprintBase(SQLModel):
-    project_id: UUID = Field(foreign_key="project.id", nullable=False)
-    name: str = Field(nullable=False, max_length=100)
-    start_date: date = Field(nullable=False)
-    end_date: date = Field(nullable=False)
+class Sprint(SQLModel, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
 
 class SprintPublic(BaseModel, SprintBase):
@@ -56,18 +52,13 @@ class SprintUpdate(SQLModel):
     start_date: date | None = None
     end_date: date | None = None
 
+class SprintTask(SQLModel, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
 class SprintModel(SprintPublic, table=True):
     __tablename__ = "sprint"
 
-    project: "ProjectModel" = Relationship(
-        back_populates="sprints",
-        sa_relationship_kwargs={"lazy": "selectin"},
-    )
-    tasks: list["SprintTaskModel"] = Relationship(
-        back_populates="sprint",
-        sa_relationship_kwargs={"lazy": "selectin"},
-    )
+    sprint_id: UUID = Field(foreign_key='sprint.id', nullable=False)
 
 
 class SprintTaskBase(SQLModel):
@@ -93,9 +84,10 @@ class SprintTaskUpdate(SQLModel):
     status: StatusType | None = None
     priority: TaskPriority | None = None
 
+class TaskAssignment(SQLModel, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
-class SprintTaskModel(SprintTaskPublic, table=True):
-    __tablename__ = "sprinttask"
+    project_task_id: UUID = Field(foreign_key='sprinttask.id', nullable=False)
 
     sprint: "SprintModel" = Relationship(
         back_populates="tasks",
@@ -120,8 +112,8 @@ class TaskAssignmentBase(SQLModel):
     accepted_at: datetime | None = None
 
 
-class TaskAssignmentPublic(BaseModel, TaskAssignmentBase):
-    pass
+class TaskChangeRequest(SQLModel, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
 
 class TaskAssignmentCreate(TaskAssignmentBase):

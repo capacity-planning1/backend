@@ -1,22 +1,13 @@
-from __future__ import annotations
-
-from datetime import date
-from typing import TYPE_CHECKING
-from uuid import UUID
+from datetime import date, datetime, timezone
+from uuid import UUID, uuid4
 
 from sqlalchemy import Column, Text
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.base import BaseModel
 
-if TYPE_CHECKING:
-    from app.models.sprints import (
-        SprintModel,
-        SprintTaskModel,
-        TaskAssignmentModel,
-        TaskChangeRequestModel,
-    )
-    from app.models.students import StudentModel
+class Project(SQLModel, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
 
 class ProjectBase(SQLModel):
@@ -39,8 +30,8 @@ class ProjectUpdate(SQLModel):
     owner_student_id: UUID | None = None
 
 
-class ProjectModel(ProjectPublic, table=True):
-    __tablename__ = "project"
+class ProjectMember(SQLModel, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
     owner: "StudentModel" = Relationship(
         back_populates="owned_projects",
@@ -76,8 +67,8 @@ class ProjectMemberPublic(BaseModel, ProjectMemberBase):
     pass
 
 
-class ProjectMemberCreate(ProjectMemberBase):
-    pass
+class Team(SQLModel, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
 
 class ProjectMemberUpdate(SQLModel):
@@ -117,9 +108,8 @@ class TeamBase(SQLModel):
     description: str | None = Field(default=None, sa_column=Column(Text))
 
 
-class TeamPublic(BaseModel, TeamBase):
-    pass
-
+class TeamMembership(SQLModel, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
 class TeamCreate(TeamBase):
     pass

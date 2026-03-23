@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from enum import Enum
-from typing import TYPE_CHECKING
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy import Column, Text
 from sqlmodel import Field, Relationship, SQLModel
@@ -15,11 +14,8 @@ if TYPE_CHECKING:
     from app.models.sprints import TaskAssignmentModel
 
 
-class SlotType(str, Enum):
-    PAIR = "pair"
-    CREDIT = "credit"
-    EXAM = "exam"
-    PERSONAL = "personal"
+class Student(SQLModel, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
 
 class StudentBase(SQLModel):
@@ -33,8 +29,8 @@ class StudentPublic(BaseModel, StudentBase):
     pass
 
 
-class StudentCreate(StudentBase):
-    pass
+class BusySlot(SQLModel, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
 
 class StudentUpdate(SQLModel):
