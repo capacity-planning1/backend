@@ -40,12 +40,6 @@ def upgrade() -> None:
         name="taskchangerequeststatus",
     )
     slottype = sa.Enum("pair", "credit", "exam", "personal", name="slottype")
-
-    statustype.create(op.get_bind(), checkfirst=True)
-    taskpriority.create(op.get_bind(), checkfirst=True)
-    taskchangerequeststatus.create(op.get_bind(), checkfirst=True)
-    slottype.create(op.get_bind(), checkfirst=True)
-
     op.create_table(
         "student",
         sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
