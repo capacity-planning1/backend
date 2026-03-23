@@ -1,87 +1,184 @@
+from __future__ import annotations
+
 from datetime import date, datetime, timezone
 from enum import Enum
 from uuid import UUID, uuid4
 
 from sqlalchemy import Column, Text
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
+
+from app.models.base import BaseModel
+
+if TYPE_CHECKING:
+    from app.models.projects import ProjectMemberModel, ProjectModel
+    from app.models.students import BusySlotModel
 
 
 class StatusType(str, Enum):
-    OPEN = 'open'
-    IN_PROGRESS = 'in_progress'
-    REVIEW = 'review'
-    TESTING = 'testing'
-    DONE = 'done'
+    OPEN = "open"
+    IN_PROGRESS = "in_progress"
+    REVIEW = "review"
+    TESTING = "testing"
+    DONE = "done"
 
 
-class TaskPriority(int, Enum):
-    LOW = 1
-    MEDIUM = 2
-    HIGH = 3
-    CRITICAL = 4
+class TaskPriority(str, Enum):
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
+    CRITICAL = "CRITICAL"
 
 
 class TaskChangeRequestStatus(str, Enum):
-    PENDING = 'pending'
-    APPROVED = 'approved'
-    REJECTED = 'rejected'
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
 
 
 class Sprint(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
 
-    project_id: UUID = Field(foreign_key='project.id', nullable=False)
 
-    name: str = Field(nullable=False, max_length=100)
+class SprintPublic(BaseModel, SprintBase):
+    pass
 
-    start_date: date = Field(nullable=False)
 
-    end_date: date = Field(nullable=False)
+class SprintCreate(SprintBase):
+    pass
 
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+class SprintUpdate(SQLModel):
+    name: str | None = Field(default=None, max_length=100)
+    start_date: date | None = None
+    end_date: date | None = None
 
 class SprintTask(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
 
-    project_id: UUID = Field(foreign_key='project.id', nullable=False)
+class SprintModel(SprintPublic, table=True):
+    __tablename__ = "sprint"
 
     sprint_id: UUID = Field(foreign_key='sprint.id', nullable=False)
 
+
+class SprintTaskBase(SQLModel):
+    project_id: UUID = Field(foreign_key="project.id", nullable=False)
+    sprint_id: UUID = Field(foreign_key="sprint.id", nullable=False)
     title: str = Field(nullable=False, max_length=255)
-
     description: str | None = Field(default=None, sa_column=Column(Text))
+    status: StatusType = Field(default=StatusType.OPEN, nullable=False)
+    priority: TaskPriority = Field(default=TaskPriority.LOW, nullable=False)
 
-    status: StatusType = Field(default=StatusType.OPEN)
 
-    priority: TaskPriority = Field(default=TaskPriority.LOW)
+class SprintTaskPublic(BaseModel, SprintTaskBase):
+    pass
 
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+class SprintTaskCreate(SprintTaskBase):
+    pass
+
+
+class SprintTaskUpdate(SQLModel):
+    title: str | None = Field(default=None, max_length=255)
+    description: str | None = None
+    status: StatusType | None = None
+    priority: TaskPriority | None = None
 
 class TaskAssignment(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
 
     project_task_id: UUID = Field(foreign_key='sprinttask.id', nullable=False)
 
-    project_member_id: UUID = Field(foreign_key='projectmember.id', nullable=False)
+    sprint: "SprintModel" = Relationship(
+        back_populates="tasks",
+        sa_relationship_kwargs={"lazy": "selectin"},
+    )
+    project: "ProjectModel" = Relationship(
+        back_populates="tasks",
+        sa_relationship_kwargs={"lazy": "selectin"},
+    )
+    assignments: list["TaskAssignmentModel"] = Relationship(
+        back_populates="task",
+        sa_relationship_kwargs={"lazy": "selectin"},
+    )
 
-    assignet_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    accepted_at: datetime | None = Field(default=None)
+class TaskAssignmentBase(SQLModel):
+    project_task_id: UUID = Field(foreign_key="sprinttask.id", nullable=False)
+    project_member_id: UUID = Field(foreign_key="projectmember.id", nullable=False)
+    assigned_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc), nullable=False
+    )
+    accepted_at: datetime | None = None
 
 
 class TaskChangeRequest(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
 
-    task_assignment_id: UUID = Field(foreign_key='taskassignment.id', nullable=False)
 
-    requested_by_member_id: UUID = Field(foreign_key='projectmember.id', nullable=False)
+class TaskAssignmentCreate(TaskAssignmentBase):
+    pass
 
+
+class TaskAssignmentUpdate(SQLModel):
+    accepted_at: datetime | None = None
+
+
+class TaskAssignmentModel(TaskAssignmentPublic, table=True):
+    __tablename__ = "taskassignment"
+
+    task: "SprintTaskModel" = Relationship(
+        back_populates="assignments",
+        sa_relationship_kwargs={"lazy": "selectin"},
+    )
+    project_member: "ProjectMemberModel" = Relationship(
+        back_populates="assignments",
+        sa_relationship_kwargs={"lazy": "selectin"},
+    )
+    busy_slots: list["BusySlotModel"] = Relationship(
+        back_populates="task_assignment",
+        sa_relationship_kwargs={"lazy": "selectin"},
+    )
+    change_requests: list["TaskChangeRequestModel"] = Relationship(
+        back_populates="task_assignment",
+        sa_relationship_kwargs={"lazy": "selectin"},
+    )
+
+
+class TaskChangeRequestBase(SQLModel):
+    task_assignment_id: UUID = Field(foreign_key="taskassignment.id", nullable=False)
+    requested_by_member_id: UUID = Field(
+        foreign_key="projectmember.id", nullable=False
+    )
     reason: str | None = Field(default=None, sa_column=Column(Text))
+    status: TaskChangeRequestStatus = Field(
+        default=TaskChangeRequestStatus.PENDING, nullable=False
+    )
+    handled_at: datetime | None = None
 
-    status: TaskChangeRequestStatus = Field(default=TaskChangeRequestStatus.PENDING)
 
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+class TaskChangeRequestPublic(BaseModel, TaskChangeRequestBase):
+    pass
 
-    handled_at: datetime | None = Field(default=None)
+
+class TaskChangeRequestCreate(TaskChangeRequestBase):
+    pass
+
+
+class TaskChangeRequestUpdate(SQLModel):
+    status: TaskChangeRequestStatus | None = None
+    reason: str | None = None
+    handled_at: datetime | None = None
+
+
+class TaskChangeRequestModel(TaskChangeRequestPublic, table=True):
+    __tablename__ = "taskchangerequest"
+
+    task_assignment: "TaskAssignmentModel" = Relationship(
+        back_populates="change_requests",
+        sa_relationship_kwargs={"lazy": "selectin"},
+    )
+    requested_by_member: "ProjectMemberModel" = Relationship(
+        back_populates="change_requests",
+        sa_relationship_kwargs={"lazy": "selectin"},
+    )
