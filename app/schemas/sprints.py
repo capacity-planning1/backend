@@ -12,13 +12,14 @@ from app.models.sprints import (
 from app.schemas.base import CommonListFilters
 
 
-class SptintFilters(CommonListFilters):
+class SprintFilters(CommonListFilters):
     name: Optional[str] = None
+    project_id: Optional[UUID] = None
     start_date: Optional[date] = None
     end_date: Optional[date] = None
     created_at: Optional[datetime] = None
 
-    @field_validator("sort_by")
+    @field_validator('sort_by')
     def validate_sort_field(self, v):
         if v is None:
             return v
@@ -27,8 +28,7 @@ class SptintFilters(CommonListFilters):
 
         if v not in allowed_filters:
             raise ValueError(
-                f"Project sorting by '{v}' not allowed. "
-                f"Allowed: {allowed_filters}"
+                f"Project sorting by '{v}' not allowed. Allowed: {allowed_filters}"
             )
         return v
 
@@ -38,8 +38,10 @@ class SprintTaskFilters(CommonListFilters):
     status: Optional[StatusType] = None
     priority: Optional[TaskPriority] = None
     created_at: Optional[datetime] = None
+    project_id: Optional[UUID] = None
+    sprint_id: Optional[UUID] = None
 
-    @field_validator("sort_by")
+    @field_validator('sort_by')
     def validate_sort_field(self, v):
         if v is None:
             return v
@@ -48,18 +50,18 @@ class SprintTaskFilters(CommonListFilters):
 
         if v not in allowed_filters:
             raise ValueError(
-                f"Project sorting by '{v}' not allowed. "
-                f"Allowed: {allowed_filters}"
+                f"Project sorting by '{v}' not allowed. Allowed: {allowed_filters}"
             )
         return v
 
 
 class TaskAssignmentFilters(CommonListFilters):
-    project_member: Optional[UUID] = None
+    project_member_id: Optional[UUID] = None
+    project_task_id: Optional[UUID] = None
     assignet_at: Optional[datetime] = None
     accepted_at: Optional[datetime] = None
 
-    @field_validator("sort_by")
+    @field_validator('sort_by')
     def validate_sort_field(self, v):
         if v is None:
             return v
@@ -68,8 +70,7 @@ class TaskAssignmentFilters(CommonListFilters):
 
         if v not in allowed_filters:
             raise ValueError(
-                f"Project sorting by '{v}' not allowed. "
-                f"Allowed: {allowed_filters}"
+                f"Project sorting by '{v}' not allowed. Allowed: {allowed_filters}"
             )
         return v
 
@@ -77,10 +78,11 @@ class TaskAssignmentFilters(CommonListFilters):
 class TaskChangeRequestFilters(CommonListFilters):
     status: Optional[TaskChangeRequestStatus] = None
     requested_by_member_id: Optional[UUID] = None
+    task_assignment_id: Optional[UUID] = None
     created_at: Optional[datetime] = None
     handled_at: Optional[datetime] = None
 
-    @field_validator("sort_by")
+    @field_validator('sort_by')
     def validate_sort_field(self, v):
         if v is None:
             return v
@@ -89,7 +91,6 @@ class TaskChangeRequestFilters(CommonListFilters):
 
         if v not in allowed_filters:
             raise ValueError(
-                f"Project sorting by '{v}' not allowed. "
-                f"Allowed: {allowed_filters}"
+                f"Project sorting by '{v}' not allowed. Allowed: {allowed_filters}"
             )
         return v

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING
 from uuid import UUID
@@ -16,10 +16,10 @@ if TYPE_CHECKING:
 
 
 class SlotType(str, Enum):
-    PAIR = "pair"
-    CREDIT = "credit"
-    EXAM = "exam"
-    PERSONAL = "personal"
+    PAIR = 'pair'
+    CREDIT = 'credit'
+    EXAM = 'exam'
+    PERSONAL = 'personal'
 
 
 class StudentBase(SQLModel):
@@ -45,31 +45,31 @@ class StudentUpdate(SQLModel):
 
 
 class StudentModel(StudentPublic, table=True):
-    __tablename__ = "student"
+    __tablename__ = 'student'
 
-    memberships: list["ProjectMemberModel"] = Relationship(
-        back_populates="student",
-        sa_relationship_kwargs={"lazy": "selectin"},
+    memberships: list['ProjectMemberModel'] = Relationship(
+        back_populates='student',
+        sa_relationship_kwargs={'lazy': 'selectin'},
     )
-    owned_projects: list["ProjectModel"] = Relationship(
-        back_populates="owner",
-        sa_relationship_kwargs={"lazy": "selectin"},
+    owned_projects: list['ProjectModel'] = Relationship(
+        back_populates='owner',
+        sa_relationship_kwargs={'lazy': 'selectin'},
     )
-    busy_slots: list["BusySlotModel"] = Relationship(
-        back_populates="student",
-        sa_relationship_kwargs={"lazy": "selectin"},
+    busy_slots: list['BusySlotModel'] = Relationship(
+        back_populates='student',
+        sa_relationship_kwargs={'lazy': 'selectin'},
     )
 
 
 class BusySlotBase(SQLModel):
-    student_id: UUID = Field(foreign_key="student.id", nullable=False)
+    student_id: UUID = Field(foreign_key='student.id', nullable=False)
     slot_type: SlotType = Field(nullable=False)
     start_datetime: datetime = Field(nullable=False)
     end_datetime: datetime = Field(nullable=False)
     title: str = Field(nullable=False, max_length=255)
     description: str | None = Field(default=None, sa_column=Column(Text))
     source: str = Field(nullable=False, max_length=50)
-    task_assignment_id: UUID = Field(foreign_key="taskassignment.id", nullable=False)
+    task_assignment_id: UUID = Field(foreign_key='taskassignment.id', nullable=False)
 
 
 class BusySlotPublic(BaseModel, BusySlotBase):
@@ -90,13 +90,13 @@ class BusySlotUpdate(SQLModel):
 
 
 class BusySlotModel(BusySlotPublic, table=True):
-    __tablename__ = "busyslot"
+    __tablename__ = 'busyslot'
 
-    student: "StudentModel" = Relationship(
-        back_populates="busy_slots",
-        sa_relationship_kwargs={"lazy": "selectin"},
+    student: 'StudentModel' = Relationship(
+        back_populates='busy_slots',
+        sa_relationship_kwargs={'lazy': 'selectin'},
     )
-    task_assignment: "TaskAssignmentModel" = Relationship(
-        back_populates="busy_slots",
-        sa_relationship_kwargs={"lazy": "selectin"},
+    task_assignment: 'TaskAssignmentModel' = Relationship(
+        back_populates='busy_slots',
+        sa_relationship_kwargs={'lazy': 'selectin'},
     )

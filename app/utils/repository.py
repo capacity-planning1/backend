@@ -1,15 +1,14 @@
-from typing import Generic, Optional, Sequence, TypeAlias, TypeVar
+from typing import Any, Generic, Optional, Sequence, TypeAlias, TypeVar
 from uuid import UUID
 
-from app.dependencies.session import SessionDep
 from generics import get_filled_type
 from pydantic import BaseModel as PydanticBaseModel
 from sqlalchemy.sql._typing import _ColumnExpressionArgument
-from sqlmodel import and_, select
+from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from app.dependencies.session import SessionDep
 from app.models.base import BaseModel
-
 
 FilterType: TypeAlias = _ColumnExpressionArgument[bool] | bool
 
@@ -35,27 +34,37 @@ class Repository(Generic[ModelT]):
     async def fetch(
         self,
         filters: Optional[PydanticBaseModel] = None,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None,
     ) -> Sequence[ModelT]:
         select_statement = select(self.model)
+
+        offset = 0
+        limit = 100
+
         if filters is not None:
-            filters_statement = and_(True)
-            filters_dict = filters.model_dump()
-            for key, value in filters_dict.items():
-                if not hasattr(self.__model, key):
-                    continue
-                if value is not None:
-                    filters_statement = and_(
-                        filters_statement, getattr(self.__model, key) == value
+            filter_data = filters.model_dump(
+                exclude={'offset', 'limit', 'sort_by', 'sort_order'}, exclude_none=True
+            )
+
+            for key, value in filter_data.items():
+                if hasattr(self.model, key):
+                    select_statement = select_statement.where(
+                        getattr(self.model, key) == value
                     )
-            select_statement = select_statement.where(filters_statement)
-        if offset is not None:
-            select_statement = select_statement.offset(offset)
-        if limit is not None:
-            select_statement = select_statement.limit(limit)
-        entities = await self.__session.exec(select_statement)
-        return entities.all()
+
+            sort_by = getattr(filters, 'sort_by', None)
+            if sort_by and hasattr(self.model, sort_by):
+                column = getattr(self.model, sort_by)
+                sort_order = getattr(filters, 'sort_order', 'asc')
+                select_statement = select_statement.order_by(
+                    column.desc() if sort_order == 'desc' else column.asc()
+                )
+
+            offset = getattr(filters, 'offset', 0)
+            limit = getattr(filters, 'limit', 100)
+
+        select_statement = select_statement.offset(offset).limit(limit)
+        result = await self.__session.execute(select_statement)
+        return result.scalars().all()
 
     async def save(self, instance: ModelT) -> ModelT:
         self.__session.add(instance)
@@ -88,3 +97,60 @@ class Repository(Generic[ModelT]):
                 setattr(instance, key, value)
         await self.save(instance)
         return instance
+
+    async def fetch_by_related_project(
+        self,
+        related_model: type,
+        current_foreign_key: str,
+        related_filter_field: str,
+        related_filter_value: Any,
+        filters: Optional[PydanticBaseModel] = None,
+    ) -> Sequence[ModelT]:
+        """
+        Получить все сущности ModelT, у которых через связанную модель
+        поле related_filter_field равно related_filter_value
+        Args:
+            related_model: Класс связанной модели
+            current_foreign_key: Имя поля в текущей модели
+            related_filter_field: Имя поля в связанной модели для фильтрации
+            related_filter_value: Значение для фильтрации по связанной модели
+            filters: Pydantic модель с фильтрами для основной модели
+        """
+        current_field = getattr(self.model, current_foreign_key)
+        related_id_field = related_model.id
+        related_filter_attr = getattr(related_model, related_filter_field)
+
+        select_statement = (
+            select(self.model)
+            .join(related_model, current_field == related_id_field)
+            .where(related_filter_attr == related_filter_value)
+        )
+
+        offset = 0
+        limit = 100
+
+        if filters is not None:
+            filter_data = filters.model_dump(
+                exclude={'offset', 'limit', 'sort_by', 'sort_order'}, exclude_none=True
+            )
+
+            for key, value in filter_data.items():
+                if hasattr(self.model, key):
+                    select_statement = select_statement.where(
+                        getattr(self.model, key) == value
+                    )
+
+            sort_by = getattr(filters, 'sort_by', None)
+            if sort_by and hasattr(self.model, sort_by):
+                column = getattr(self.model, sort_by)
+                sort_order = getattr(filters, 'sort_order', 'asc')
+                select_statement = select_statement.order_by(
+                    column.desc() if sort_order == 'desc' else column.asc()
+                )
+
+            offset = getattr(filters, 'offset', 0)
+            limit = getattr(filters, 'limit', 100)
+
+        select_statement = select_statement.offset(offset).limit(limit)
+        result = await self.__session.execute(select_statement)
+        return result.scalars().all()
