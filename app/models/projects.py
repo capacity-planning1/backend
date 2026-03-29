@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 class ProjectBase(SQLModel):
     name: str = Field(nullable=False, max_length=255)
     description: str | None = Field(default=None, sa_column=Column(Text))
-    owner_student_id: UUID = Field(foreign_key="student.id", nullable=False)
+    owner_student_id: UUID = Field(foreign_key='student.id', nullable=False)
 
 
 class ProjectPublic(BaseModel, ProjectBase):
@@ -40,7 +40,7 @@ class ProjectUpdate(SQLModel):
 
 
 class ProjectModel(ProjectPublic, table=True):
-    __tablename__ = "project"
+    __tablename__ = 'project'
 
     owner: StudentModel = Relationship(
         back_populates="owned_projects",
@@ -65,8 +65,8 @@ class ProjectModel(ProjectPublic, table=True):
 
 
 class ProjectMemberBase(SQLModel):
-    project_id: UUID = Field(foreign_key="project.id", nullable=False)
-    student_id: UUID = Field(foreign_key="student.id", nullable=False)
+    project_id: UUID = Field(foreign_key='project.id', nullable=False)
+    student_id: UUID = Field(foreign_key='student.id', nullable=False)
     role: str = Field(nullable=False, max_length=50)
     join_date: date = Field(default_factory=date.today, nullable=False)
     is_active: bool = Field(default=True, nullable=False)
@@ -87,7 +87,7 @@ class ProjectMemberUpdate(SQLModel):
 
 
 class ProjectMemberModel(ProjectMemberPublic, table=True):
-    __tablename__ = "projectmember"
+    __tablename__ = 'projectmember'
 
     project: ProjectModel = Relationship(
         back_populates="members",
@@ -112,7 +112,7 @@ class ProjectMemberModel(ProjectMemberPublic, table=True):
 
 
 class TeamBase(SQLModel):
-    project_id: UUID = Field(foreign_key="project.id", nullable=False)
+    project_id: UUID = Field(foreign_key='project.id', nullable=False)
     name: str = Field(nullable=False, max_length=100)
     description: str | None = Field(default=None, sa_column=Column(Text))
 
@@ -131,7 +131,7 @@ class TeamUpdate(SQLModel):
 
 
 class TeamModel(TeamPublic, table=True):
-    __tablename__ = "team"
+    __tablename__ = 'team'
 
     project: ProjectModel = Relationship(
         back_populates="teams",
@@ -144,8 +144,8 @@ class TeamModel(TeamPublic, table=True):
 
 
 class TeamMembershipBase(SQLModel):
-    team_id: UUID = Field(foreign_key="team.id", nullable=False)
-    project_member_id: UUID = Field(foreign_key="projectmember.id", nullable=False)
+    team_id: UUID = Field(foreign_key='team.id', nullable=False)
+    project_member_id: UUID = Field(foreign_key='projectmember.id', nullable=False)
     position: str = Field(nullable=False, max_length=100)
 
 
@@ -162,7 +162,7 @@ class TeamMembershipUpdate(SQLModel):
 
 
 class TeamMembershipModel(TeamMembershipPublic, table=True):
-    __tablename__ = "teammembership"
+    __tablename__ = 'teammembership'
 
     team: TeamModel = Relationship(
         back_populates="memberships",

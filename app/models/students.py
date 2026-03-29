@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING
 from uuid import UUID
@@ -16,10 +16,10 @@ if TYPE_CHECKING:
 
 
 class SlotType(str, Enum):
-    PAIR = "pair"
-    CREDIT = "credit"
-    EXAM = "exam"
-    PERSONAL = "personal"
+    PAIR = 'pair'
+    CREDIT = 'credit'
+    EXAM = 'exam'
+    PERSONAL = 'personal'
 
 
 class StudentBase(SQLModel):
@@ -46,7 +46,7 @@ class StudentUpdate(SQLModel):
 
 
 class StudentModel(StudentPublic, table=True):
-    __tablename__ = "student"
+    __tablename__ = 'student'
 
     password_hash: str = Field(nullable=False, max_length=255)
     registered_at: datetime = Field(
@@ -70,7 +70,7 @@ class StudentModel(StudentPublic, table=True):
 
 
 class BusySlotBase(SQLModel):
-    student_id: UUID = Field(foreign_key="student.id", nullable=False)
+    student_id: UUID = Field(foreign_key='student.id', nullable=False)
     slot_type: SlotType = Field(nullable=False)
     start_datetime: datetime = Field(nullable=False)
     end_datetime: datetime = Field(nullable=False)
@@ -94,7 +94,7 @@ class BusySlotUpdate(SQLModel):
 
 
 class BusySlotModel(BusySlotPublic, table=True):
-    __tablename__ = "busyslot"
+    __tablename__ = 'busyslot'
 
     student: StudentModel = Relationship(
         back_populates="busy_slots",

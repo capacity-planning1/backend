@@ -16,28 +16,28 @@ if TYPE_CHECKING:
 
 
 class StatusType(str, Enum):
-    OPEN = "open"
-    IN_PROGRESS = "in_progress"
-    REVIEW = "review"
-    TESTING = "testing"
-    DONE = "done"
+    OPEN = 'open'
+    IN_PROGRESS = 'in_progress'
+    REVIEW = 'review'
+    TESTING = 'testing'
+    DONE = 'done'
 
 
 class TaskPriority(str, Enum):
-    LOW = "LOW"
-    MEDIUM = "MEDIUM"
-    HIGH = "HIGH"
-    CRITICAL = "CRITICAL"
+    LOW = 'LOW'
+    MEDIUM = 'MEDIUM'
+    HIGH = 'HIGH'
+    CRITICAL = 'CRITICAL'
 
 
 class TaskChangeRequestStatus(str, Enum):
-    PENDING = "pending"
-    APPROVED = "approved"
-    REJECTED = "rejected"
+    PENDING = 'pending'
+    APPROVED = 'approved'
+    REJECTED = 'rejected'
 
 
 class SprintBase(SQLModel):
-    project_id: UUID = Field(foreign_key="project.id", nullable=False)
+    project_id: UUID = Field(foreign_key='project.id', nullable=False)
     name: str = Field(nullable=False, max_length=100)
     start_date: date = Field(nullable=False)
     end_date: date = Field(nullable=False)
@@ -58,7 +58,7 @@ class SprintUpdate(SQLModel):
 
 
 class SprintModel(SprintPublic, table=True):
-    __tablename__ = "sprint"
+    __tablename__ = 'sprint'
 
     project: ProjectModel = Relationship(
         back_populates="sprints",
@@ -71,8 +71,8 @@ class SprintModel(SprintPublic, table=True):
 
 
 class SprintTaskBase(SQLModel):
-    project_id: UUID = Field(foreign_key="project.id", nullable=False)
-    sprint_id: UUID = Field(foreign_key="sprint.id", nullable=False)
+    project_id: UUID = Field(foreign_key='project.id', nullable=False)
+    sprint_id: UUID = Field(foreign_key='sprint.id', nullable=False)
     title: str = Field(nullable=False, max_length=255)
     description: str | None = Field(default=None, sa_column=Column(Text))
     status: StatusType = Field(default=StatusType.OPEN, nullable=False)
@@ -95,7 +95,7 @@ class SprintTaskUpdate(SQLModel):
 
 
 class SprintTaskModel(SprintTaskPublic, table=True):
-    __tablename__ = "sprinttask"
+    __tablename__ = 'sprinttask'
 
     sprint: SprintModel = Relationship(
         back_populates="tasks",
@@ -112,8 +112,8 @@ class SprintTaskModel(SprintTaskPublic, table=True):
 
 
 class TaskAssignmentBase(SQLModel):
-    project_task_id: UUID = Field(foreign_key="sprinttask.id", nullable=False)
-    project_member_id: UUID = Field(foreign_key="projectmember.id", nullable=False)
+    project_task_id: UUID = Field(foreign_key='sprinttask.id', nullable=False)
+    project_member_id: UUID = Field(foreign_key='projectmember.id', nullable=False)
     assigned_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc), nullable=False
     )
@@ -134,7 +134,7 @@ class TaskAssignmentUpdate(SQLModel):
 
 
 class TaskAssignmentModel(TaskAssignmentPublic, table=True):
-    __tablename__ = "taskassignment"
+    __tablename__ = 'taskassignment'
 
     task: SprintTaskModel = Relationship(
         back_populates="assignments",
@@ -155,10 +155,8 @@ class TaskAssignmentModel(TaskAssignmentPublic, table=True):
 
 
 class TaskChangeRequestBase(SQLModel):
-    task_assignment_id: UUID = Field(foreign_key="taskassignment.id", nullable=False)
-    requested_by_member_id: UUID = Field(
-        foreign_key="projectmember.id", nullable=False
-    )
+    task_assignment_id: UUID = Field(foreign_key='taskassignment.id', nullable=False)
+    requested_by_member_id: UUID = Field(foreign_key='projectmember.id', nullable=False)
     reason: str | None = Field(default=None, sa_column=Column(Text))
     status: TaskChangeRequestStatus = Field(
         default=TaskChangeRequestStatus.PENDING, nullable=False
@@ -181,7 +179,7 @@ class TaskChangeRequestUpdate(SQLModel):
 
 
 class TaskChangeRequestModel(TaskChangeRequestPublic, table=True):
-    __tablename__ = "taskchangerequest"
+    __tablename__ = 'taskchangerequest'
 
     task_assignment: TaskAssignmentModel = Relationship(
         back_populates="change_requests",
