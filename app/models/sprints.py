@@ -60,13 +60,13 @@ class SprintUpdate(SQLModel):
 class SprintModel(SprintPublic, table=True):
     __tablename__ = 'sprint'
 
-    project: 'ProjectModel' = Relationship(
-        back_populates='sprints',
-        sa_relationship_kwargs={'lazy': 'selectin'},
+    project: ProjectModel = Relationship(
+        back_populates="sprints",
+        sa_relationship_kwargs={"lazy": "selectin"},
     )
-    tasks: list['SprintTaskModel'] = Relationship(
-        back_populates='sprint',
-        sa_relationship_kwargs={'lazy': 'selectin'},
+    tasks: list[SprintTaskModel] = Relationship(
+        back_populates="sprint",
+        sa_relationship_kwargs={"lazy": "selectin"},
     )
 
 
@@ -97,17 +97,17 @@ class SprintTaskUpdate(SQLModel):
 class SprintTaskModel(SprintTaskPublic, table=True):
     __tablename__ = 'sprinttask'
 
-    sprint: 'SprintModel' = Relationship(
-        back_populates='tasks',
-        sa_relationship_kwargs={'lazy': 'selectin'},
+    sprint: SprintModel = Relationship(
+        back_populates="tasks",
+        sa_relationship_kwargs={"lazy": "selectin"},
     )
-    project: 'ProjectModel' = Relationship(
-        back_populates='tasks',
-        sa_relationship_kwargs={'lazy': 'selectin'},
+    project: ProjectModel = Relationship(
+        back_populates="tasks",
+        sa_relationship_kwargs={"lazy": "selectin"},
     )
-    assignments: list['TaskAssignmentModel'] = Relationship(
-        back_populates='task',
-        sa_relationship_kwargs={'lazy': 'selectin'},
+    assignments: list[TaskAssignmentModel] = Relationship(
+        back_populates="task",
+        sa_relationship_kwargs={"lazy": "selectin"},
     )
 
 
@@ -117,6 +117,7 @@ class TaskAssignmentBase(SQLModel):
     assigned_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc), nullable=False
     )
+    state: str = Field(default="assigned", nullable=False, max_length=50)
     accepted_at: datetime | None = None
 
 
@@ -135,21 +136,21 @@ class TaskAssignmentUpdate(SQLModel):
 class TaskAssignmentModel(TaskAssignmentPublic, table=True):
     __tablename__ = 'taskassignment'
 
-    task: 'SprintTaskModel' = Relationship(
-        back_populates='assignments',
-        sa_relationship_kwargs={'lazy': 'selectin'},
+    task: SprintTaskModel = Relationship(
+        back_populates="assignments",
+        sa_relationship_kwargs={"lazy": "selectin"},
     )
-    project_member: 'ProjectMemberModel' = Relationship(
-        back_populates='assignments',
-        sa_relationship_kwargs={'lazy': 'selectin'},
+    project_member: ProjectMemberModel = Relationship(
+        back_populates="assignments",
+        sa_relationship_kwargs={"lazy": "selectin"},
     )
-    busy_slots: list['BusySlotModel'] = Relationship(
-        back_populates='task_assignment',
-        sa_relationship_kwargs={'lazy': 'selectin'},
+    busy_slots: list[BusySlotModel] = Relationship(
+        back_populates="task_assignment",
+        sa_relationship_kwargs={"lazy": "selectin"},
     )
-    change_requests: list['TaskChangeRequestModel'] = Relationship(
-        back_populates='task_assignment',
-        sa_relationship_kwargs={'lazy': 'selectin'},
+    change_requests: list[TaskChangeRequestModel] = Relationship(
+        back_populates="task_assignment",
+        sa_relationship_kwargs={"lazy": "selectin"},
     )
 
 
@@ -180,11 +181,11 @@ class TaskChangeRequestUpdate(SQLModel):
 class TaskChangeRequestModel(TaskChangeRequestPublic, table=True):
     __tablename__ = 'taskchangerequest'
 
-    task_assignment: 'TaskAssignmentModel' = Relationship(
-        back_populates='change_requests',
-        sa_relationship_kwargs={'lazy': 'selectin'},
+    task_assignment: TaskAssignmentModel = Relationship(
+        back_populates="change_requests",
+        sa_relationship_kwargs={"lazy": "selectin"},
     )
-    requested_by_member: 'ProjectMemberModel' = Relationship(
-        back_populates='change_requests',
-        sa_relationship_kwargs={'lazy': 'selectin'},
+    requested_by_member: ProjectMemberModel = Relationship(
+        back_populates="change_requests",
+        sa_relationship_kwargs={"lazy": "selectin"},
     )
