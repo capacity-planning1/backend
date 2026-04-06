@@ -2,8 +2,6 @@ from datetime import date, datetime
 from typing import Optional
 from uuid import UUID
 
-from pydantic import field_validator
-
 from app.models.sprints import (
     StatusType,
     TaskChangeRequestStatus,
@@ -18,19 +16,7 @@ class SprintFilters(CommonListFilters):
     start_date: Optional[date] = None
     end_date: Optional[date] = None
     created_at: Optional[datetime] = None
-
-    @field_validator('sort_by')
-    def validate_sort_field(self, v):
-        if v is None:
-            return v
-
-        allowed_filters = ['name', 'start_date', 'end_date', 'created_at']
-
-        if v not in allowed_filters:
-            raise ValueError(
-                f"Project sorting by '{v}' not allowed. Allowed: {allowed_filters}"
-            )
-        return v
+    _allowed_sort_fields = ['name', 'start_date', 'end_date', 'created_at']
 
 
 class SprintTaskFilters(CommonListFilters):
@@ -40,19 +26,7 @@ class SprintTaskFilters(CommonListFilters):
     created_at: Optional[datetime] = None
     project_id: Optional[UUID] = None
     sprint_id: Optional[UUID] = None
-
-    @field_validator('sort_by')
-    def validate_sort_field(self, v):
-        if v is None:
-            return v
-
-        allowed_filters = ['title', 'status', 'priority', 'created_at']
-
-        if v not in allowed_filters:
-            raise ValueError(
-                f"Project sorting by '{v}' not allowed. Allowed: {allowed_filters}"
-            )
-        return v
+    _allowed_sort_fields = ['title', 'status', 'priority', 'created_at']
 
 
 class TaskAssignmentFilters(CommonListFilters):
@@ -60,19 +34,7 @@ class TaskAssignmentFilters(CommonListFilters):
     project_task_id: Optional[UUID] = None
     assignet_at: Optional[datetime] = None
     accepted_at: Optional[datetime] = None
-
-    @field_validator('sort_by')
-    def validate_sort_field(self, v):
-        if v is None:
-            return v
-
-        allowed_filters = ['assignet_at', 'accepted_at']
-
-        if v not in allowed_filters:
-            raise ValueError(
-                f"Project sorting by '{v}' not allowed. Allowed: {allowed_filters}"
-            )
-        return v
+    _allowed_sort_fields = ['assignet_at', 'accepted_at']
 
 
 class TaskChangeRequestFilters(CommonListFilters):
@@ -81,16 +43,4 @@ class TaskChangeRequestFilters(CommonListFilters):
     task_assignment_id: Optional[UUID] = None
     created_at: Optional[datetime] = None
     handled_at: Optional[datetime] = None
-
-    @field_validator('sort_by')
-    def validate_sort_field(self, v):
-        if v is None:
-            return v
-
-        allowed_filters = ['name', 'created_at']
-
-        if v not in allowed_filters:
-            raise ValueError(
-                f"Project sorting by '{v}' not allowed. Allowed: {allowed_filters}"
-            )
-        return v
+    _allowed_sort_fields = ['name', 'created_at']
