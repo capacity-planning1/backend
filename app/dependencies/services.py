@@ -5,8 +5,8 @@ from fastapi.params import Depends
 from app.services.projects import (
     ProjectMemberService,
     ProjectService,
-    TeamMembershipService,
     TeamService,
+    TeamMembershipService,
 )
 from app.services.sprints import (
     SprintService,
@@ -14,13 +14,17 @@ from app.services.sprints import (
     TaskAssignmentService,
     TaskChangeRequestService,
 )
-from app.services.students import StudentService
+from app.services.students import BusySlotService, StudentService
+
+BusySlotServiceDep = Annotated[BusySlotService, Depends(BusySlotService)]
 
 StudentServiceDep = Annotated[StudentService, Depends(StudentService)]
 
 ProjectServiceDep = Annotated[ProjectService, Depends(ProjectService)]
 
-ProjectMemberServiceDep = Annotated[ProjectMemberService, Depends(ProjectMemberService)]
+ProjectMemberServiceDep = Annotated[
+    ProjectMemberService, Depends(ProjectMemberService)
+]
 
 TeamServiceDep = Annotated[TeamService, Depends(TeamService)]
 
