@@ -18,6 +18,8 @@ ModelT = TypeVar('ModelT', bound=BaseModel)
 class Repository(Generic[ModelT]):
     __model: type[ModelT] | None = None
     __session: AsyncSession
+    OFFSET = 0
+    LIMIT = 100
 
     @property
     def model(self) -> type[ModelT]:
@@ -37,8 +39,8 @@ class Repository(Generic[ModelT]):
     ) -> Sequence[ModelT]:
         select_statement = select(self.model)
 
-        offset = 0
-        limit = 100
+        offset = self.OFFSET
+        limit = self.LIMIT
 
         if filters is not None:
             filter_data = filters.model_dump(
@@ -126,8 +128,8 @@ class Repository(Generic[ModelT]):
             .where(related_filter_attr == related_filter_value)
         )
 
-        offset = 0
-        limit = 100
+        offset = self.OFFSET
+        limit = self.LIMIT
 
         if filters is not None:
             filter_data = filters.model_dump(
