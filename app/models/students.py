@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy import Column, Text, TIMESTAMP
 from sqlmodel import Field, Relationship, SQLModel
