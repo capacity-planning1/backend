@@ -1,7 +1,7 @@
 """auto
 
 Revision ID: a0e51b9d2a08
-Revises: 0002_add_base_public_models
+Revises: 0001_initial
 Create Date: 2026-03-23 12:25:51.027948
 """
 from __future__ import annotations
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = 'a0e51b9d2a08'
-down_revision = '0002_add_base_public_models'
+down_revision = '0001_initial'
 branch_labels = None
 depends_on = None
 

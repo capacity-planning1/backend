@@ -13,7 +13,7 @@ class Project(SQLModel, table=True):
 class ProjectBase(SQLModel):
     name: str = Field(nullable=False, max_length=255)
     description: str | None = Field(default=None, sa_column=Column(Text))
-    owner_student_id: UUID = Field(foreign_key="student.id", nullable=False)
+    owner_student_id: UUID = Field(foreign_key='student.id', nullable=False)
 
 
 class ProjectPublic(BaseModel, ProjectBase):
@@ -30,34 +30,34 @@ class ProjectUpdate(SQLModel):
     owner_student_id: UUID | None = None
 
 
-class ProjectMember(SQLModel, table=True):
-    id: UUID = Field(default_factory=uuid4, primary_key=True)
+class ProjectModel(ProjectPublic, table=True):
+    __tablename__ = 'project'
 
-    owner: "StudentModel" = Relationship(
+    owner: StudentModel = Relationship(
         back_populates="owned_projects",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    members: list["ProjectMemberModel"] = Relationship(
+    members: list[ProjectMemberModel] = Relationship(
         back_populates="project",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    teams: list["TeamModel"] = Relationship(
+    teams: list[TeamModel] = Relationship(
         back_populates="project",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    sprints: list["SprintModel"] = Relationship(
+    sprints: list[SprintModel] = Relationship(
         back_populates="project",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    tasks: list["SprintTaskModel"] = Relationship(
+    tasks: list[SprintTaskModel] = Relationship(
         back_populates="project",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
 
 
 class ProjectMemberBase(SQLModel):
-    project_id: UUID = Field(foreign_key="project.id", nullable=False)
-    student_id: UUID = Field(foreign_key="student.id", nullable=False)
+    project_id: UUID = Field(foreign_key='project.id', nullable=False)
+    student_id: UUID = Field(foreign_key='student.id', nullable=False)
     role: str = Field(nullable=False, max_length=50)
     join_date: date = Field(default_factory=date.today, nullable=False)
     is_active: bool = Field(default=True, nullable=False)
@@ -78,32 +78,32 @@ class ProjectMemberUpdate(SQLModel):
 
 
 class ProjectMemberModel(ProjectMemberPublic, table=True):
-    __tablename__ = "projectmember"
+    __tablename__ = 'projectmember'
 
-    project: "ProjectModel" = Relationship(
+    project: ProjectModel = Relationship(
         back_populates="members",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    student: "StudentModel" = Relationship(
+    student: StudentModel = Relationship(
         back_populates="memberships",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    team_memberships: list["TeamMembershipModel"] = Relationship(
+    team_memberships: list[TeamMembershipModel] = Relationship(
         back_populates="project_member",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    assignments: list["TaskAssignmentModel"] = Relationship(
+    assignments: list[TaskAssignmentModel] = Relationship(
         back_populates="project_member",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    change_requests: list["TaskChangeRequestModel"] = Relationship(
+    change_requests: list[TaskChangeRequestModel] = Relationship(
         back_populates="requested_by_member",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
 
 
 class TeamBase(SQLModel):
-    project_id: UUID = Field(foreign_key="project.id", nullable=False)
+    project_id: UUID = Field(foreign_key='project.id', nullable=False)
     name: str = Field(nullable=False, max_length=100)
     description: str | None = Field(default=None, sa_column=Column(Text))
 
@@ -121,21 +121,21 @@ class TeamUpdate(SQLModel):
 
 
 class TeamModel(TeamPublic, table=True):
-    __tablename__ = "team"
+    __tablename__ = 'team'
 
-    project: "ProjectModel" = Relationship(
+    project: ProjectModel = Relationship(
         back_populates="teams",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    memberships: list["TeamMembershipModel"] = Relationship(
+    memberships: list[TeamMembershipModel] = Relationship(
         back_populates="team",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
 
 
 class TeamMembershipBase(SQLModel):
-    team_id: UUID = Field(foreign_key="team.id", nullable=False)
-    project_member_id: UUID = Field(foreign_key="projectmember.id", nullable=False)
+    team_id: UUID = Field(foreign_key='team.id', nullable=False)
+    project_member_id: UUID = Field(foreign_key='projectmember.id', nullable=False)
     position: str = Field(nullable=False, max_length=100)
 
 
@@ -152,13 +152,13 @@ class TeamMembershipUpdate(SQLModel):
 
 
 class TeamMembershipModel(TeamMembershipPublic, table=True):
-    __tablename__ = "teammembership"
+    __tablename__ = 'teammembership'
 
-    team: "TeamModel" = Relationship(
+    team: TeamModel = Relationship(
         back_populates="memberships",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    project_member: "ProjectMemberModel" = Relationship(
+    project_member: ProjectMemberModel = Relationship(
         back_populates="team_memberships",
         sa_relationship_kwargs={"lazy": "selectin"},
     )

@@ -1,4 +1,4 @@
-﻿from functools import lru_cache
+from functools import lru_cache
 from urllib.parse import quote_plus
 
 from pydantic import Field
@@ -23,8 +23,8 @@ class Settings(BaseSettings):
     def database_url(self) -> str:
         return (
             'postgresql+asyncpg://'
-            f"{quote_plus(self.postgres_user)}:{quote_plus(self.postgres_password)}"
-            f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
+            f'{quote_plus(self.postgres_user)}:{quote_plus(self.postgres_password)}'
+            f'@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}'
         )
 
 
