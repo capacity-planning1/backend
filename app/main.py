@@ -1,23 +1,15 @@
-from contextlib import asynccontextmanager
+from fastapi import APIRouter, FastAPI
 
-from fastapi import FastAPI
-
-from app.db.database import create_db_and_tables
-
-
-@asynccontextmanager
-async def lifespan(_app: FastAPI):
-    await create_db_and_tables()
-    yield
-
+from app.routers import projects, sprints, students
 
 app = FastAPI(
     title='Capacity Planning API',
     version='1.0.0',
-    lifespan=lifespan,
 )
 
+api_prefix = '/api'
 
-@app.get('/')
-def read_root():
-    return {'message': 'Capacity Planning API is running'}
+app_router = APIRouter(prefix=f'{api_prefix}/v1')
+app_router.include_router(projects.router)
+app_router.include_router(sprints.router)
+app_router.include_router(students.router)
