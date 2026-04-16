@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from datetime import date, datetime, timezone
 from enum import Enum
-from typing import TYPE_CHECKING
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy import Column, Text
 from sqlmodel import Field, Relationship, SQLModel
@@ -56,6 +55,8 @@ class SprintUpdate(SQLModel):
     start_date: date | None = None
     end_date: date | None = None
 
+class SprintTask(SQLModel, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
 class SprintModel(SprintPublic, table=True):
     __tablename__ = 'sprint'
@@ -93,6 +94,8 @@ class SprintTaskUpdate(SQLModel):
     status: StatusType | None = None
     priority: TaskPriority | None = None
 
+class TaskAssignment(SQLModel, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
 class SprintTaskModel(SprintTaskPublic, table=True):
     __tablename__ = 'sprinttask'
@@ -121,8 +124,8 @@ class TaskAssignmentBase(SQLModel):
     accepted_at: datetime | None = None
 
 
-class TaskAssignmentPublic(BaseModel, TaskAssignmentBase):
-    pass
+class TaskChangeRequest(SQLModel, table=True):
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
 
 class TaskAssignmentCreate(TaskAssignmentBase):
