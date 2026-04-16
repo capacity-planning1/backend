@@ -8,12 +8,12 @@ from app.models.project import TeamCreate, TeamPublic
 from app.schemas.projects import TeamFilters
 
 router = APIRouter(
-    prefix='/projects',
+    prefix='/projects/{project_id}',
     tags=['projects'],
 )
 
 
-@router.get('/{project_id}/teams')
+@router.get('/teams')
 async def get_teams(
     team_service: TeamServiceDep,
     project_id: UUID,
@@ -23,7 +23,7 @@ async def get_teams(
     return await team_service.get_teams(filters)
 
 
-@router.post('/{project_id}/teams')
+@router.post('/teams')
 async def create_team(
     team_service: TeamServiceDep,
     project_id: UUID,
