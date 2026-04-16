@@ -31,7 +31,13 @@ REST API на FastAPI, которое помогает тимлидам студ
 | POSTGRES_PASSWORD   | string | Пароль пользователя PostgreSQL.            | postgres              |
 | DB_ECHO             | bool   | Включить логирование SQL (True/False).     | False                 |
 
+## Миграции (Alembic)
+- Применить существующие миграции (первый запуск): `uv run alembic upgrade head`
+- Создать новую миграцию (автогенерация по моделям): `uv run alembic revision --autogenerate -m "comment"`
+- Откатить на один шаг: `uv run alembic downgrade -1`
+- Алебмик берёт URL БД из `.env` (переменные из таблицы выше).
+
 ## Что внутри
 - Асинхронное подключение к PostgreSQL через `postgresql+asyncpg` и SQLModel.
-- Таблицы создаются на этапе `lifespan` FastAPI, без отдельной команды.
+- Структура БД управляется миграциями Alembic, автосоздание таблиц при старте отключено.
 - Все настройки берутся из переменных окружения (см. `.env.example`).
