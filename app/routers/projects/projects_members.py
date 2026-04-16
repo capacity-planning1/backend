@@ -12,12 +12,12 @@ from app.models.project import (
 from app.schemas.projects import ProjectMembersFilters
 
 router = APIRouter(
-    prefix='/',
+    prefix='/{project_id}',
     tags=['projectMembers'],
 )
 
 
-@router.get('/{project_id}/members')
+@router.get('/members')
 async def get_project_members(
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,
@@ -27,7 +27,7 @@ async def get_project_members(
     return await project_member_service.get_projects_members(filters)
 
 
-@router.post('/{project_id}/members')
+@router.post('/members')
 async def create_project_members(
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,
@@ -37,7 +37,7 @@ async def create_project_members(
     return await project_member_service.add_member_to_project(pm_create)
 
 
-@router.get('/{project_id}/members/{student_id}')
+@router.get('/members/{student_id}')
 async def get_project_member(
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,
@@ -46,7 +46,7 @@ async def get_project_member(
     return await project_member_service.get_project_member(student_id, project_id)
 
 
-@router.put('/{project_id}/members/{student_id}')
+@router.put('/members/{student_id}')
 async def update_project_member(
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,
@@ -58,7 +58,7 @@ async def update_project_member(
     )
 
 
-@router.delete('/{project_id}/members/{student_id}')
+@router.delete('/members/{student_id}')
 async def delete_project_member(
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,
