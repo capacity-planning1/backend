@@ -1,11 +1,10 @@
 from typing import Optional, Sequence
-from uuid import UUID
 
 from app.dependencies.repositories import (
     TeamMembershipRepository,
     TeamMembershipRepositoryDep,
 )
-from app.models.project import (
+from app.models.projects.project import (
     TeamMembershipCreate,
     TeamMembershipModel,
     TeamMembershipPublic,
@@ -33,11 +32,8 @@ class TeamMembershipService:
         return await self.__team_membership_repository.save(tm)
 
     async def get_member(
-        self, team_id: UUID, pm_id: UUID
+        self, filters: TeamMembershipFilters
     ) -> Optional[TeamMembershipPublic]:
-        filters = TeamMembershipFilters()
-        filters.team_id = team_id
-        filters.project_member_id = pm_id
         result = await self.__team_membership_repository.fetch(filters)
 
         if len(result) == 0:
@@ -46,12 +42,8 @@ class TeamMembershipService:
         return result[0]
 
     async def update_membership(
-        self, team_id: UUID, pm_id: UUID, tm_update: TeamMembershipUpdate
+        self, filters: TeamMembershipFilters, tm_update: TeamMembershipUpdate
     ) -> Optional[TeamMembershipPublic]:
-        filters = TeamMembershipFilters()
-        filters.team_id = team_id
-        filters.project_member_id = pm_id
-
         tm = await self.__team_membership_repository.fetch(filters)
 
         if len(tm) == 0:
@@ -60,12 +52,8 @@ class TeamMembershipService:
         return await self.__team_membership_repository.update(tm[0].id, tm_update)
 
     async def delete_membership(
-        self, team_id: UUID, pm_id: UUID
+        self, filters: TeamMembershipFilters
     ) -> Optional[TeamMembershipPublic]:
-        filters = TeamMembershipFilters()
-        filters.team_id = team_id
-        filters.project_member_id = pm_id
-
         tm = await self.__team_membership_repository.fetch(filters)
 
         if len(tm) == 0:

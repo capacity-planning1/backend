@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from datetime import datetime
-from enum import Enum
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING
-from uuid import UUID
 
 from sqlalchemy import Column, TIMESTAMP, Text
 from sqlmodel import Field, Relationship, SQLModel
@@ -11,6 +9,7 @@ from sqlmodel import Field, Relationship, SQLModel
 from app.models.base import BaseModel
 
 if TYPE_CHECKING:
+<<<<<<< HEAD:app/models/students.py
     from app.models.projects import ProjectMemberModel, ProjectModel
     from app.models.sprints import TaskAssignmentModel
 
@@ -20,6 +19,11 @@ class SlotType(str, Enum):
     CREDIT = "credit"
     EXAM = "exam"
     PERSONAL = "personal"
+=======
+    from app.models.project_member import ProjectMemberModel
+    from app.models.project import ProjectModel
+    from app.models.busy_slot import BusySlotModel
+>>>>>>> origin/dev:app/models/students/student.py
 
 
 class StudentBase(SQLModel):
@@ -59,6 +63,7 @@ class StudentModel(StudentPublic, table=True):
         back_populates="student",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
+<<<<<<< HEAD:app/models/students.py
 
 
 class BusySlotBase(SQLModel):
@@ -107,3 +112,5 @@ class BusySlotModel(BusySlotPublic, table=True):
         back_populates="busy_slots",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
+=======
+>>>>>>> origin/dev:app/models/students/student.py

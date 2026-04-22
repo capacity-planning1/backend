@@ -5,7 +5,7 @@ from app.dependencies.repositories import (
     SprintTaskRepository,
     SprintTaskRepositoryDep,
 )
-from app.models.sprints import (
+from app.models.sprints.sprint_task import (
     SprintTaskCreate,
     SprintTaskModel,
     SprintTaskPublic,

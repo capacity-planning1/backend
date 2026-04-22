@@ -7,7 +7,7 @@ from app.dependencies.services import (
     TeamMembershipServiceDep,
     TeamServiceDep,
 )
-from app.models.project import (
+from app.models.projects.project import (
     TeamMembershipCreate,
     TeamMembershipPublic,
     TeamMembershipUpdate,
@@ -79,7 +79,10 @@ async def get_member(
     team_id: UUID,
     student_id: UUID
 ) -> Optional[TeamMembershipPublic]:
-    return await team_membership_service.get_member(team_id, student_id)
+    filters = TeamMembershipFilters
+    filters.team_id = team_id
+    filters.project_member_id = student_id
+    return await team_membership_service.get_member(filters)
 
 
 @router.put('/members/{student_id}')
@@ -90,8 +93,11 @@ async def update_team_member(
     student_id: UUID,
     tm_update: TeamMembershipUpdate
 ) -> Optional[TeamMembershipPublic]:
+    filters = TeamMembershipFilters()
+    filters.team_id = team_id
+    filters.project_member_id = student_id
     return await team_membership_service.update_membership(
-        team_id, student_id, tm_update)
+        filters, tm_update)
 
 
 @router.delete('/members/{student_id}')
@@ -101,4 +107,7 @@ async def delete_membership(
     team_id: UUID,
     student_id: UUID
 ) -> Optional[TeamMembershipPublic]:
-    return await team_membership_service.delete_membership(team_id, student_id)
+    filters = TeamMembershipFilters()
+    filters.team_id = team_id
+    filters.project_member_id = student_id
+    return await team_membership_service.delete_membership(filters)

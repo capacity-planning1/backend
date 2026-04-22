@@ -46,7 +46,10 @@ async def get_task_assignment(
     task_id: UUID,
     project_member_id: UUID,
 ) -> Optional[TaskAssignmentPublic]:
-    return await task_assignment_service.get_task_assignment(task_id, project_member_id)
+    filters = TaskAssignmentFilters()
+    filters.project_member_id = project_member_id
+    filters.project_task_id = task_id
+    return await task_assignment_service.get_task_assignment(filters)
 
 
 @router.put('/{project_member_id}')
@@ -57,8 +60,11 @@ async def update_task_assignment(
     project_member_id: UUID,
     task_assignment_update: TaskAssignmentUpdate,
 ) -> Optional[TaskAssignmentPublic]:
+    filters = TaskAssignmentFilters()
+    filters.project_task_id = task_id
+    filters.project_member_id = project_member_id
     return await task_assignment_service.update_task_assignment(
-        task_id, project_member_id, task_assignment_update
+        filters, task_assignment_update
     )
 
 
@@ -69,6 +75,9 @@ async def delete_task_assignment(
     task_id: UUID,
     project_member_id: UUID,
 ) -> Optional[TaskAssignmentPublic]:
+    filters = TaskAssignmentFilters()
+    filters.project_task_id = task_id
+    filters.project_member_id = project_member_id
     return await task_assignment_service.delete_task_assignment(
         task_id, project_member_id
     )

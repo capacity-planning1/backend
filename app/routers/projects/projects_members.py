@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter
 
 from app.dependencies.services import ProjectMemberServiceDep
-from app.models.project import (
+from app.models.projects.project import (
     ProjectMemberCreate,
     ProjectMemberPublic,
     ProjectMemberUpdate,
@@ -12,12 +12,12 @@ from app.models.project import (
 from app.schemas.projects import ProjectMembersFilters
 
 router = APIRouter(
-    prefix='/',
+    prefix='/{project_id}/members',
     tags=['projectMembers'],
 )
 
 
-@router.get('/{project_id}/members')
+@router.get('/')
 async def get_project_members(
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,
@@ -27,7 +27,7 @@ async def get_project_members(
     return await project_member_service.get_projects_members(filters)
 
 
-@router.post('/{project_id}/members')
+@router.post('/')
 async def create_project_members(
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,
@@ -37,33 +37,40 @@ async def create_project_members(
     return await project_member_service.add_member_to_project(pm_create)
 
 
-@router.get('/{project_id}/members/{student_id}')
+@router.get('/{student_id}')
 async def get_project_member(
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,
     student_id: UUID
 ) -> Optional[ProjectMemberPublic]:
-    return await project_member_service.get_project_member(student_id, project_id)
+    filters = ProjectMembersFilters()
+    filters.project_id = project_id
+    filters.student_id = student_id
+    return await project_member_service.get_project_member(filters)
 
 
-@router.put('/{project_id}/members/{student_id}')
+@router.put('/{student_id}')
 async def update_project_member(
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,
     student_id: UUID,
     project_member_update: ProjectMemberUpdate
 ) -> Optional[ProjectMemberPublic]:
+    filters = ProjectMembersFilters()
+    filters.student_id = student_id
+    filters.project_id = project_id
     return await project_member_service.update_project_member(
-        project_id, student_id, project_member_update
+        filters, project_member_update
     )
 
 
-@router.delete('/{project_id}/members/{student_id}')
+@router.delete('/{student_id}')
 async def delete_project_member(
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,
     student_id: UUID
 ) -> Optional[ProjectMemberPublic]:
-    return await project_member_service.delete_project_member(
-        project_id, student_id
-    )
+    filters = ProjectMembersFilters()
+    filters.project_id = project_id
+    filters.student_id = student_id
+    return await project_member_service.delete_project_member(filters)

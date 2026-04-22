@@ -5,7 +5,7 @@ from app.dependencies.repositories import (
     ProjectMemberRepository,
     ProjectMemberRepositoryDep,
 )
-from app.models.project import (
+from app.models.projects.project_member import (
     ProjectMemberCreate,
     ProjectMemberModel,
     ProjectMemberPublic,
@@ -36,11 +36,8 @@ class ProjectMemberService:
         return await self.__project_member_repository.fetch(filters)
 
     async def get_project_member(
-        self, student_id: UUID, project_id: UUID
+        self, filters: ProjectMembersFilters
     ) -> Optional[ProjectMemberPublic]:
-        filters = ProjectMembersFilters()
-        filters.student_id = student_id
-        filters.project_id = project_id
         result = await self.__project_member_repository.fetch(filters)
 
         if len(result) == 0:
@@ -49,12 +46,8 @@ class ProjectMemberService:
         return result[0]
 
     async def update_project_member(
-        self, project_id: UUID, student_id: UUID, pm_update: ProjectMemberUpdate
+        self, filters: ProjectMembersFilters, pm_update: ProjectMemberUpdate
     ) -> Optional[ProjectMemberPublic]:
-        filters = ProjectMembersFilters()
-        filters.project_id = project_id
-        filters.student_id = student_id
-
         pm = await self.__project_member_repository.fetch(filters)
 
         if len(pm) == 0:
@@ -63,12 +56,8 @@ class ProjectMemberService:
         return await self.__project_member_repository.update(pm[0].id, pm_update)
 
     async def delete_project_member(
-        self, project_id: UUID, student_id: UUID
+        self, filters: ProjectMembersFilters
     ) -> Optional[ProjectMemberPublic]:
-        filters = ProjectMembersFilters()
-        filters.project_id = project_id
-        filters.student_id = student_id
-
         pm = await self.__project_member_repository.fetch(filters)
 
         if len(pm) == 0:

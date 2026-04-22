@@ -18,16 +18,3 @@ AsyncSessionLocal = async_sessionmaker(
     expire_on_commit=False,
     class_=AsyncSession,
 )
-
-
-async def create_db_and_tables() -> None:
-    # Import models so metadata is correctly populated before creating tables
-    from app.models import projects, sprints, students  # noqa: F401
-
-    async with engine.begin() as conn:
-        await conn.run_sync(SQLModel.metadata.create_all)
-
-
-async def get_session() -> AsyncGenerator[AsyncSession, None]:
-    async with AsyncSessionLocal() as session:
-        yield session

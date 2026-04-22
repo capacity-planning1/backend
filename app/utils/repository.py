@@ -61,8 +61,8 @@ class Repository(Generic[ModelT]):
                     column.desc() if sort_order == 'desc' else column.asc()
                 )
 
-            offset = getattr(filters, 'offset', 0)
-            limit = getattr(filters, 'limit', 100)
+            offset = getattr(filters, 'offset', self.OFFSET)
+            limit = getattr(filters, 'limit', self.LIMIT)
 
         select_statement = select_statement.offset(offset).limit(limit)
         result = await self.__session.execute(select_statement)

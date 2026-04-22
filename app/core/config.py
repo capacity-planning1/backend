@@ -1,17 +1,18 @@
 from functools import lru_cache
 from urllib.parse import quote_plus
 
-from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy import URL
 
 
 class Settings(BaseSettings):
-    postgres_host: str = Field('localhost', alias='POSTGRES_HOST')
-    postgres_port: int = Field(5432, alias='POSTGRES_PORT')
-    postgres_db: str = Field('capacity_planning', alias='POSTGRES_DB')
-    postgres_user: str = Field('postgres', alias='POSTGRES_USER')
-    postgres_password: str = Field('postgres', alias='POSTGRES_PASSWORD')
-    database_echo: bool = Field(False, alias='DB_ECHO')
+    postgres_scheme: str = 'postgresql+asyncpg'
+    postgres_host: str = 'localhost'
+    postgres_port: int = 5432
+    postgres_db: str = 'capacity_planning'
+    postgres_user: str = 'postgres'
+    postgres_password: str = 'postgres'
+    database_echo: bool = False
 
     model_config = SettingsConfigDict(
         env_file='.env',
