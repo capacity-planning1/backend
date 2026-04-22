@@ -3,15 +3,27 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Column, Text, TIMESTAMP
+from sqlalchemy import Column, TIMESTAMP, Text
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.base import BaseModel
 
 if TYPE_CHECKING:
+<<<<<<< HEAD:app/models/students.py
+    from app.models.projects import ProjectMemberModel, ProjectModel
+    from app.models.sprints import TaskAssignmentModel
+
+
+class SlotType(str, Enum):
+    PAIR = "pair"
+    CREDIT = "credit"
+    EXAM = "exam"
+    PERSONAL = "personal"
+=======
     from app.models.project_member import ProjectMemberModel
     from app.models.project import ProjectModel
     from app.models.busy_slot import BusySlotModel
+>>>>>>> origin/dev:app/models/students/student.py
 
 
 class StudentBase(SQLModel):
@@ -26,7 +38,7 @@ class StudentPublic(BaseModel, StudentBase):
 
 
 class StudentCreate(StudentBase):
-    password_hash: str = Field(nullable=False, max_length=255)
+    pass
 
 
 class StudentUpdate(SQLModel):
@@ -34,28 +46,71 @@ class StudentUpdate(SQLModel):
     first_name: str | None = Field(default=None, max_length=100)
     last_name: str | None = Field(default=None, max_length=100)
     skills: str | None = Field(default=None)
-    password_hash: str | None = Field(default=None, max_length=255)
 
 
 class StudentModel(StudentPublic, table=True):
-    __tablename__ = 'student'
+    __tablename__ = "student"
 
-    password_hash: str = Field(nullable=False, max_length=255)
-    registered_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
-        nullable=False,
-        sa_type=TIMESTAMP(timezone=True),
-    )
-
-    memberships: list[ProjectMemberModel] = Relationship(
+    memberships: list["ProjectMemberModel"] = Relationship(
         back_populates="student",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    owned_projects: list[ProjectModel] = Relationship(
+    owned_projects: list["ProjectModel"] = Relationship(
         back_populates="owner",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    busy_slots: list[BusySlotModel] = Relationship(
+    busy_slots: list["BusySlotModel"] = Relationship(
         back_populates="student",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
+<<<<<<< HEAD:app/models/students.py
+
+
+class BusySlotBase(SQLModel):
+    student_id: UUID = Field(foreign_key="student.id", nullable=False)
+    slot_type: SlotType = Field(nullable=False)
+    start_datetime: datetime = Field(
+        nullable=False,
+        sa_type=TIMESTAMP(timezone=True),
+    )
+    end_datetime: datetime = Field(
+        nullable=False,
+        sa_type=TIMESTAMP(timezone=True),
+    )
+    title: str = Field(nullable=False, max_length=255)
+    description: str | None = Field(default=None, sa_column=Column(Text))
+    source: str = Field(nullable=False, max_length=50)
+    task_assignment_id: UUID = Field(foreign_key="taskassignment.id", nullable=False)
+
+
+class BusySlotPublic(BaseModel, BusySlotBase):
+    pass
+
+
+class BusySlotCreate(BusySlotBase):
+    pass
+
+
+class BusySlotUpdate(SQLModel):
+    slot_type: SlotType | None = None
+    start_datetime: datetime | None = None
+    end_datetime: datetime | None = None
+    title: str | None = Field(default=None, max_length=255)
+    description: str | None = None
+    source: str | None = Field(default=None, max_length=50)
+    task_assignment_id: UUID | None = None
+
+
+class BusySlotModel(BusySlotPublic, table=True):
+    __tablename__ = "busyslot"
+
+    student: "StudentModel" = Relationship(
+        back_populates="busy_slots",
+        sa_relationship_kwargs={"lazy": "selectin"},
+    )
+    task_assignment: "TaskAssignmentModel" = Relationship(
+        back_populates="busy_slots",
+        sa_relationship_kwargs={"lazy": "selectin"},
+    )
+=======
+>>>>>>> origin/dev:app/models/students/student.py
