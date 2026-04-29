@@ -4,10 +4,9 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+MINIMAL_KEY_LENGTH = 32
 
 class AuthSettings(BaseSettings):
-    MINIMAL_KEY_LENGTH = 32
-
     model_config = SettingsConfigDict(
         env_prefix='AUTH_',
         env_file='.env',
@@ -31,7 +30,7 @@ class AuthSettings(BaseSettings):
 
         key = key_path.read_text()
 
-        if len(key) < self.MINIMAL_KEY_LENGTH:
+        if len(key) < MINIMAL_KEY_LENGTH:
             raise ValueError(
                 f"Private key too short: {len(key)} characters (minimum 32 required)"
             )
@@ -48,7 +47,7 @@ class AuthSettings(BaseSettings):
 
         key = key_path.read_text()
 
-        if len(key) < self.MINIMAL_KEY_LENGTH:
+        if len(key) < MINIMAL_KEY_LENGTH:
             raise ValueError(
                 f"Private key too short: {len(key)} characters (minimum 32 required)"
             )
