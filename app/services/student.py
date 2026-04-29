@@ -5,13 +5,14 @@ from app.dependencies.repositories import (
     StudentRepository,
     StudentRepositoryDep,
 )
-from app.models.students import (
+from app.models.students.student import (
     StudentCreate,
     StudentModel,
     StudentPublic,
     StudentUpdate,
 )
 from app.schemas.students import StudentFilters
+from app.utils.hasher import Hasher
 
 
 class StudentService:
@@ -25,6 +26,9 @@ class StudentService:
 
     async def create_student(self, student_create: StudentCreate) -> StudentPublic:
         student_dump = student_create.model_dump()
+        student_dump['hashed_password'] = Hasher.get_password_hash(
+            student_dump.pop('password')
+        )
         student = StudentModel(**student_dump)
         return await self.__student_repository.save(student)
 
@@ -38,3 +42,11 @@ class StudentService:
 
     async def delete_student(self, student_id: UUID) -> Optional[StudentPublic]:
         return await self.__student_repository.delete(student_id)
+
+    async def get_student_by_email(self, email: str) -> Optional[StudentPublic]:
+        students = self.get_students()
+        for student in students:
+            if student.email == email:
+                return student
+
+        return None

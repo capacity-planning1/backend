@@ -10,10 +10,10 @@ from app.models.base import BaseModel
 
 
 if TYPE_CHECKING:
-    from app.models.project_member import ProjectMemberModel
-    from app.models.busy_slot import BusySlotModel
-    from app.models.task_change_request import TaskChangeRequestModel
-    from app.models.sprint_task import SprintTaskModel
+    from app.models.projects.project_member import ProjectMemberModel
+    from app.models.students.busy_slot import BusySlotModel
+    from app.models.sprints.task_change_request import TaskChangeRequestModel
+    from app.models.sprints.sprint_task import SprintTaskModel
 
 
 class TaskAssignment(SQLModel, table=True):

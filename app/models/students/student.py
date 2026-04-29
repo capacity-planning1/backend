@@ -9,27 +9,16 @@ from sqlmodel import Field, Relationship, SQLModel
 from app.models.base import BaseModel
 
 if TYPE_CHECKING:
-<<<<<<< HEAD:app/models/students.py
-    from app.models.projects import ProjectMemberModel, ProjectModel
-    from app.models.sprints import TaskAssignmentModel
-
-
-class SlotType(str, Enum):
-    PAIR = "pair"
-    CREDIT = "credit"
-    EXAM = "exam"
-    PERSONAL = "personal"
-=======
-    from app.models.project_member import ProjectMemberModel
-    from app.models.project import ProjectModel
-    from app.models.busy_slot import BusySlotModel
->>>>>>> origin/dev:app/models/students/student.py
+    from app.models.projects.project_member import ProjectMemberModel
+    from app.models.projects.project import ProjectModel
+    from app.models.students.busy_slot import BusySlotModel
 
 
 class StudentBase(SQLModel):
     email: str = Field(index=True, nullable=False, max_length=255)
     first_name: str = Field(nullable=False, max_length=100)
     last_name: str = Field(nullable=False, max_length=100)
+    hashed_password: str = Field(nullable=False)
     skills: str | None = Field(default=None, sa_column=Column(Text))
 
 
@@ -38,7 +27,7 @@ class StudentPublic(BaseModel, StudentBase):
 
 
 class StudentCreate(StudentBase):
-    pass
+    password: str = Field(min_length=8)
 
 
 class StudentUpdate(SQLModel):
@@ -63,54 +52,3 @@ class StudentModel(StudentPublic, table=True):
         back_populates="student",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-<<<<<<< HEAD:app/models/students.py
-
-
-class BusySlotBase(SQLModel):
-    student_id: UUID = Field(foreign_key="student.id", nullable=False)
-    slot_type: SlotType = Field(nullable=False)
-    start_datetime: datetime = Field(
-        nullable=False,
-        sa_type=TIMESTAMP(timezone=True),
-    )
-    end_datetime: datetime = Field(
-        nullable=False,
-        sa_type=TIMESTAMP(timezone=True),
-    )
-    title: str = Field(nullable=False, max_length=255)
-    description: str | None = Field(default=None, sa_column=Column(Text))
-    source: str = Field(nullable=False, max_length=50)
-    task_assignment_id: UUID = Field(foreign_key="taskassignment.id", nullable=False)
-
-
-class BusySlotPublic(BaseModel, BusySlotBase):
-    pass
-
-
-class BusySlotCreate(BusySlotBase):
-    pass
-
-
-class BusySlotUpdate(SQLModel):
-    slot_type: SlotType | None = None
-    start_datetime: datetime | None = None
-    end_datetime: datetime | None = None
-    title: str | None = Field(default=None, max_length=255)
-    description: str | None = None
-    source: str | None = Field(default=None, max_length=50)
-    task_assignment_id: UUID | None = None
-
-
-class BusySlotModel(BusySlotPublic, table=True):
-    __tablename__ = "busyslot"
-
-    student: "StudentModel" = Relationship(
-        back_populates="busy_slots",
-        sa_relationship_kwargs={"lazy": "selectin"},
-    )
-    task_assignment: "TaskAssignmentModel" = Relationship(
-        back_populates="busy_slots",
-        sa_relationship_kwargs={"lazy": "selectin"},
-    )
-=======
->>>>>>> origin/dev:app/models/students/student.py

@@ -12,8 +12,8 @@ from app.models.base import BaseModel
 
 
 if TYPE_CHECKING:
-    from app.models.project_member import ProjectMemberModel
-    from app.models.task_assignment import TaskAssignmentModel
+    from app.models.projects.project_member import ProjectMemberModel
+    from app.models.sprints.task_assignment import TaskAssignmentModel
 
 
 class TaskChangeRequestStatus(str, Enum):

@@ -2,19 +2,17 @@ from typing import Annotated
 
 from fastapi.params import Depends
 
-from app.services.projects import (
-    ProjectMemberService,
-    ProjectService,
-    TeamService,
-    TeamMembershipService,
-)
-from app.services.sprints import (
-    SprintService,
-    SprintTaskService,
-    TaskAssignmentService,
-    TaskChangeRequestService,
-)
-from app.services.students import BusySlotService, StudentService
+from app.services.blacklist import BlacklistService
+from app.services.busy_slot import BusySlotService
+from app.services.project import ProjectService
+from app.services.project_member import ProjectMemberService
+from app.services.sprint import SprintService
+from app.services.sprint_task import SprintTaskService
+from app.services.student import StudentService
+from app.services.task_assignment import TaskAssignmentService
+from app.services.task_change_request import TaskChangeRequestService
+from app.services.team import TeamService
+from app.services.team_membership import TeamMembershipService
 
 BusySlotServiceDep = Annotated[BusySlotService, Depends(BusySlotService)]
 
@@ -22,9 +20,7 @@ StudentServiceDep = Annotated[StudentService, Depends(StudentService)]
 
 ProjectServiceDep = Annotated[ProjectService, Depends(ProjectService)]
 
-ProjectMemberServiceDep = Annotated[
-    ProjectMemberService, Depends(ProjectMemberService)
-]
+ProjectMemberServiceDep = Annotated[ProjectMemberService, Depends(ProjectMemberService)]
 
 TeamServiceDep = Annotated[TeamService, Depends(TeamService)]
 
@@ -43,3 +39,5 @@ TaskAssignmentServiceDep = Annotated[
 TaskChangeRequestServiceDep = Annotated[
     TaskChangeRequestService, Depends(TaskChangeRequestService)
 ]
+
+TokenBlacklistServiceDep = Annotated[BlacklistService, Depends(BlacklistService)]

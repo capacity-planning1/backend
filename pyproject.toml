@@ -10,6 +10,8 @@ dependencies = [
     "pydantic-settings>=2.6.1",
     "asyncpg>=0.30.0",
     "alembic>=1.13.2",
+    "pwdlib>=0.3.0",
+    "jwt>=1.4.0",
 ]
 
 [dependency-groups]
