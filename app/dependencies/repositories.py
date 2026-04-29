@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Annotated, TypeAlias
+from typing import Annotated, TypeAlias, TYPE_CHECKING
 
 from fastapi import Depends
 
@@ -10,13 +10,17 @@ if TYPE_CHECKING:
     from app.models.projects.project_member import ProjectMemberModel
     from app.models.projects.team import TeamModel
     from app.models.projects.team_membership import TeamMembershipModel
+
     from app.models.sprints.sprint import SprintModel
     from app.models.sprints.sprint_task import SprintTaskModel
     from app.models.sprints.task_assignment import TaskAssignmentModel
     from app.models.sprints.task_change_request import TaskChangeRequestModel
-    from app.models.students.busy_slot import BusySlotModel
+
     from app.models.students.student import StudentModel
+    from app.models.students.busy_slot import BusySlotModel
+
     from app.models.token_blacklist import TokenBlacklistModel
+    from app.repositories.token_blacklist import TokenBlacklistRepository
 
 
 async def get_project_repository(session: SessionDep):
@@ -110,10 +114,7 @@ StudentRepositoryDep = Annotated[StudentRepository, Depends(get_student_reposito
 
 
 async def get_token_blacklist_repository(session: SessionDep):
-    yield Repository[TokenBlacklistModel](session)
+    yield TokenBlacklistRepository(session)
 
 
-TokenBlacklistRepository: TypeAlias = Repository[TokenBlacklistModel]
-TokenBlacklistRepositoryDep = Annotated[
-    TokenBlacklistRepository, Depends(get_token_blacklist_repository)
-]
+TokenBlacklistRepositoryDep = Annotated[TokenBlacklistRepository, Depends(get_token_blacklist_repository)]

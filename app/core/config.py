@@ -1,11 +1,13 @@
 from functools import lru_cache
-from pathlib import Path
 from urllib.parse import quote_plus
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class AuthSettings(BaseSettings):
+    MINIMAL_KEY_LENGTH = 32
+
     model_config = SettingsConfigDict(
         env_prefix='AUTH_',
         env_file='.env',
@@ -16,26 +18,42 @@ class AuthSettings(BaseSettings):
     private_key_path: str = 'private.pem'
     public_key_path: str = 'public.pem'
     algorithm: str = 'RS256'
-    access_token_lifetime_seconds: int = 900
-    refresh_token_lifetime_seconds: int = 604800
+    access_token_lifetime_seconds: int = 600
+    refresh_token_lifetime_seconds: int = 3600
 
     def get_private_key(self) -> str:
         key_path = Path(self.private_key_path)
         if not key_path.exists():
             raise FileNotFoundError(
-                f'Private key not found at {self.private_key_path}\n'
-                f'Run: openssl genrsa -out {self.private_key_path} 2048'
+                f"Private key not found at {self.private_key_path}\n"
+                f"Run: openssl genrsa -out {self.private_key_path} 2048"
             )
-        return key_path.read_text()
+
+        key = key_path.read_text()
+
+        if len(key) < self.MINIMAL_KEY_LENGTH:
+            raise ValueError(
+                f"Private key too short: {len(key)} characters (minimum 32 required)"
+            )
+
+        return key
 
     def get_public_key(self) -> str:
         key_path = Path(self.public_key_path)
         if not key_path.exists():
             raise FileNotFoundError(
-                f'Public key not found at {self.public_key_path}\n'
-                f'Run: openssl rsa -in private.pem -pubout -out {self.public_key_path}'
+                f"Public key not found at {self.public_key_path}\n"
+                f"Run: openssl rsa -in private.pem -pubout -out {self.public_key_path}"
             )
-        return key_path.read_text()
+
+        key = key_path.read_text()
+
+        if len(key) < self.MINIMAL_KEY_LENGTH:
+            raise ValueError(
+                f"Private key too short: {len(key)} characters (minimum 32 required)"
+            )
+
+        return key
 
 
 class DbSettings(BaseSettings):

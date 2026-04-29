@@ -10,16 +10,23 @@ from app.models.base import BaseModel
 
 
 class TokenBlacklistModel(BaseModel, table=True):
-    __tablename__ = 'token_blacklist'
+    __tablename__ = "token_blacklist"
 
-    jti: str = Field(unique=True, nullable=False, max_length=255)
-    token_type: str = Field(default='refresh', nullable=False, max_length=20)
+    jti: str = Field(
+        unique=True,
+        nullable=False,
+        max_length=255
+    )
     expires_at: datetime = Field(
         nullable=False,
     )
-    user_id: UUID | None = Field(default=None, nullable=True, foreign_key='student.id')
+    student_id: UUID | None = Field(
+        default=None,
+        nullable=True,
+        foreign_key="student.id"
+    )
 
     __table_args__ = (
-        Index('ix_token_blacklist_jti', 'jti'),
-        Index('ix_token_blacklist_expires_at', 'expires_at'),
+        Index("ix_token_blacklist_jti", "jti"),
+        Index("ix_token_blacklist_expires_at", "expires_at")
     )

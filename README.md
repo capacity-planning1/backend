@@ -1,4 +1,4 @@
-﻿# Визуальный планировщик ресурсов
+# Визуальный планировщик ресурсов
 
 REST API на FastAPI, которое помогает тимлидам студенческих проектов планировать загрузку команды и спринты на основе актуальных данных.
 
@@ -22,14 +22,38 @@ REST API на FastAPI, которое помогает тимлидам студ
    Таблицы создадутся автоматически при старте приложения.
 
 ## Переменные окружения
-| Название переменной | Тип    | Описание                                   | Значение по умолчанию |
-|---------------------|--------|--------------------------------------------|-----------------------|
-| POSTGRES_HOST       | string | Хост локальной базы PostgreSQL.            | localhost             |
-| POSTGRES_PORT       | int    | Порт подключения к PostgreSQL.             | 5432                  |
-| POSTGRES_DB         | string | Имя базы данных для приложения.            | capacity_planning     |
-| POSTGRES_USER       | string | Пользователь PostgreSQL с правами на базу. | postgres              |
-| POSTGRES_PASSWORD   | string | Пароль пользователя PostgreSQL.            | postgres              |
-| DB_ECHO             | bool   | Включить логирование SQL (True/False).     | False                 |
+
+| Название переменной | Тип    | Описание                                                   | Значение по умолчанию |
+|---------------------|--------|------------------------------------------------------------|-----------------------|
+| DB_POSTGRES_SCHEME     | string | Схема подключения к PostgreSQL с асинхронным драйвером.    | postgresql+asyncpg    |
+| DB_POSTGRES_HOST       | string | Хост локальной базы PostgreSQL.                            | localhost             |
+| DB_POSTGRES_PORT       | int    | Порт подключения к PostgreSQL.                             | 5432                  |
+| DB_POSTGRES_DB         | string | Имя базы данных для приложения.                            | capacity_planning     |
+| DB_POSTGRES_USER       | string | Пользователь PostgreSQL с правами на базу.                 | postgres              |
+| DB_POSTGRES_PASSWORD   | string | Пароль пользователя PostgreSQL.                            | postgres              |
+| DB_ECHO             | bool   | Включить логирование SQL (True/False).                     | False                 |
+| AUTH_PRIVATE_KEY_PATH | string | Путь к секретному ключу для подписи JWT-токенов | private.pem |
+| AUTH_PUBLIC_KEY_PATH | string | Путь к публичному ключу для расшифровки JWT-токенов | public.pem |
+| AUTH_ALGORITHM           | string | Алгоритм шифрования JWT.                                   | RS256                 |
+| AUTH_ACCESS_TOKEN_LIFETIME_SECONDS | int | Время жизни access-токена в секундах. | 600                  |
+| AUTH_REFRESH_TOKEN_LIFETIME_SECONDS | int | Время жизни refresh-токена в секундах. | 3600                  |
+
+## Генерация JWT ключей (для асимметричного шифрования RS256)
+
+1. Сгенерируйте приватный ключ (минимум 2048 бит):
+```bash
+   openssl genrsa -out private.pem 2048
+```
+2. Извлеките публичный ключ:
+``` bash 
+   openssl rsa -in private.pem -pubout -out public.pem
+```
+
+⚠️ **Требования к ключам:**
+- Длина ключа: минимум 2048 бит (что соответствует >32 символам в base64)
+- Формат: PEM
+- Приватный ключ должен быть защищен и не попадать в репозиторий
+
 
 ## Миграции (Alembic)
 - Применить существующие миграции (первый запуск): `uv run alembic upgrade head`

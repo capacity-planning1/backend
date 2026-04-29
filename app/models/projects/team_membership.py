@@ -6,8 +6,8 @@ from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from app.models.base import BaseModel
-    from app.models.team import TeamModel
-    from app.models.project_member import ProjectMemberModel
+    from app.models.projects.team import TeamModel
+    from app.models.projects.project_member import ProjectMemberModel
 
 
 class TeamMembershipBase(SQLModel):

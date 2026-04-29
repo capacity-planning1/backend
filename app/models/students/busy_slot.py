@@ -11,8 +11,8 @@ from sqlmodel import Field, Relationship, SQLModel
 from app.models.base import BaseModel
 
 if TYPE_CHECKING:
-    from app.models.student import StudentModel
-    from app.models.task_assignment import TaskAssignmentModel
+    from app.models.students.student import StudentModel
+    from app.models.sprints.task_assignment import TaskAssignmentModel
 
 
 class SlotType(str, Enum):
