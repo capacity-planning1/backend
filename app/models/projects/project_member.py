@@ -1,16 +1,16 @@
 from datetime import date
-from uuid import UUID
 from typing import TYPE_CHECKING
+from uuid import UUID
 
 from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from app.models.base import BaseModel
-    from app.models.project import ProjectModel
-    from app.models.student import StudentModel
-    from app.models.team_membership import TeamMembershipModel
-    from app.models.task_assignment import TaskAssignmentModel
-    from app.models.task_change_request import TaskChangeRequestModel
+    from app.models.projects.project import ProjectModel
+    from app.models.projects.team_membership import TeamMembershipModel
+    from app.models.sprints.task_assignment import TaskAssignmentModel
+    from app.models.sprints.task_change_request import TaskChangeRequestModel
+    from app.models.students.student import StudentModel
 
 
 class ProjectMemberBase(SQLModel):
@@ -35,22 +35,22 @@ class ProjectMemberModel(ProjectMemberPublic, table=True):
     __tablename__ = 'projectmember'
 
     project: ProjectModel = Relationship(
-        back_populates="members",
-        sa_relationship_kwargs={"lazy": "selectin"},
+        back_populates='members',
+        sa_relationship_kwargs={'lazy': 'selectin'},
     )
     student: StudentModel = Relationship(
-        back_populates="memberships",
-        sa_relationship_kwargs={"lazy": "selectin"},
+        back_populates='memberships',
+        sa_relationship_kwargs={'lazy': 'selectin'},
     )
     team_memberships: list[TeamMembershipModel] = Relationship(
-        back_populates="project_member",
-        sa_relationship_kwargs={"lazy": "selectin"},
+        back_populates='project_member',
+        sa_relationship_kwargs={'lazy': 'selectin'},
     )
     assignments: list[TaskAssignmentModel] = Relationship(
-        back_populates="project_member",
-        sa_relationship_kwargs={"lazy": "selectin"},
+        back_populates='project_member',
+        sa_relationship_kwargs={'lazy': 'selectin'},
     )
     change_requests: list[TaskChangeRequestModel] = Relationship(
-        back_populates="requested_by_member",
-        sa_relationship_kwargs={"lazy": "selectin"},
+        back_populates='requested_by_member',
+        sa_relationship_kwargs={'lazy': 'selectin'},
     )

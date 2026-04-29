@@ -5,7 +5,7 @@ from app.dependencies.repositories import (
     TeamRepository,
     TeamRepositoryDep,
 )
-from app.models.projects.project import (
+from app.models.projects.team import (
     TeamCreate,
     TeamModel,
     TeamPublic,

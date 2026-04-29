@@ -5,7 +5,7 @@ from app.dependencies.repositories import (
     BusySlotRepository,
     BusySlotRepositoryDep,
 )
-from app.models.students import (
+from app.models.students.busy_slot import (
     BusySlotCreate,
     BusySlotModel,
     BusySlotPublic,

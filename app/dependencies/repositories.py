@@ -1,25 +1,22 @@
-from typing import Annotated, TypeAlias
+from typing import TYPE_CHECKING, Annotated, TypeAlias
 
 from fastapi import Depends
 
-from app.dependencies.session import SessionDep
-from app.models.projects import (
-    ProjectMemberModel,
-    ProjectModel,
-    TeamMembershipModel,
-    TeamModel,
-)
-from app.models.sprints import (
-    SprintModel,
-    SprintTaskModel,
-    TaskAssignmentModel,
-    TaskChangeRequestModel,
-)
-from app.models.students import (
-    BusySlotModel,
-    StudentModel,
-)
 from app.utils.repository import Repository
+
+if TYPE_CHECKING:
+    from app.dependencies.session import SessionDep
+    from app.models.projects.project import ProjectModel
+    from app.models.projects.project_member import ProjectMemberModel
+    from app.models.projects.team import TeamModel
+    from app.models.projects.team_membership import TeamMembershipModel
+    from app.models.sprints.sprint import SprintModel
+    from app.models.sprints.sprint_task import SprintTaskModel
+    from app.models.sprints.task_assignment import TaskAssignmentModel
+    from app.models.sprints.task_change_request import TaskChangeRequestModel
+    from app.models.students.busy_slot import BusySlotModel
+    from app.models.students.student import StudentModel
+    from app.models.token_blacklist import TokenBlacklistModel
 
 
 async def get_project_repository(session: SessionDep):
@@ -110,3 +107,13 @@ async def get_student_repository(session: SessionDep):
 
 StudentRepository: TypeAlias = Repository[StudentModel]
 StudentRepositoryDep = Annotated[StudentRepository, Depends(get_student_repository)]
+
+
+async def get_token_blacklist_repository(session: SessionDep):
+    yield Repository[TokenBlacklistModel](session)
+
+
+TokenBlacklistRepository: TypeAlias = Repository[TokenBlacklistModel]
+TokenBlacklistRepositoryDep = Annotated[
+    TokenBlacklistRepository, Depends(get_token_blacklist_repository)
+]
