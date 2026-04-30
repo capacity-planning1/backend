@@ -6,12 +6,12 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.core.auth import create_access_token, decode_token, get_student_id_from_token
 from app.dependencies.services import StudentServiceDep, TokenBlacklistServiceDep
-from app.models.students.student import StudentModel
+from app.models.students.student import StudentModel, StudentPublic
 from app.utils.hasher import Hasher
 
 oauth2_scheme = HTTPBearer(auto_error=False)
 
-type AuthenticatedStudent = Optional[StudentModel]
+type AuthenticatedStudent = Optional[StudentPublic]
 
 
 async def authenticate_student(
@@ -33,8 +33,7 @@ async def get_current_student(
         Optional[HTTPAuthorizationCredentials], Depends(oauth2_scheme)
     ],
     student_service: StudentServiceDep,
-    blacklist_service: TokenBlacklistServiceDep,
-) -> StudentModel:
+) -> StudentPublic:
     if not credentials:
         raise HTTPException(status_code=401, detail='Not authenticated')
 
@@ -47,25 +46,15 @@ async def get_current_student(
     if not student:
         raise HTTPException(status_code=401, detail='User not found')
 
-    return student
+    return StudentPublic(
+        id=student.id,
+        email=student.email,
+        first_name=student.first_name,
+        last_name=student.last_name,
+        skills=student.skills,
+        created_at=student.created_at,
+        updated_at=student.updated_at
+    )
 
 
-CurrentStudentDep = Annotated[StudentModel, Depends(get_current_student)]
-
-
-async def refresh_access_token(
-    refresh_token: str, student_service: StudentServiceDep
-) -> str | None:
-    payload = decode_token(refresh_token)
-    if not payload:
-        return None
-
-    student_id = payload.get('sub')
-    if not student_id:
-        return None
-
-    student = await student_service.get_student(student_id)
-    if not student:
-        return None
-
-    return create_access_token(student_id)
+CurrentStudentDep = Annotated[StudentPublic, Depends(get_current_student)]

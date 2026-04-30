@@ -1,4 +1,14 @@
 from pydantic import BaseModel, EmailStr, Field
+from uuid import UUID
+from datetime import datetime
+from typing import Optional
+
+from app.models.students.student import StudentPublic
+
+
+class AuthBase(BaseModel):
+    email: EmailStr
+    password: str
 
 
 class RegisterRequest(BaseModel):
@@ -9,24 +19,33 @@ class RegisterRequest(BaseModel):
     skills: str | None = None
 
 
-class RegisterResponse(BaseModel):
-    id: str
-    email: str
-    first_name: str
-    last_name: str
-    message: str = 'Student created successfully'
-
-
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
 
+class RegisterResponse(BaseModel):
+    id: UUID
+    email: EmailStr
+    first_name: str
+    last_name: str
+    skills: str | None = None
+
+
 class LoginResponse(BaseModel):
     access_token: str
     refresh_token: str
-    token_type: str = 'bearer'
+    token_type: str = "bearer"
 
 
-class RefreshRequest(BaseModel):
-    refresh_token: str
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+UserResponse = StudentPublic
+
+
+class MessageResponse(BaseModel):
+    message: str
+    success: bool = True
