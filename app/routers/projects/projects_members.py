@@ -4,6 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter
 
 from app.dependencies.services import ProjectMemberServiceDep
+from app.dependencies.auth import CurrentUserPermissionsDep
 from app.models.projects.project import (
     ProjectMemberCreate,
     ProjectMemberPublic,
@@ -29,9 +30,10 @@ async def get_project_members(
 
 @router.post('/')
 async def create_project_members(
+    permissions: CurrentUserPermissionsDep,
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,
-    pm_create: ProjectMemberCreate
+    pm_create: ProjectMemberCreate,
 ) -> ProjectMemberPublic:
     pm_create.project_id = project_id
     return await project_member_service.add_member_to_project(pm_create)
@@ -51,6 +53,7 @@ async def get_project_member(
 
 @router.put('/{student_id}')
 async def update_project_member(
+    permissions: CurrentUserPermissionsDep,
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,
     student_id: UUID,
@@ -66,6 +69,7 @@ async def update_project_member(
 
 @router.delete('/{student_id}')
 async def delete_project_member(
+    permissions: CurrentUserPermissionsDep,
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,
     student_id: UUID

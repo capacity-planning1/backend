@@ -4,6 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter
 
 from app.dependencies.services import TaskChangeRequestServiceDep
+from app.dependencies.auth import CurrentUserPermissionsDep
 from app.models.sprints import (
     TaskChangeRequestCreate,
     TaskChangeRequestPublic,
@@ -19,6 +20,7 @@ router = APIRouter(
 
 @router.get('/change-requests')
 async def get_task_change_requests(
+    permissions: CurrentUserPermissionsDep,
     task_change_request_service: TaskChangeRequestServiceDep,
     project_id: UUID,
     filters: TaskChangeRequestFilters,
@@ -30,6 +32,7 @@ async def get_task_change_requests(
 
 @router.post('/tasks/{task_id}/change-requests')
 async def create_task_change_request(
+    permissions: CurrentUserPermissionsDep,
     task_change_request_service: TaskChangeRequestServiceDep,
     project_id: UUID,
     task_id: UUID,
@@ -43,6 +46,7 @@ async def create_task_change_request(
 
 @router.get('/change-requests/{request_id}')
 async def get_task_change_request(
+    permissions: CurrentUserPermissionsDep,
     task_change_request_service: TaskChangeRequestServiceDep,
     project_id: UUID,
     request_id: UUID,
@@ -52,6 +56,7 @@ async def get_task_change_request(
 
 @router.put('/change-requests/{request_id}')
 async def update_task_change_request(
+    permissions: CurrentUserPermissionsDep,
     task_change_request_service: TaskChangeRequestServiceDep,
     project_id: UUID,
     request_id: UUID,
@@ -64,6 +69,7 @@ async def update_task_change_request(
 
 @router.delete('/change-requests/{request_id}')
 async def delete_task_change_request(
+    permissions: CurrentUserPermissionsDep,
     task_change_request_service: TaskChangeRequestServiceDep,
     project_id: UUID,
     request_id: UUID,
