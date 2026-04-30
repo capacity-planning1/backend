@@ -4,6 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter
 
 from app.dependencies.services import SprintTaskServiceDep
+from app.dependencies.auth import CurrentUserPermissionsDep
 from app.models.sprints import (
     SprintTaskCreate,
     SprintTaskPublic,
@@ -19,6 +20,7 @@ router = APIRouter(
 
 @router.get('/')
 async def get_tasks(
+    permissions: CurrentUserPermissionsDep,
     sprint_task_service: SprintTaskServiceDep,
     project_id: UUID,
     filters: SprintTaskFilters,
@@ -28,6 +30,7 @@ async def get_tasks(
 
 @router.post('/')
 async def create_task(
+    permissions: CurrentUserPermissionsDep,
     sprint_task_service: SprintTaskServiceDep,
     project_id: UUID,
     task_create: SprintTaskCreate,
@@ -38,6 +41,7 @@ async def create_task(
 
 @router.get('/{task_id}')
 async def get_task(
+    permissions: CurrentUserPermissionsDep,
     sprint_task_service: SprintTaskServiceDep, project_id: UUID, task_id: UUID
 ) -> Optional[SprintTaskPublic]:
     return await sprint_task_service.get_task(task_id)
@@ -45,6 +49,7 @@ async def get_task(
 
 @router.put('/{task_id}')
 async def update_task(
+    permissions: CurrentUserPermissionsDep,
     sprint_task_service: SprintTaskServiceDep,
     project_id: UUID,
     task_id: UUID,
@@ -55,6 +60,7 @@ async def update_task(
 
 @router.delete('/{task_id}')
 async def dekete_task(
+    permissions: CurrentUserPermissionsDep,
     sprint_task_service: SprintTaskServiceDep, project_id: UUID, task_id: UUID
 ) -> Optional[SprintTaskPublic]:
     return await sprint_task_service.delete_task(task_id)

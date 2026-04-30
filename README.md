@@ -37,6 +37,13 @@ REST API на FastAPI, которое помогает тимлидам студ
 | AUTH_ALGORITHM           | string | Алгоритм шифрования JWT.                                   | RS256                 |
 | AUTH_ACCESS_TOKEN_LIFETIME_SECONDS | int | Время жизни access-токена в секундах. | 600                  |
 | AUTH_REFRESH_TOKEN_LIFETIME_SECONDS | int | Время жизни refresh-токена в секундах. | 3600                  |
+| AUTH_ADMIN_EMAIL | Email администратора | admin@example.com |
+| AUTH_ADMIN_PASSWORD | Пароль администратора | Admin123! |
+| AUTH_ADMIN_FIRST_NAME | Имя администратора | Admin |
+| AUTH_ADMIN_LAST_NAME | Фамилия администратора | User |
+| AUTH_ADMIN_ROLE_CODE | Код роли администратора | admin |
+| AUTH_DEFAULT_USER_ROLE_CODE | Роль по умолчанию для новых пользователей | user |
+| BOOTSTRAP_ENABLED | Включить автоматическое создание ролей и администратора при запуске | true |
 
 ## Генерация JWT ключей (для асимметричного шифрования RS256)
 

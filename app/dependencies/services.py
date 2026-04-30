@@ -13,6 +13,8 @@ from app.services.task_change_request import TaskChangeRequestService
 from app.services.team import TeamService
 from app.services.team_membership import TeamMembershipService
 from app.services.refresh_session import RefreshSessionService
+from app.services.rbac import RoleService
+
 
 BusySlotServiceDep = Annotated[BusySlotService, Depends(BusySlotService)]
 
@@ -41,3 +43,5 @@ TaskChangeRequestServiceDep = Annotated[
 ]
 
 RefreshSessionServiceDep = Annotated[RefreshSessionService, Depends(RefreshSessionService)]
+
+RoleServiceDep = Annotated[RoleService, Depends(RoleService)]

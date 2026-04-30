@@ -19,8 +19,9 @@ if TYPE_CHECKING:
     from app.models.students.student import StudentModel
     from app.models.students.busy_slot import BusySlotModel
 
-    from app.models.token_blacklist import TokenBlacklistModel
-    from app.repositories.token_blacklist import TokenBlacklistRepository
+    from app.repositories.refresh_session import RefreshSessionRepository
+
+    from app.repositories.rbac import RoleRepository, PermissionRepository, UserRoleRepository
 
 
 async def get_project_repository(session: SessionDep):
@@ -113,8 +114,29 @@ StudentRepository: TypeAlias = Repository[StudentModel]
 StudentRepositoryDep = Annotated[StudentRepository, Depends(get_student_repository)]
 
 
-async def get_token_blacklist_repository(session: SessionDep):
-    yield TokenBlacklistRepository(session)
+async def get_refresh_session_repository(session: SessionDep) -> RefreshSessionRepository:
+    return RefreshSessionRepository(session)
 
 
-TokenBlacklistRepositoryDep = Annotated[TokenBlacklistRepository, Depends(get_token_blacklist_repository)]
+RefreshSessionRepositoryDep = Annotated[RefreshSessionRepository, Depends(get_refresh_session_repository)]
+
+
+async def get_role_repository(session: SessionDep) -> RoleRepository:
+    return RoleRepository(session)
+
+
+RoleRepositoryDep = Annotated[RoleRepository, Depends(get_role_repository)]
+
+
+async def get_permission_repository(session: SessionDep) -> PermissionRepository:
+    return PermissionRepository(session)
+
+
+PermissionRepositoryDep = Annotated[PermissionRepository, Depends(get_permission_repository)]
+
+
+async def get_user_role_repository(session: SessionDep) -> UserRoleRepository:
+    return UserRoleRepository(session)
+
+
+UserRoleRepositoryDep = Annotated[UserRoleRepository, Depends(get_user_role_repository)]

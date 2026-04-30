@@ -7,6 +7,7 @@ from app.dependencies.services import (
     ProjectMemberServiceDep,
     ProjectServiceDep,
 )
+from app.dependencies.auth import CurrentUserPermissionsDep
 from app.models.projects.project import (
     ProjectCreate,
     ProjectMemberCreate,
@@ -61,6 +62,7 @@ async def get_project(
 
 @router.put('/{project_id}')
 async def update_project(
+    permissions: CurrentUserPermissionsDep,
     project_service: ProjectServiceDep, project_update: ProjectUpdate, project_id: UUID
 ) -> Optional[ProjectPublic]:
     return await project_service.update_project(project_update, project_id)
@@ -68,6 +70,7 @@ async def update_project(
 
 @router.delete('/{project_id}')
 async def detele_project(
+    permissions: CurrentUserPermissionsDep,
     project_member_service: ProjectServiceDep, project_id: UUID
 ) -> Optional[ProjectPublic]:
     return await project_member_service.delete_project(project_id)
