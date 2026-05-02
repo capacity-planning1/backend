@@ -60,11 +60,11 @@ class SprintUpdate(SQLModel):
 class SprintModel(SprintPublic, table=True):
     __tablename__ = 'sprint'
 
-    project: ProjectModel = Relationship(
+    project: "ProjectModel" = Relationship(
         back_populates="sprints",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    tasks: list[SprintTaskModel] = Relationship(
+    tasks: list["SprintTaskModel"] = Relationship(
         back_populates="sprint",
         sa_relationship_kwargs={"lazy": "selectin"},
     )

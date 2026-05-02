@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 from logging.config import fileConfig
-from typing import TYPE_CHECKING
 
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
@@ -11,13 +10,16 @@ from sqlmodel import SQLModel
 from alembic import context
 from app.core.config import get_settings
 
-if TYPE_CHECKING:
-    pass
+print("=" * 80)
+print("DEBUG: Попытка импортировать модели...")
+
+import app.models
 
 
 config = context.config
 settings = get_settings()
-config.set_main_option('sqlalchemy.url', settings.database_url)
+
+config.set_main_option('sqlalchemy.url', settings.database_url.render_as_string(hide_password=False))
 
 if config.config_file_name:
     fileConfig(config.config_file_name)
@@ -27,7 +29,7 @@ target_metadata = SQLModel.metadata
 
 def run_migrations_offline() -> None:
     context.configure(
-        url=settings.database_url,
+        url=str(settings.database_url),
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={'paramstyle': 'named'},

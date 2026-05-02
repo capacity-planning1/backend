@@ -49,11 +49,11 @@ class BusySlotUpdate(SQLModel):
 class BusySlotModel(BusySlotPublic, table=True):
     __tablename__ = 'busyslot'
 
-    student: StudentModel = Relationship(
+    student: "StudentModel" = Relationship(
         back_populates="busy_slots",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    task_assignment: TaskAssignmentModel = Relationship(
+    task_assignment: "TaskAssignmentModel" = Relationship(
         back_populates="busy_slots",
         sa_relationship_kwargs={"lazy": "selectin"},
     )

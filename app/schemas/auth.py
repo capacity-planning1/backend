@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Optional
 
 from app.models.students.student import StudentPublic
+from app.schemas.base import CommonListFilters
 
 
 class AuthBase(BaseModel):
@@ -32,12 +33,6 @@ class RegisterResponse(BaseModel):
     skills: str | None = None
 
 
-class LoginResponse(BaseModel):
-    access_token: str
-    refresh_token: str
-    token_type: str = "bearer"
-
-
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
@@ -49,3 +44,18 @@ UserResponse = StudentPublic
 class MessageResponse(BaseModel):
     message: str
     success: bool = True
+
+
+class AssignRoleRequest(BaseModel):
+    role_code: str = Field(..., description="Role code to assign")
+
+
+class RefreshSessionFilters(CommonListFilters):
+    jti: Optional[str] = None
+    student_id: Optional[UUID] = None
+    expires_at: Optional[datetime] = None
+    is_revoked: Optional[bool] = None
+    user_agent: Optional[str] = None
+    ip_address: Optional[str] = None
+
+    _allowed_sort_fields = ['expires_at']

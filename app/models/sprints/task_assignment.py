@@ -16,10 +16,6 @@ if TYPE_CHECKING:
     from app.models.sprints.sprint_task import SprintTaskModel
 
 
-class TaskAssignment(SQLModel, table=True):
-    id: UUID = Field(default_factory=uuid4, primary_key=True)
-
-
 class TaskAssignmentBase(SQLModel):
     project_task_id: UUID = Field(foreign_key='sprinttask.id', nullable=False)
     project_member_id: UUID = Field(foreign_key='projectmember.id', nullable=False)
@@ -45,19 +41,19 @@ class TaskAssignmentUpdate(SQLModel):
 class TaskAssignmentModel(TaskAssignmentPublic, table=True):
     __tablename__ = 'taskassignment'
 
-    task: SprintTaskModel = Relationship(
+    task: "SprintTaskModel" = Relationship(
         back_populates="assignments",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    project_member: ProjectMemberModel = Relationship(
+    project_member: "ProjectMemberModel" = Relationship(
         back_populates="assignments",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    busy_slots: list[BusySlotModel] = Relationship(
+    busy_slots: list["BusySlotModel"] = Relationship(
         back_populates="task_assignment",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    change_requests: list[TaskChangeRequestModel] = Relationship(
+    change_requests: list["TaskChangeRequestModel"] = Relationship(
         back_populates="task_assignment",
         sa_relationship_kwargs={"lazy": "selectin"},
     )

@@ -16,13 +16,14 @@ from app.core.config import settings
 from app.dependencies.auth import authenticate_student, CurrentStudentDep
 from app.dependencies.services import StudentServiceDep, RefreshSessionServiceDep
 from app.models.students.student import StudentCreate
+from app.models.auth.refresh_session import RefreshSessionCreate
 from app.schemas.auth import (
     LoginRequest,
-    LoginResponse,
     RegisterRequest,
     RegisterResponse,
     UserResponse,
     MessageResponse,
+    TokenResponse,
 )
 
 router = APIRouter(prefix='/auth', tags=['auth'])
@@ -62,7 +63,7 @@ async def register(register_data: RegisterRequest, student_service: StudentServi
     )
 
 
-@router.post('/login', response_model=LoginResponse)
+@router.post('/login', response_model=TokenResponse)
 async def login(
     request: Request,
     response: Response,
@@ -87,7 +88,7 @@ async def login(
     if not refresh_payload:
         raise HTTPException(status_code=500, detail="Invalid token payload")
 
-    await refresh_session_service.create_session(
+    refresh_session = RefreshSessionCreate(
         jti=refresh_payload.get("jti"),
         student_id=student.id,
         expires_at = datetime.fromtimestamp(float(refresh_payload["exp"]), tz=timezone.utc),
@@ -95,17 +96,17 @@ async def login(
         ip_address=request.client.host if request.client else None
     )
 
+    await refresh_session_service.create_session(refresh_session)
+
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=True,
         samesite="lax",
         max_age=settings.auth.refresh_token_lifetime_seconds
     )
-    return LoginResponse(
+    return TokenResponse(
         access_token=access_token,
-        refresh_token=refresh_token,
         token_type="bearer"
     )
 
@@ -117,7 +118,7 @@ async def get_current_user(
     return current_student
 
 
-@router.post('/refresh', response_model=LoginResponse)
+@router.post('/refresh', response_model=TokenResponse)
 async def refresh(
     request: Request,
     response: Response,
@@ -143,11 +144,10 @@ async def refresh(
         key="refresh_token",
         value=new_refresh_token,
         httponly=True,
-        secure=True,
         samesite="lax"
     )
 
-    return LoginResponse(access_token=new_access_token, refresh_token=new_refresh_token)
+    return TokenResponse(access_token=new_access_token, refresh_token=new_refresh_token)
 
 
 @router.post('/logout', response_model=MessageResponse)

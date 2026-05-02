@@ -22,10 +22,6 @@ class TaskChangeRequestStatus(str, Enum):
     REJECTED = 'rejected'
 
 
-class TaskChangeRequest(SQLModel, table=True):
-    id: UUID = Field(default_factory=uuid4, primary_key=True)
-
-
 class TaskChangeRequestBase(SQLModel):
     task_assignment_id: UUID = Field(foreign_key='taskassignment.id', nullable=False)
     requested_by_member_id: UUID = Field(foreign_key='projectmember.id', nullable=False)
@@ -53,11 +49,11 @@ class TaskChangeRequestUpdate(SQLModel):
 class TaskChangeRequestModel(TaskChangeRequestPublic, table=True):
     __tablename__ = 'taskchangerequest'
 
-    task_assignment: TaskAssignmentModel = Relationship(
+    task_assignment: "TaskAssignmentModel" = Relationship(
         back_populates="change_requests",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    requested_by_member: ProjectMemberModel = Relationship(
+    requested_by_member: "ProjectMemberModel" = Relationship(
         back_populates="change_requests",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
