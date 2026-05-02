@@ -8,10 +8,13 @@ from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.base import BaseModel
 
+from app.models.auth.rbac import UserRoleLink
+
 if TYPE_CHECKING:
     from app.models.projects.project_member import ProjectMemberModel
     from app.models.projects.project import ProjectModel
     from app.models.students.busy_slot import BusySlotModel
+    from app.models.auth.rbac import RoleModel
 
 
 class StudentBase(SQLModel):
@@ -52,3 +55,8 @@ class StudentModel(StudentPublic, table=True):
         back_populates="student",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
+    roles: list["RoleModel"] = Relationship(
+            back_populates="users",
+            link_model=UserRoleLink,
+            sa_relationship_kwargs={"lazy": "selectin"}
+        )

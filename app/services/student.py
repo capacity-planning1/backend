@@ -44,9 +44,12 @@ class StudentService:
         return await self.__student_repository.delete(student_id)
 
     async def get_student_by_email(self, email: str) -> Optional[StudentPublic]:
-        students = self.get_students()
-        for student in students:
-            if student.email == email:
-                return student
+        filters = StudentFilters()
+        filters.email = email
 
-        return None
+        students = await self.__student_repository.fetch(filters)
+
+        if len(students) == 0:
+            return None
+
+        return students[0]

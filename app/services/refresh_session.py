@@ -4,15 +4,19 @@ from uuid import UUID
 
 from app.core.auth import decode_token, create_refresh_token, create_access_token
 from app.dependencies.repositories import RefreshSessionRepositoryDep
+from app.models.auth.refresh_session import (
+    RefreshSessionUpdate,
+    RefreshSessionModel,
+)    
+from app.schemas.auth import RefreshSessionFilters
 
 
 class RefreshSessionService:
     def __init__(self, refresh_session_repo: RefreshSessionRepositoryDep):
-        self._repo = refresh_session_repo
+        self.__repo = refresh_session_repo
 
-    async def create_session(self, jti: str, student_id: UUID, expires_at: datetime,
-        user_agent: str | None = None, ip_address: str | None = None):
-        return await self._repo.create(jti, student_id, expires_at, user_agent, ip_address)
+    async def create_session(self, refresh_session: RefreshSessionModel):
+        return await self.__repo.save(refresh_session)
 
     async def validate_session(self, refresh_token: str) -> Optional[tuple[UUID, str]]:
         payload = decode_token(refresh_token)
@@ -25,17 +29,31 @@ class RefreshSessionService:
         if not jti or not student_id_str:
             return None
 
-        session = await self._repo.get_active_by_jti(jti)
-        if not session:
+        filters = RefreshSessionFilters()
+        filters.jti = jti
+        filters.is_revoked = False
+
+        sessions = await self.__repo.fetch(filters)
+        active_sessions = [s for s in sessions
+            if s.expires_at > datetime.now(timezone.utc)
+        ]
+
+        if len(active_sessions) == 0:
             return None
 
         return (UUID(student_id_str), jti)
 
     async def revoke_session(self, jti: str) -> bool:
-        return await self._repo.revoke_session(jti)
+        filters = RefreshSessionFilters()
+        filters.jti = jti
+        return await self.__repo.update_by_filters(
+            RefreshSessionUpdate(is_revoked=True), filters)
 
     async def revoke_all_student_sessions(self, student_id: UUID) -> int:
-        return await self._repo.revoke_all_student_sessions(student_id)
+        filters = RefreshSessionFilters()
+        filters.student_id = student_id
+        return await self.__repo.update_by_filters(
+            RefreshSessionUpdate(is_revoked=True), filters)
 
     async def refresh_tokens(self, old_refresh_token: str,
         user_agent: str | None = None, 
@@ -46,7 +64,7 @@ class RefreshSessionService:
 
         student_id, old_jti = result
 
-        await self._repo.revoke_session(old_jti)
+        await self.revoke_session(old_jti)
 
         new_access_token = create_access_token(student_id)
         new_refresh_token = create_refresh_token(student_id)
@@ -62,6 +80,14 @@ class RefreshSessionService:
         else:
             return None
 
-        await self._repo.create(new_jti, student_id, new_exp, user_agent, ip_address)
+        session = RefreshSessionModel(
+            jti=new_jti,
+            student_id=student_id,
+            expires_at=new_exp,
+            user_agent=user_agent,
+            ip_address=ip_address
+        )
+
+        await self.__repo.save(session)
 
         return (new_access_token, new_refresh_token, str(student_id))

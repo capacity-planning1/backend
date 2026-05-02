@@ -1,63 +1,86 @@
 from app.models.base import BaseModel
-from app.models.projects import (
+from app.models.projects.project import (
     ProjectBase,
     ProjectCreate,
+    ProjectModel,
+    ProjectPublic,
+    ProjectUpdate,
+)
+from app.models.projects.project_member import (
     ProjectMemberBase,
     ProjectMemberCreate,
     ProjectMemberModel,
     ProjectMemberPublic,
     ProjectMemberUpdate,
-    ProjectModel,
-    ProjectPublic,
-    ProjectUpdate,
+)
+from app.models.projects.team import (
     TeamBase,
     TeamCreate,
+    TeamModel,
+    TeamPublic,
+    TeamUpdate,
+)
+from app.models.projects.team_membership import (
     TeamMembershipBase,
     TeamMembershipCreate,
     TeamMembershipModel,
     TeamMembershipPublic,
     TeamMembershipUpdate,
-    TeamModel,
-    TeamPublic,
-    TeamUpdate,
 )
-from app.models.sprints import (
+from app.models.sprints.sprint import (
     SprintBase,
     SprintCreate,
     SprintModel,
     SprintPublic,
+    SprintUpdate,
+    StatusType,
+)
+from app.models.sprints.sprint_task import (
     SprintTaskBase,
     SprintTaskCreate,
     SprintTaskModel,
     SprintTaskPublic,
     SprintTaskUpdate,
-    SprintUpdate,
-    StatusType,
+    TaskPriority,
+)
+from app.models.sprints.task_assignment import (
     TaskAssignmentBase,
     TaskAssignmentCreate,
     TaskAssignmentModel,
     TaskAssignmentPublic,
     TaskAssignmentUpdate,
+)
+from app.models.sprints.task_change_request import (
     TaskChangeRequestBase,
     TaskChangeRequestCreate,
     TaskChangeRequestModel,
     TaskChangeRequestPublic,
     TaskChangeRequestStatus,
     TaskChangeRequestUpdate,
-    TaskPriority,
 )
-from app.models.students import (
+from app.models.students.busy_slot import (
     BusySlotBase,
     BusySlotCreate,
     BusySlotModel,
     BusySlotPublic,
     BusySlotUpdate,
     SlotType,
+)
+from app.models.students.student import (
     StudentBase,
     StudentCreate,
     StudentModel,
     StudentPublic,
     StudentUpdate,
+)
+from app.models.auth.rbac import (
+    UserRoleLink,
+    RolePermissionLink,
+    PermissionModel,
+    RoleModel,
+)
+from app.models.auth.refresh_session import (
+    RefreshSessionModel,
 )
 
 __all__ = [
@@ -116,4 +139,9 @@ __all__ = [
     'StatusType',
     'TaskPriority',
     'TaskChangeRequestStatus',
+    'UserRoleLink',
+    'RolePermissionLink',
+    'PermissionModel',
+    'RoleModel',
+    'RefreshSessionModel',
 ]
