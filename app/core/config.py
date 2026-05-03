@@ -22,6 +22,14 @@ class AuthSettings(BaseSettings):
     access_token_lifetime_seconds: int = int(timedelta(minutes=10).total_seconds())
     refresh_token_lifetime_seconds: int = int(timedelta(minutes=60).total_seconds())
 
+    @property
+    def access_token_lifetime_td(self) -> timedelta:
+        return timedelta(seconds=self.access_token_lifetime_seconds)
+
+    @property
+    def refresh_token_lifetime_td(self) -> timedelta:
+        return timedelta(seconds=self.refresh_token_lifetime_seconds)
+
     def get_private_key(self) -> str:
         key_path = Path(self.private_key_path)
         if not key_path.exists():
