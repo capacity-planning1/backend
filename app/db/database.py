@@ -10,7 +10,7 @@ settings = get_settings()
 
 engine: AsyncEngine = create_async_engine(
     settings.database_url,
-    echo=settings.database_echo,
+    echo=settings.db.database_echo,
 )
 
 AsyncSessionLocal = async_sessionmaker(

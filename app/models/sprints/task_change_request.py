@@ -12,18 +12,14 @@ from app.models.base import BaseModel
 
 
 if TYPE_CHECKING:
-    from app.models.project_member import ProjectMemberModel
-    from app.models.task_assignment import TaskAssignmentModel
+    from app.models.projects.project_member import ProjectMemberModel
+    from app.models.sprints.task_assignment import TaskAssignmentModel
 
 
 class TaskChangeRequestStatus(str, Enum):
     PENDING = 'pending'
     APPROVED = 'approved'
     REJECTED = 'rejected'
-
-
-class TaskChangeRequest(SQLModel, table=True):
-    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
 
 class TaskChangeRequestBase(SQLModel):
@@ -53,11 +49,11 @@ class TaskChangeRequestUpdate(SQLModel):
 class TaskChangeRequestModel(TaskChangeRequestPublic, table=True):
     __tablename__ = 'taskchangerequest'
 
-    task_assignment: TaskAssignmentModel = Relationship(
+    task_assignment: "TaskAssignmentModel" = Relationship(
         back_populates="change_requests",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    requested_by_member: ProjectMemberModel = Relationship(
+    requested_by_member: "ProjectMemberModel" = Relationship(
         back_populates="change_requests",
         sa_relationship_kwargs={"lazy": "selectin"},
     )

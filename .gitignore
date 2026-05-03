@@ -178,3 +178,8 @@ pyrightconfig.json
 .vscode/
 
 .env
+
+# JWT keys
+*.pem
+*.key
+*.crt

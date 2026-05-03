@@ -10,14 +10,10 @@ from app.models.base import BaseModel
 
 
 if TYPE_CHECKING:
-    from app.models.project_member import ProjectMemberModel
-    from app.models.busy_slot import BusySlotModel
-    from app.models.task_change_request import TaskChangeRequestModel
-    from app.models.sprint_task import SprintTaskModel
-
-
-class TaskAssignment(SQLModel, table=True):
-    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    from app.models.projects.project_member import ProjectMemberModel
+    from app.models.students.busy_slot import BusySlotModel
+    from app.models.sprints.task_change_request import TaskChangeRequestModel
+    from app.models.sprints.sprint_task import SprintTaskModel
 
 
 class TaskAssignmentBase(SQLModel):
@@ -45,19 +41,19 @@ class TaskAssignmentUpdate(SQLModel):
 class TaskAssignmentModel(TaskAssignmentPublic, table=True):
     __tablename__ = 'taskassignment'
 
-    task: SprintTaskModel = Relationship(
+    task: "SprintTaskModel" = Relationship(
         back_populates="assignments",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    project_member: ProjectMemberModel = Relationship(
+    project_member: "ProjectMemberModel" = Relationship(
         back_populates="assignments",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    busy_slots: list[BusySlotModel] = Relationship(
+    busy_slots: list["BusySlotModel"] = Relationship(
         back_populates="task_assignment",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    change_requests: list[TaskChangeRequestModel] = Relationship(
+    change_requests: list["TaskChangeRequestModel"] = Relationship(
         back_populates="task_assignment",
         sa_relationship_kwargs={"lazy": "selectin"},
     )

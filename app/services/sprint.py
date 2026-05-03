@@ -5,7 +5,7 @@ from app.dependencies.repositories import (
     SprintRepository,
     SprintRepositoryDep,
 )
-from app.models.sprints import (
+from app.models.sprints.sprint import (
     SprintCreate,
     SprintModel,
     SprintPublic,

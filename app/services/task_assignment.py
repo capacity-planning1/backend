@@ -13,7 +13,7 @@ from app.models.sprints.task_assignment import (
 from app.schemas.sprints import TaskAssignmentFilters
 
 
-class TaskAssigmnentService:
+class TaskAssignmentService:
     __task_assignment_repository: TaskAssignmentRepository
 
     def __init__(self, ta_repository: TaskAssignmentRepositoryDep):

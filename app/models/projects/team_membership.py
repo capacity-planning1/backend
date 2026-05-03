@@ -3,11 +3,11 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel
 
+from app.models.base import BaseModel
 
 if TYPE_CHECKING:
-    from app.models.base import BaseModel
-    from app.models.team import TeamModel
-    from app.models.project_member import ProjectMemberModel
+    from app.models.projects.team import TeamModel
+    from app.models.projects.project_member import ProjectMemberModel
 
 
 class TeamMembershipBase(SQLModel):
@@ -31,11 +31,11 @@ class TeamMembershipUpdate(SQLModel):
 class TeamMembershipModel(TeamMembershipPublic, table=True):
     __tablename__ = 'teammembership'
 
-    team: TeamModel = Relationship(
+    team: "TeamModel" = Relationship(
         back_populates="memberships",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    project_member: ProjectMemberModel = Relationship(
+    project_member: "ProjectMemberModel" = Relationship(
         back_populates="team_memberships",
         sa_relationship_kwargs={"lazy": "selectin"},
     )

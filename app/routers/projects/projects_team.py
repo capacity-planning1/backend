@@ -7,6 +7,7 @@ from app.dependencies.services import (
     TeamMembershipServiceDep,
     TeamServiceDep,
 )
+from app.dependencies.auth import CurrentUserPermissionsDep
 from app.models.projects.project import (
     TeamMembershipCreate,
     TeamMembershipPublic,
@@ -33,6 +34,7 @@ async def get_team(
 
 @router.put('/')
 async def update_team(
+    permissions: CurrentUserPermissionsDep,
     team_service: TeamServiceDep,
     project_id: UUID,
     team_id: UUID,
@@ -43,6 +45,7 @@ async def update_team(
 
 @router.delete('/')
 async def delete_team(
+    permissions: CurrentUserPermissionsDep,
     team_service: TeamServiceDep,
     project_id: UUID,
     team_id: UUID
@@ -63,6 +66,7 @@ async def get_team_members(
 
 @router.post('/members')
 async def create_team_member(
+    permissions: CurrentUserPermissionsDep,
     team_membership_service: TeamMembershipServiceDep,
     project_id: UUID,
     team_id: UUID,
@@ -74,6 +78,7 @@ async def create_team_member(
 
 @router.get('/members/{student_id}')
 async def get_member(
+    permissions: CurrentUserPermissionsDep,
     team_membership_service: TeamMembershipServiceDep,
     project_id: UUID,
     team_id: UUID,
@@ -87,6 +92,7 @@ async def get_member(
 
 @router.put('/members/{student_id}')
 async def update_team_member(
+    permissions: CurrentUserPermissionsDep,
     team_membership_service: TeamMembershipServiceDep,
     project_id: UUID,
     team_id: UUID,
@@ -102,6 +108,7 @@ async def update_team_member(
 
 @router.delete('/members/{student_id}')
 async def delete_membership(
+    permissions: CurrentUserPermissionsDep,
     team_membership_service: TeamMembershipServiceDep,
     project_id: UUID,
     team_id: UUID,

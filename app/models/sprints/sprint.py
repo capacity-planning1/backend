@@ -11,8 +11,8 @@ from app.models.base import BaseModel
 
 
 if TYPE_CHECKING:
-    from app.models.project import ProjectModel
-    from app.models.sprint_task import SprintTaskModel
+    from app.models.projects.project import ProjectModel
+    from app.models.sprints.sprint_task import SprintTaskModel
 
 
 class StatusType(str, Enum):
@@ -60,11 +60,11 @@ class SprintUpdate(SQLModel):
 class SprintModel(SprintPublic, table=True):
     __tablename__ = 'sprint'
 
-    project: ProjectModel = Relationship(
+    project: "ProjectModel" = Relationship(
         back_populates="sprints",
         sa_relationship_kwargs={"lazy": "selectin"},
     )
-    tasks: list[SprintTaskModel] = Relationship(
+    tasks: list["SprintTaskModel"] = Relationship(
         back_populates="sprint",
         sa_relationship_kwargs={"lazy": "selectin"},
     )

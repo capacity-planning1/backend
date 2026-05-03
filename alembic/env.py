@@ -9,11 +9,17 @@ from sqlmodel import SQLModel
 
 from alembic import context
 from app.core.config import get_settings
-from app.models import projects, sprints, students  # noqa: F401
+
+print("=" * 80)
+print("DEBUG: Попытка импортировать модели...")
+
+import app.models
+
 
 config = context.config
 settings = get_settings()
-config.set_main_option('sqlalchemy.url', settings.database_url)
+
+config.set_main_option('sqlalchemy.url', settings.database_url.render_as_string(hide_password=False))
 
 if config.config_file_name:
     fileConfig(config.config_file_name)
@@ -23,7 +29,7 @@ target_metadata = SQLModel.metadata
 
 def run_migrations_offline() -> None:
     context.configure(
-        url=settings.database_url,
+        url=str(settings.database_url),
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={'paramstyle': 'named'},

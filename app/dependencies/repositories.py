@@ -1,25 +1,27 @@
-from typing import Annotated, TypeAlias
+from typing import Annotated, TypeAlias, TYPE_CHECKING
 
 from fastapi import Depends
 
-from app.dependencies.session import SessionDep
-from app.models.projects import (
-    ProjectMemberModel,
-    ProjectModel,
-    TeamMembershipModel,
-    TeamModel,
-)
-from app.models.sprints import (
-    SprintModel,
-    SprintTaskModel,
-    TaskAssignmentModel,
-    TaskChangeRequestModel,
-)
-from app.models.students import (
-    BusySlotModel,
-    StudentModel,
-)
 from app.utils.repository import Repository
+
+if TYPE_CHECKING:
+    from app.dependencies.session import SessionDep
+    from app.models.projects.project import ProjectModel
+    from app.models.projects.project_member import ProjectMemberModel
+    from app.models.projects.team import TeamModel
+    from app.models.projects.team_membership import TeamMembershipModel
+
+    from app.models.sprints.sprint import SprintModel
+    from app.models.sprints.sprint_task import SprintTaskModel
+    from app.models.sprints.task_assignment import TaskAssignmentModel
+    from app.models.sprints.task_change_request import TaskChangeRequestModel
+
+    from app.models.students.student import StudentModel
+    from app.models.students.busy_slot import BusySlotModel
+
+    from app.models.auth.refresh_session import RefreshSessionModel
+
+    from app.repositories.rbac import RoleRepository, PermissionRepository, UserRoleRepository
 
 
 async def get_project_repository(session: SessionDep):
@@ -110,3 +112,16 @@ async def get_student_repository(session: SessionDep):
 
 StudentRepository: TypeAlias = Repository[StudentModel]
 StudentRepositoryDep = Annotated[StudentRepository, Depends(get_student_repository)]
+
+
+async def get_refresh_session_repository(session: SessionDep):
+    yield Repository[RefreshSessionModel](session)
+
+
+RefreshSessionRepository: TypeAlias = Repository[RefreshSessionModel]
+RefreshSessionRepositoryDep = Annotated[RefreshSessionRepository, Depends(get_refresh_session_repository)]
+
+
+RoleRepositoryDep = Annotated[RoleRepository, Depends(RoleRepository)]
+PermissionRepositoryDep = Annotated[PermissionRepository, Depends(PermissionRepository)]
+UserRoleRepositoryDep = Annotated[UserRoleRepository, Depends(UserRoleRepository)]
