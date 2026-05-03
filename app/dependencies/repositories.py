@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from app.models.students.student import StudentModel
     from app.models.students.busy_slot import BusySlotModel
 
-    from app.repositories.refresh_session import RefreshSessionRepository
+    from app.models.auth.refresh_session import RefreshSessionModel
 
     from app.repositories.rbac import RoleRepository, PermissionRepository, UserRoleRepository
 
@@ -114,29 +114,14 @@ StudentRepository: TypeAlias = Repository[StudentModel]
 StudentRepositoryDep = Annotated[StudentRepository, Depends(get_student_repository)]
 
 
-async def get_refresh_session_repository(session: SessionDep) -> RefreshSessionRepository:
-    return RefreshSessionRepository(session)
+async def get_refresh_session_repository(session: SessionDep):
+    yield Repository[RefreshSessionModel](session)
 
 
+RefreshSessionRepository: TypeAlias = Repository[RefreshSessionModel]
 RefreshSessionRepositoryDep = Annotated[RefreshSessionRepository, Depends(get_refresh_session_repository)]
 
 
-async def get_role_repository(session: SessionDep) -> RoleRepository:
-    return RoleRepository(session)
-
-
-RoleRepositoryDep = Annotated[RoleRepository, Depends(get_role_repository)]
-
-
-async def get_permission_repository(session: SessionDep) -> PermissionRepository:
-    return PermissionRepository(session)
-
-
-PermissionRepositoryDep = Annotated[PermissionRepository, Depends(get_permission_repository)]
-
-
-async def get_user_role_repository(session: SessionDep) -> UserRoleRepository:
-    return UserRoleRepository(session)
-
-
-UserRoleRepositoryDep = Annotated[UserRoleRepository, Depends(get_user_role_repository)]
+RoleRepositoryDep = Annotated[RoleRepository, Depends(RoleRepository)]
+PermissionRepositoryDep = Annotated[PermissionRepository, Depends(PermissionRepository)]
+UserRoleRepositoryDep = Annotated[UserRoleRepository, Depends(UserRoleRepository)]

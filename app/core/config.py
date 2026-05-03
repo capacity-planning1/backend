@@ -19,16 +19,8 @@ class AuthSettings(BaseSettings):
     private_key_path: str = 'private.pem'
     public_key_path: str = 'public.pem'
     algorithm: str = 'RS256'
-    access_token_lifetime_seconds: int = 600
-    refresh_token_lifetime_seconds: int = 3600
-
-    @property
-    def access_token_lifetime_td(self) -> timedelta:
-        return timedelta(seconds=self.access_token_lifetime_seconds)
-
-    @property
-    def refresh_token_lifetime_td(self) -> timedelta:
-        return timedelta(seconds=self.refresh_token_lifetime_seconds)
+    access_token_lifetime_seconds: int = int(timedelta(minutes=10).total_seconds())
+    refresh_token_lifetime_seconds: int = int(timedelta(minutes=60).total_seconds())
 
     def get_private_key(self) -> str:
         key_path = Path(self.private_key_path)
@@ -112,7 +104,7 @@ class Settings(BaseSettings):
     bootstrap_enabled: bool = True
 
     @property
-    def database_url(self) -> str:
+    def database_url(self) -> URL:
         return URL.create(
             drivername="postgresql+asyncpg",
             username=self.db.postgres_user,
