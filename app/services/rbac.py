@@ -1,6 +1,7 @@
 from typing import List, Set
 from uuid import UUID
 
+from app.core.config import settings
 from app.dependencies.repositories import (
     RoleRepositoryDep,
     PermissionRepositoryDep,
@@ -45,7 +46,7 @@ class RoleService:
         if not role:
             return False
 
-        if role_code == "user":
+        if role_code == settings.role.default_user_role_code:
             return False
         return await self._user_role_repo.remove_role(student_id, role.id)
 

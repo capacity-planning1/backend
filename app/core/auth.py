@@ -10,7 +10,7 @@ from app.core.config import settings
 
 def create_access_token(student_id: UUID) -> str:
     now = datetime.now(timezone.utc)
-    delta = settings.auth.access_token_lifetime_td
+    delta = timedelta(settings.auth.access_token_lifetime_seconds)
     exp = now + delta
     payload = {
         'sub': str(student_id),
@@ -30,7 +30,7 @@ def create_refresh_token(
     if expires_delta:
         exp = now + expires_delta
     else:
-        exp = now + settings.auth.refresh_token_lifetime_td
+        exp = now + timedelta(settings.auth.refresh_token_lifetime_seconds)
 
     payload = {
         'sub': str(student_id),
