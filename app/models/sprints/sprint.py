@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from datetime import date
 from enum import Enum
-from uuid import UUID, uuid4
 from typing import TYPE_CHECKING
+from uuid import UUID
 
+from sqlalchemy.orm import relationship
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.base import BaseModel
-
 
 if TYPE_CHECKING:
     from app.models.projects.project import ProjectModel
@@ -60,11 +60,17 @@ class SprintUpdate(SQLModel):
 class SprintModel(SprintPublic, table=True):
     __tablename__ = 'sprint'
 
-    project: "ProjectModel" = Relationship(
-        back_populates="sprints",
-        sa_relationship_kwargs={"lazy": "selectin"},
+    project: 'ProjectModel' = Relationship(
+        sa_relationship=relationship(
+            "ProjectModel",
+            back_populates='sprints',
+            lazy="selectin",
+        )
     )
-    tasks: list["SprintTaskModel"] = Relationship(
-        back_populates="sprint",
-        sa_relationship_kwargs={"lazy": "selectin"},
+    tasks: list['SprintTaskModel'] = Relationship(
+        sa_relationship=relationship(
+            "SprintTaskModel",
+            back_populates='sprint',
+            lazy="selectin",
+        )
     )

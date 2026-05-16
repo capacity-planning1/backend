@@ -1,3 +1,6 @@
+from app.models.auth.refresh_session import (
+    RefreshSessionModel,
+)
 from app.models.base import BaseModel
 from app.models.projects.project import (
     ProjectBase,
@@ -73,15 +76,6 @@ from app.models.students.student import (
     StudentPublic,
     StudentUpdate,
 )
-from app.models.auth.rbac import (
-    UserRoleLink,
-    RolePermissionLink,
-    PermissionModel,
-    RoleModel,
-)
-from app.models.auth.refresh_session import (
-    RefreshSessionModel,
-)
 
 __all__ = [
     'BaseModel',
@@ -139,9 +133,5 @@ __all__ = [
     'StatusType',
     'TaskPriority',
     'TaskChangeRequestStatus',
-    'UserRoleLink',
-    'RolePermissionLink',
-    'PermissionModel',
-    'RoleModel',
     'RefreshSessionModel',
 ]

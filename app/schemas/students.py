@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from app.models.students import SlotType
+from app.models.students.busy_slot import SlotType
 from app.schemas.base import CommonListFilters
 
 

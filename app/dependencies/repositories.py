@@ -1,27 +1,21 @@
-from typing import Annotated, TypeAlias, TYPE_CHECKING
+from typing import TYPE_CHECKING, Annotated, TypeAlias
 
 from fastapi import Depends
 
 from app.utils.repository import Repository
 
-if TYPE_CHECKING:
-    from app.dependencies.session import SessionDep
-    from app.models.projects.project import ProjectModel
-    from app.models.projects.project_member import ProjectMemberModel
-    from app.models.projects.team import TeamModel
-    from app.models.projects.team_membership import TeamMembershipModel
-
-    from app.models.sprints.sprint import SprintModel
-    from app.models.sprints.sprint_task import SprintTaskModel
-    from app.models.sprints.task_assignment import TaskAssignmentModel
-    from app.models.sprints.task_change_request import TaskChangeRequestModel
-
-    from app.models.students.student import StudentModel
-    from app.models.students.busy_slot import BusySlotModel
-
-    from app.models.auth.refresh_session import RefreshSessionModel
-
-    from app.repositories.rbac import RoleRepository, PermissionRepository, UserRoleRepository
+from app.dependencies.session import SessionDep
+from app.models.auth.refresh_session import RefreshSessionModel
+from app.models.projects.project import ProjectModel
+from app.models.projects.project_member import ProjectMemberModel
+from app.models.projects.team import TeamModel
+from app.models.projects.team_membership import TeamMembershipModel
+from app.models.sprints.sprint import SprintModel
+from app.models.sprints.sprint_task import SprintTaskModel
+from app.models.sprints.task_assignment import TaskAssignmentModel
+from app.models.sprints.task_change_request import TaskChangeRequestModel
+from app.models.students.busy_slot import BusySlotModel
+from app.models.students.student import StudentModel
 
 
 async def get_project_repository(session: SessionDep):
@@ -119,9 +113,6 @@ async def get_refresh_session_repository(session: SessionDep):
 
 
 RefreshSessionRepository: TypeAlias = Repository[RefreshSessionModel]
-RefreshSessionRepositoryDep = Annotated[RefreshSessionRepository, Depends(get_refresh_session_repository)]
-
-
-RoleRepositoryDep = Annotated[RoleRepository, Depends(RoleRepository)]
-PermissionRepositoryDep = Annotated[PermissionRepository, Depends(PermissionRepository)]
-UserRoleRepositoryDep = Annotated[UserRoleRepository, Depends(UserRoleRepository)]
+RefreshSessionRepositoryDep = Annotated[
+    RefreshSessionRepository, Depends(get_refresh_session_repository)
+]

@@ -2,7 +2,7 @@ from datetime import date, datetime
 from typing import Optional
 from uuid import UUID
 
-from app.models.sprints import (
+from app.models.sprints.sprint import (
     StatusType,
     TaskChangeRequestStatus,
     TaskPriority,

@@ -3,23 +3,21 @@ from uuid import UUID
 
 from fastapi import APIRouter, Query
 
+from app.dependencies.auth import CurrentStudentDep
 from app.dependencies.services import (
     ProjectMemberServiceDep,
     ProjectServiceDep,
 )
-from app.dependencies.auth import CurrentUserPermissionsDep
 from app.models.projects.project import (
     ProjectCreate,
-    ProjectMemberCreate,
-    ProjectMemberPublic,
     ProjectPublic,
     ProjectUpdate,
 )
-from app.routers.projects.projects import (
-    projects_members,
-    projects_team,
-    projects_teams,
+from app.models.projects.project_member import (
+    ProjectMemberCreate,
+    ProjectMemberPublic,
 )
+from app.routers.projects import projects_members, projects_team, projects_teams
 from app.schemas.projects import ProjectFilters
 
 router = APIRouter(
@@ -62,15 +60,18 @@ async def get_project(
 
 @router.put('/{project_id}')
 async def update_project(
-    permissions: CurrentUserPermissionsDep,
-    project_service: ProjectServiceDep, project_update: ProjectUpdate, project_id: UUID
+    _role: CurrentStudentDep,
+    project_service: ProjectServiceDep,
+    project_update: ProjectUpdate,
+    project_id: UUID,
 ) -> Optional[ProjectPublic]:
     return await project_service.update_project(project_update, project_id)
 
 
 @router.delete('/{project_id}')
 async def detele_project(
-    permissions: CurrentUserPermissionsDep,
-    project_member_service: ProjectServiceDep, project_id: UUID
+    _role: CurrentStudentDep,
+    project_member_service: ProjectServiceDep,
+    project_id: UUID,
 ) -> Optional[ProjectPublic]:
     return await project_member_service.delete_project(project_id)

@@ -1,6 +1,7 @@
-from uuid import UUID, uuid4
 from typing import TYPE_CHECKING
+from uuid import UUID
 
+from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Text
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -33,11 +34,17 @@ class TeamUpdate(SQLModel):
 class TeamModel(TeamPublic, table=True):
     __tablename__ = 'team'
 
-    project: "ProjectModel" = Relationship(
-        back_populates="teams",
-        sa_relationship_kwargs={"lazy": "selectin"},
+    project: 'ProjectModel' = Relationship(
+        sa_relationship=relationship(
+            "ProjectModel",
+            back_populates='teams',
+            lazy="selectin",
+        )
     )
-    memberships: list["TeamMembershipModel"] = Relationship(
-        back_populates="team",
-        sa_relationship_kwargs={"lazy": "selectin"},
+    memberships: list['TeamMembershipModel'] = Relationship(
+        sa_relationship=relationship(
+            "TeamMembershipModel",
+            back_populates='team',
+            lazy="selectin",
+        )
     )

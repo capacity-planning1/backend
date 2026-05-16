@@ -2,17 +2,18 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from uuid import UUID
 from typing import TYPE_CHECKING
+from uuid import UUID
 
+from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Text
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.base import BaseModel
 
 if TYPE_CHECKING:
-    from app.models.students.student import StudentModel
     from app.models.sprints.task_assignment import TaskAssignmentModel
+    from app.models.students.student import StudentModel
 
 
 class SlotType(str, Enum):
@@ -28,7 +29,7 @@ class BusySlotBase(SQLModel):
     start_datetime: datetime = Field(nullable=False)
     end_datetime: datetime = Field(nullable=False)
     description: str | None = Field(default=None, sa_column=Column(Text))
-    task_assignment_id: UUID = Field(foreign_key="taskassignment.id", nullable=False)
+    task_assignment_id: UUID = Field(foreign_key='taskassignment.id', nullable=False)
 
 
 class BusySlotPublic(BaseModel, BusySlotBase):
@@ -49,11 +50,17 @@ class BusySlotUpdate(SQLModel):
 class BusySlotModel(BusySlotPublic, table=True):
     __tablename__ = 'busyslot'
 
-    student: "StudentModel" = Relationship(
-        back_populates="busy_slots",
-        sa_relationship_kwargs={"lazy": "selectin"},
+    student: 'StudentModel' = Relationship(
+        sa_relationship=relationship(
+            "StudentModel",
+            back_populates='busy_slots',
+            lazy="selectin",
+        )
     )
-    task_assignment: "TaskAssignmentModel" = Relationship(
-        back_populates="busy_slots",
-        sa_relationship_kwargs={"lazy": "selectin"},
+    task_assignment: 'TaskAssignmentModel' = Relationship(
+        sa_relationship=relationship(
+            "TaskAssignmentModel",
+            back_populates='busy_slots',
+            lazy="selectin",
+        )
     )

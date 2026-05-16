@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, Query
 
 from app.dependencies.services import StudentServiceDep
-from app.models.students import (
+from app.models.students.student import (
     StudentPublic,
     StudentUpdate,
 )
@@ -21,8 +21,7 @@ router.include_router(busy_slots.router)
 
 @router.get('/')
 async def get_students(
-    student_service: StudentServiceDep,
-    filters: Annotated[StudentFilters, Query()]
+    student_service: StudentServiceDep, filters: Annotated[StudentFilters, Query()]
 ) -> Sequence[StudentPublic]:
     return await student_service.get_students(filters)
 
@@ -43,9 +42,7 @@ async def get_student_profile(
 
 @router.put('/{student_id}')
 async def update_student(
-    student_service: StudentServiceDep,
-    student_update: StudentUpdate,
-    student_id: UUID
+    student_service: StudentServiceDep, student_update: StudentUpdate, student_id: UUID
 ) -> Optional[StudentPublic]:
     return await student_service.update_student(student_update, student_id)
 

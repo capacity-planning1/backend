@@ -1,5 +1,4 @@
 from typing import Optional, Sequence
-from uuid import UUID
 
 from app.dependencies.repositories import (
     ProjectMemberRepository,

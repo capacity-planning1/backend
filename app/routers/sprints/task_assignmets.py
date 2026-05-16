@@ -3,9 +3,9 @@ from uuid import UUID
 
 from fastapi import APIRouter
 
+from app.dependencies.auth import CurrentStudentDep
 from app.dependencies.services import TaskAssignmentServiceDep
-from app.dependencies.auth import CurrentUserPermissionsDep
-from app.models.sprints import (
+from app.models.sprints.task_assignment import (
     TaskAssignmentCreate,
     TaskAssignmentPublic,
     TaskAssignmentUpdate,
@@ -20,9 +20,9 @@ router = APIRouter(
 
 @router.get('/')
 async def get_task_assignments(
-    permissions: CurrentUserPermissionsDep,
+    _role: CurrentStudentDep,
     task_assignment_service: TaskAssignmentServiceDep,
-    project_id: UUID,
+    _project_id: UUID,
     task_id: UUID,
     filters: TaskAssignmentFilters,
 ) -> Sequence[TaskAssignmentPublic]:
@@ -32,9 +32,9 @@ async def get_task_assignments(
 
 @router.post('/')
 async def create_task_assignment(
-    permissions: CurrentUserPermissionsDep,
+    _role: CurrentStudentDep,
     task_assignment_service: TaskAssignmentServiceDep,
-    project_id: UUID,
+    _project_id: UUID,
     task_id: UUID,
     task_assignment_create: TaskAssignmentCreate,
 ) -> TaskAssignmentPublic:
@@ -44,9 +44,9 @@ async def create_task_assignment(
 
 @router.get('/{project_member_id}')
 async def get_task_assignment(
-    permissions: CurrentUserPermissionsDep,
+    _role: CurrentStudentDep,
     task_assignment_service: TaskAssignmentServiceDep,
-    project_id: UUID,
+    _project_id: UUID,
     task_id: UUID,
     project_member_id: UUID,
 ) -> Optional[TaskAssignmentPublic]:
@@ -57,10 +57,10 @@ async def get_task_assignment(
 
 
 @router.put('/{project_member_id}')
-async def update_task_assignment(
-    permissions: CurrentUserPermissionsDep,
+async def update_task_assignment(  # noqa: PLR0913
+    _role: CurrentStudentDep,
     task_assignment_service: TaskAssignmentServiceDep,
-    project_id: UUID,
+    _project_id: UUID,
     task_id: UUID,
     project_member_id: UUID,
     task_assignment_update: TaskAssignmentUpdate,
@@ -75,9 +75,9 @@ async def update_task_assignment(
 
 @router.delete('/{project_member_id}')
 async def delete_task_assignment(
-    permissions: CurrentUserPermissionsDep,
+    _role: CurrentStudentDep,
     task_assignment_service: TaskAssignmentServiceDep,
-    project_id: UUID,
+    _project_id: UUID,
     task_id: UUID,
     project_member_id: UUID,
 ) -> Optional[TaskAssignmentPublic]:

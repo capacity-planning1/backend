@@ -1,0 +1,51 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: fastapi_db
+    restart: "no"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: capacity_planning
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d capacity_planning"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    container_name: fastapi_app
+    restart: "no"
+    ports:
+      - "8000:8000"
+    environment:
+      # ДОБАВЛЕНА ЭТА ПЕРЕМЕННАЯ - указываем драйвер
+      - DB__POSTGRES_SCHEME=postgresql+asyncpg
+      - DB__POSTGRES_HOST=db
+      - DB__POSTGRES_PORT=5432
+      - DB__POSTGRES_USER=postgres
+      - DB__POSTGRES_PASSWORD=postgres
+      - DB__POSTGRES_DB=capacity_planning
+      - DB__DATABASE_ECHO=false
+
+      - AUTH__PRIVATE_KEY_PATH=private.pem
+      - AUTH__PUBLIC_KEY_PATH=public.pem
+      - AUTH__ALGORITHM=HS256
+      - AUTH__ACCESS_TOKEN_LIFETIME_SECONDS=600
+      - AUTH__REFRESH_TOKEN_LIFETIME_SECONDS=3600
+
+      - ROLE__ADMIN_ROLE_CODE=admin
+      - ROLE__DEFAULT_USER_ROLE_CODE=user
+
+      - BOOTSTRAP_ENABLED=true  
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

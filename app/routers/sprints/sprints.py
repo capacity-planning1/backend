@@ -3,17 +3,14 @@ from uuid import UUID
 
 from fastapi import APIRouter
 
+from app.dependencies.auth import CurrentStudentDep
 from app.dependencies.services import SprintServiceDep
-from app.models.sprints import (
+from app.models.sprints.sprint import (
     SprintCreate,
     SprintPublic,
     SprintUpdate,
 )
-from app.routers.sprints import (
-    project_tasks,
-    task_assignmets,
-    task_change_request,
-)
+from app.routers.sprints import project_tasks, task_assignmets, task_change_requests
 from app.schemas.sprints import SprintFilters
 
 router = APIRouter(
@@ -22,7 +19,7 @@ router = APIRouter(
 )
 
 router.include_router(task_assignmets.router)
-router.include_router(task_change_request.router)
+router.include_router(task_change_requests.router)
 router.include_router(project_tasks.router)
 
 
@@ -36,7 +33,10 @@ async def get_sprints(
 
 @router.post('/')
 async def create_sprint(
-    sprint_service: SprintServiceDep, sprint_create: SprintCreate, project_id: UUID
+    _role: CurrentStudentDep,
+    sprint_service: SprintServiceDep,
+    sprint_create: SprintCreate,
+    project_id: UUID,
 ) -> SprintPublic:
     sprint_create.project_id = project_id
     return await sprint_service.create_sprint(sprint_create)
@@ -44,15 +44,19 @@ async def create_sprint(
 
 @router.get('/{sprint_id}')
 async def get_sprint(
-    sprint_service: SprintServiceDep, project_id: UUID, sprint_id: UUID
+    _role: CurrentStudentDep,
+    sprint_service: SprintServiceDep,
+    _project_id: UUID,
+    sprint_id: UUID,
 ) -> Optional[SprintPublic]:
     return await sprint_service.get_sprint(sprint_id)
 
 
 @router.put('/{sprint_id}')
 async def update_sprint(
+    _role: CurrentStudentDep,
     sprint_service: SprintServiceDep,
-    project_id: UUID,
+    _project_id: UUID,
     sprint_id: UUID,
     sprint_update: SprintUpdate,
 ) -> Optional[SprintPublic]:
@@ -61,6 +65,9 @@ async def update_sprint(
 
 @router.delete('/{sprint_id}')
 async def delete_sprint(
-    sprint_service: SprintServiceDep, project_id: UUID, sprint_id: UUID
+    _role: CurrentStudentDep,
+    sprint_service: SprintServiceDep,
+    _project_id: UUID,
+    sprint_id: UUID,
 ) -> Optional[SprintPublic]:
     return await sprint_service.delete_sprint(sprint_id)

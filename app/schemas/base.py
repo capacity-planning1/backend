@@ -10,13 +10,15 @@ class CommonListFilters(BaseModel):
     sort_order: Literal['asc', 'desc'] = 'asc'
     _allowed_sort_fields: list[str] = []
 
+    @classmethod
     @field_validator('sort_by')
-    def validate_sort_field(self, v):
+    def validate_sort_field(cls, v):
         if v is None:
             return v
 
-        if v not in self._allowed_sort_fields:
+        if v not in cls._allowed_sort_fields:
             raise ValueError(
-                f"Project sorting by '{v}' not allowed. Allowed: {self._allowed_sort_fields}"
+                f"Project sorting by '{v}' not allowed. "
+                f'Allowed: {cls._allowed_sort_fields}'
             )
         return v

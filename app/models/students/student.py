@@ -1,20 +1,24 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from enum import Enum
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Column, TIMESTAMP, Text
+from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Text
 from sqlmodel import Field, Relationship, SQLModel
 
+from app.core.config import settings
 from app.models.base import BaseModel
 
-from app.models.auth.rbac import UserRoleLink
-
 if TYPE_CHECKING:
-    from app.models.projects.project_member import ProjectMemberModel
     from app.models.projects.project import ProjectModel
+    from app.models.projects.project_member import ProjectMemberModel
     from app.models.students.busy_slot import BusySlotModel
-    from app.models.auth.rbac import RoleModel
+
+
+class Role(str, Enum):
+    ADMIN = settings.role.admin_role_code
+    USER = settings.role.default_user_role_code
 
 
 class StudentBase(SQLModel):
@@ -23,6 +27,7 @@ class StudentBase(SQLModel):
     last_name: str = Field(nullable=False, max_length=100)
     hashed_password: str = Field(nullable=False)
     skills: str | None = Field(default=None, sa_column=Column(Text))
+    role: str = Field(default=settings.role.default_user_role_code, nullable=False)
 
 
 class StudentPublic(BaseModel, StudentBase):
@@ -41,22 +46,26 @@ class StudentUpdate(SQLModel):
 
 
 class StudentModel(StudentPublic, table=True):
-    __tablename__ = "student"
+    __tablename__ = 'student'
 
-    memberships: list["ProjectMemberModel"] = Relationship(
-        back_populates="student",
-        sa_relationship_kwargs={"lazy": "selectin"},
-    )
-    owned_projects: list["ProjectModel"] = Relationship(
-        back_populates="owner",
-        sa_relationship_kwargs={"lazy": "selectin"},
-    )
-    busy_slots: list["BusySlotModel"] = Relationship(
-        back_populates="student",
-        sa_relationship_kwargs={"lazy": "selectin"},
-    )
-    roles: list["RoleModel"] = Relationship(
-            back_populates="users",
-            link_model=UserRoleLink,
-            sa_relationship_kwargs={"lazy": "selectin"}
+    memberships: list['ProjectMemberModel'] = Relationship(
+        sa_relationship=relationship(
+            "ProjectMemberModel",
+            back_populates='student',
+            lazy="selectin",
         )
+    )
+    owned_projects: list['ProjectModel'] = Relationship(
+        sa_relationship=relationship(
+            "ProjectModel",
+            back_populates="owner",
+            lazy="selectin"
+        )
+    )
+    busy_slots: list['BusySlotModel'] = Relationship(
+        sa_relationship=relationship(
+            "BusySlotModel",
+            back_populates='student',
+            lazy="selectin",
+        )
+    )
