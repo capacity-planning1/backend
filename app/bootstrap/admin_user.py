@@ -4,14 +4,12 @@ from app.core.config import settings
 from app.models.students.student import StudentModel
 from app.schemas.students import StudentFilters
 from app.utils.hasher import Hasher
-from app.utils.repository import Repository  # Импортируем сам базовый класс репозитория
+from app.utils.repository import Repository
 
 
-# Меняем тип аргумента с зависимости на чистую AsyncSession
 async def create_admin_user(session: AsyncSession):
-    # Вручную создаем репозиторий на основе сессии
     student_repo = Repository[StudentModel](session)
-    student_repo.model = StudentModel  # Явно задаем модель, так как мы убрали магию
+    student_repo.model = StudentModel
 
     filters = StudentFilters(email=settings.role.admin_email)
     existing_admin = await student_repo.fetch(filters)
@@ -30,6 +28,4 @@ async def create_admin_user(session: AsyncSession):
         admin = await student_repo.save(admin)
         print(f"✓ Created admin user: {admin.email}")
     else:
-        # Небольшой фикс: existing_admin — это список (Sequence), 
-        # поэтому берем первый элемент [0], чтобы прочитать email
         print(f"✓ Admin user already exists: {existing_admin[0].email}")

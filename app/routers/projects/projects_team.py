@@ -27,6 +27,7 @@ router = APIRouter(
 
 @router.get('/')
 async def get_team(
+    _role: CurrentStudentDep,
     team_service: TeamServiceDep, _project_id: UUID, team_id: UUID
 ) -> Optional[TeamPublic]:
     return await team_service.get_team(team_id)
@@ -55,6 +56,7 @@ async def delete_team(
 
 @router.get('/members')
 async def get_team_members(
+    _role: CurrentStudentDep,
     team_membership_service: TeamMembershipServiceDep,
     _project_id: UUID,
     team_id: UUID,
@@ -91,8 +93,8 @@ async def get_member(
 
 
 @router.put('/members/{student_id}')
-async def update_team_member(  # noqa: PLR0913
-    _role: CurrentStudentDep,
+async def update_team_member(
+    _student: CurrentStudentDep,
     team_membership_service: TeamMembershipServiceDep,
     _project_id: UUID,
     team_id: UUID,
@@ -107,7 +109,7 @@ async def update_team_member(  # noqa: PLR0913
 
 @router.delete('/members/{student_id}')
 async def delete_membership(
-    _role: CurrentStudentDep,
+    _student: CurrentStudentDep,
     team_membership_service: TeamMembershipServiceDep,
     _project_id: UUID,
     team_id: UUID,

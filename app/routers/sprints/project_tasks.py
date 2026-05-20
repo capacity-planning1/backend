@@ -20,7 +20,7 @@ router = APIRouter(
 
 @router.get('/')
 async def get_tasks(
-    _role: CurrentStudentDep,
+    _student: CurrentStudentDep,
     sprint_task_service: SprintTaskServiceDep,
     project_id: UUID,
     filters: SprintTaskFilters,
@@ -31,7 +31,7 @@ async def get_tasks(
 
 @router.post('/')
 async def create_task(
-    _role: CurrentStudentDep,
+    _student: CurrentStudentDep,
     sprint_task_service: SprintTaskServiceDep,
     project_id: UUID,
     task_create: SprintTaskCreate,
@@ -42,7 +42,7 @@ async def create_task(
 
 @router.get('/{task_id}')
 async def get_task(
-    _role: CurrentStudentDep,
+    _student: CurrentStudentDep,
     sprint_task_service: SprintTaskServiceDep,
     _project_id: UUID,
     task_id: UUID,
@@ -52,7 +52,7 @@ async def get_task(
 
 @router.put('/{task_id}')
 async def update_task(
-    _role: CurrentStudentDep,
+    _student: CurrentStudentDep,
     sprint_task_service: SprintTaskServiceDep,
     _project_id: UUID,
     task_id: UUID,
@@ -63,7 +63,7 @@ async def update_task(
 
 @router.delete('/{task_id}')
 async def dekete_task(
-    _role: CurrentStudentDep,
+    _student: CurrentStudentDep,
     sprint_task_service: SprintTaskServiceDep,
     _project_id: UUID,
     task_id: UUID,

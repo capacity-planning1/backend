@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter
 
+from app.dependencies.auth import CurrentStudentDep
 from app.dependencies.services import TaskChangeRequestServiceDep
 from app.models.sprints.task_change_request import (
     TaskChangeRequestCreate,
@@ -19,6 +20,7 @@ router = APIRouter(
 
 @router.get('/change-requests')
 async def get_task_change_requests(
+    _student: CurrentStudentDep,
     task_change_request_service: TaskChangeRequestServiceDep,
     project_id: UUID,
     filters: TaskChangeRequestFilters,
@@ -30,6 +32,7 @@ async def get_task_change_requests(
 
 @router.post('/tasks/{task_id}/change-requests')
 async def create_task_change_request(
+    _student: CurrentStudentDep,
     task_change_request_service: TaskChangeRequestServiceDep,
     _project_id: UUID,
     task_id: UUID,
@@ -43,6 +46,7 @@ async def create_task_change_request(
 
 @router.get('/change-requests/{request_id}')
 async def get_task_change_request(
+    _student: CurrentStudentDep,
     task_change_request_service: TaskChangeRequestServiceDep,
     _project_id: UUID,
     request_id: UUID,
@@ -52,6 +56,7 @@ async def get_task_change_request(
 
 @router.put('/change-requests/{request_id}')
 async def update_task_change_request(
+    _student: CurrentStudentDep,
     task_change_request_service: TaskChangeRequestServiceDep,
     _project_id: UUID,
     request_id: UUID,
@@ -64,6 +69,7 @@ async def update_task_change_request(
 
 @router.delete('/change-requests/{request_id}')
 async def delete_task_change_request(
+    _student: CurrentStudentDep,
     task_change_request_service: TaskChangeRequestServiceDep,
     _project_id: UUID,
     request_id: UUID,

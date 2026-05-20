@@ -86,7 +86,7 @@ class Settings(BaseSettings):
     bootstrap_enabled: bool = True
 
     @property
-    def database_url(self) -> URL:
+    def database_url(self) -> str:
         return URL.create(
             drivername='postgresql+asyncpg',
             username=self.db.postgres_user,

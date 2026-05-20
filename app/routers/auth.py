@@ -145,6 +145,7 @@ async def refresh(
 
 @router.post('/logout', response_model=MessageResponse)
 async def logout(
+    _student: CurrentStudentDep,
     response: Response,
     request: Request,
     refresh_session_service: RefreshSessionServiceDep,
@@ -165,12 +166,12 @@ async def logout(
 
 @router.post('/logout-all', response_model=MessageResponse)
 async def logout_all_devices(
+    student: CurrentStudentDep,
     response: Response,
     refresh_session_service: RefreshSessionServiceDep,
-    current_student: CurrentStudentDep,
 ):
     revoked_count = await refresh_session_service.revoke_all_student_sessions(
-        current_student.id
+        student.id
     )
 
     response.delete_cookie('refresh_token')

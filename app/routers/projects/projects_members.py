@@ -21,10 +21,10 @@ router = APIRouter(
 
 @router.get('/')
 async def get_project_members(
+    student: CurrentStudentDep,
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,
     filters: ProjectMembersFilters,
-    student: CurrentStudentDep,
     project_role: ProjectRoleDep,
 ) -> Sequence[ProjectMemberPublic]:
     if (
@@ -103,7 +103,7 @@ async def update_project_member(  # noqa: PLR0913
 
 @router.delete('/{student_id}')
 async def delete_project_member(
-    _student: CurrentStudentDep,
+    student: CurrentStudentDep,
     _project_role: ProjectRoleDep,
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,

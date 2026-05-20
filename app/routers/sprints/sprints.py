@@ -25,6 +25,7 @@ router.include_router(project_tasks.router)
 
 @router.get('/')
 async def get_sprints(
+    _student: CurrentStudentDep,
     sprint_service: SprintServiceDep, project_id: UUID, filters: SprintFilters
 ) -> Sequence[SprintPublic]:
     filters.project_id = project_id
@@ -33,7 +34,7 @@ async def get_sprints(
 
 @router.post('/')
 async def create_sprint(
-    _role: CurrentStudentDep,
+    _student: CurrentStudentDep,
     sprint_service: SprintServiceDep,
     sprint_create: SprintCreate,
     project_id: UUID,
@@ -44,7 +45,7 @@ async def create_sprint(
 
 @router.get('/{sprint_id}')
 async def get_sprint(
-    _role: CurrentStudentDep,
+    _student: CurrentStudentDep,
     sprint_service: SprintServiceDep,
     _project_id: UUID,
     sprint_id: UUID,
@@ -54,7 +55,7 @@ async def get_sprint(
 
 @router.put('/{sprint_id}')
 async def update_sprint(
-    _role: CurrentStudentDep,
+    _student: CurrentStudentDep,
     sprint_service: SprintServiceDep,
     _project_id: UUID,
     sprint_id: UUID,
@@ -65,7 +66,7 @@ async def update_sprint(
 
 @router.delete('/{sprint_id}')
 async def delete_sprint(
-    _role: CurrentStudentDep,
+    _student: CurrentStudentDep,
     sprint_service: SprintServiceDep,
     _project_id: UUID,
     sprint_id: UUID,

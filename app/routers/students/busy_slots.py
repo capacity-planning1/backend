@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter
 
+from app.dependencies.auth import CurrentStudentDep
 from app.dependencies.services import BusySlotServiceDep
 from app.models.students.busy_slot import (
     BusySlotCreate,
@@ -19,6 +20,7 @@ router = APIRouter(
 
 @router.get('/')
 async def get_busy_slots(
+    _student: CurrentStudentDep,
     busy_slot_service: BusySlotServiceDep, student_id: UUID, filters: BusySlotFilters
 ) -> Sequence[BusySlotPublic]:
     filters.student_id = student_id
@@ -27,6 +29,7 @@ async def get_busy_slots(
 
 @router.post('/')
 async def create_busy_slot(
+    _student: CurrentStudentDep,
     busy_slot_service: BusySlotServiceDep, student_id: UUID, bs_create: BusySlotCreate
 ) -> BusySlotPublic:
     bs_create.student_id = student_id
@@ -35,6 +38,7 @@ async def create_busy_slot(
 
 @router.get('/{busy_slot_id}')
 async def get_busy_slot(
+    _student: CurrentStudentDep,
     busy_slot_service: BusySlotServiceDep, _student_id: UUID, busy_slot_id: UUID
 ) -> Optional[BusySlotPublic]:
     return await busy_slot_service.get_busy_slot(busy_slot_id)
@@ -42,6 +46,7 @@ async def get_busy_slot(
 
 @router.put('/{busy_slot_id}')
 async def update_busy_slot(
+    _student: CurrentStudentDep,
     busy_slot_service: BusySlotServiceDep,
     _student_id: UUID,
     busy_slot_id: UUID,
@@ -52,6 +57,7 @@ async def update_busy_slot(
 
 @router.delete('/{busy_slot_id}')
 async def delete_busy_slot(
+    _student: CurrentStudentDep,
     busy_slot_service: BusySlotServiceDep, _student_id: UUID, busy_slot_id: UUID
 ) -> Optional[BusySlotPublic]:
     return await busy_slot_service.delete_busy_slot(busy_slot_id)

@@ -20,7 +20,7 @@ router = APIRouter(
 
 @router.get('/')
 async def get_task_assignments(
-    _role: CurrentStudentDep,
+    _student: CurrentStudentDep,
     task_assignment_service: TaskAssignmentServiceDep,
     _project_id: UUID,
     task_id: UUID,
@@ -32,7 +32,7 @@ async def get_task_assignments(
 
 @router.post('/')
 async def create_task_assignment(
-    _role: CurrentStudentDep,
+    _student: CurrentStudentDep,
     task_assignment_service: TaskAssignmentServiceDep,
     _project_id: UUID,
     task_id: UUID,
@@ -44,7 +44,7 @@ async def create_task_assignment(
 
 @router.get('/{project_member_id}')
 async def get_task_assignment(
-    _role: CurrentStudentDep,
+    _student: CurrentStudentDep,
     task_assignment_service: TaskAssignmentServiceDep,
     _project_id: UUID,
     task_id: UUID,
@@ -58,7 +58,7 @@ async def get_task_assignment(
 
 @router.put('/{project_member_id}')
 async def update_task_assignment(  # noqa: PLR0913
-    _role: CurrentStudentDep,
+    _student: CurrentStudentDep,
     task_assignment_service: TaskAssignmentServiceDep,
     _project_id: UUID,
     task_id: UUID,
@@ -75,7 +75,7 @@ async def update_task_assignment(  # noqa: PLR0913
 
 @router.delete('/{project_member_id}')
 async def delete_task_assignment(
-    _role: CurrentStudentDep,
+    _student: CurrentStudentDep,
     task_assignment_service: TaskAssignmentServiceDep,
     _project_id: UUID,
     task_id: UUID,

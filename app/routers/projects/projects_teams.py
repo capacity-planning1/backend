@@ -16,7 +16,7 @@ router = APIRouter(
 
 @router.get('/teams')
 async def get_teams(
-    _role: CurrentStudentDep,
+    _student: CurrentStudentDep,
     team_service: TeamServiceDep,
     project_id: UUID,
     filters: TeamFilters,
@@ -27,7 +27,7 @@ async def get_teams(
 
 @router.post('/teams')
 async def create_team(
-    _role: CurrentStudentDep,
+    _student: CurrentStudentDep,
     team_service: TeamServiceDep,
     project_id: UUID,
     team_create: TeamCreate,

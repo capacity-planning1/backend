@@ -32,13 +32,16 @@ router.include_router(projects_members.router)
 
 @router.get('/')
 async def get_projects(
-    project_service: ProjectServiceDep, filters: Annotated[ProjectFilters, Query()]
+    _student: CurrentStudentDep,
+    project_service: ProjectServiceDep,
+    filters: Annotated[ProjectFilters, Query()]
 ) -> Sequence[ProjectPublic]:
     return await project_service.get_projects(filters)
 
 
 @router.post('/')
 async def create_project(
+    _student: CurrentStudentDep,
     project_service: ProjectServiceDep, project_create: ProjectCreate
 ) -> ProjectPublic:
     return await project_service.create_project(project_create)
@@ -46,13 +49,16 @@ async def create_project(
 
 @router.post('/join')
 async def join_project(
-    project_member_service: ProjectMemberServiceDep, pm_create: ProjectMemberCreate
+    _student: CurrentStudentDep,
+    project_member_service: ProjectMemberServiceDep,
+    pm_create: ProjectMemberCreate
 ) -> Optional[ProjectMemberPublic]:
     return await project_member_service.add_member_to_project(pm_create)
 
 
 @router.get('/{project_id}')
 async def get_project(
+    _student: CurrentStudentDep,
     project_service: ProjectServiceDep, project_id: UUID
 ) -> Optional[ProjectPublic]:
     return await project_service.get_project(project_id)
@@ -60,7 +66,7 @@ async def get_project(
 
 @router.put('/{project_id}')
 async def update_project(
-    _role: CurrentStudentDep,
+    _student: CurrentStudentDep,
     project_service: ProjectServiceDep,
     project_update: ProjectUpdate,
     project_id: UUID,
@@ -70,7 +76,7 @@ async def update_project(
 
 @router.delete('/{project_id}')
 async def detele_project(
-    _role: CurrentStudentDep,
+    _student: CurrentStudentDep,
     project_member_service: ProjectServiceDep,
     project_id: UUID,
 ) -> Optional[ProjectPublic]:
