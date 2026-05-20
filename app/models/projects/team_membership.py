@@ -1,13 +1,14 @@
-from uuid import UUID
 from typing import TYPE_CHECKING
+from uuid import UUID
 
+from sqlalchemy.orm import relationship
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.base import BaseModel
 
 if TYPE_CHECKING:
-    from app.models.projects.team import TeamModel
     from app.models.projects.project_member import ProjectMemberModel
+    from app.models.projects.team import TeamModel
 
 
 class TeamMembershipBase(SQLModel):
@@ -31,11 +32,17 @@ class TeamMembershipUpdate(SQLModel):
 class TeamMembershipModel(TeamMembershipPublic, table=True):
     __tablename__ = 'teammembership'
 
-    team: "TeamModel" = Relationship(
-        back_populates="memberships",
-        sa_relationship_kwargs={"lazy": "selectin"},
+    team: 'TeamModel' = Relationship(
+        sa_relationship=relationship(
+            "TeamModel",
+            back_populates='memberships',
+            lazy="selectin",
+        )
     )
-    project_member: "ProjectMemberModel" = Relationship(
-        back_populates="team_memberships",
-        sa_relationship_kwargs={"lazy": "selectin"},
+    project_member: 'ProjectMemberModel' = Relationship(
+        sa_relationship=relationship(
+            "ProjectMemberModel",
+            back_populates='team_memberships',
+            lazy="selectin",
+        )
     )

@@ -1,7 +1,8 @@
-from pydantic import BaseModel, EmailStr, Field
-from uuid import UUID
 from datetime import datetime
 from typing import Optional
+from uuid import UUID
+
+from pydantic import BaseModel, EmailStr, Field
 
 from app.models.students.student import StudentPublic
 from app.schemas.base import CommonListFilters
@@ -35,7 +36,7 @@ class RegisterResponse(BaseModel):
 
 class TokenResponse(BaseModel):
     access_token: str
-    token_type: str = "bearer"
+    token_type: str = 'bearer'
 
 
 UserResponse = StudentPublic
@@ -47,7 +48,7 @@ class MessageResponse(BaseModel):
 
 
 class AssignRoleRequest(BaseModel):
-    role_code: str = Field(..., description="Role code to assign")
+    role_code: str = Field(..., description='Role code to assign')
 
 
 class RefreshSessionFilters(CommonListFilters):

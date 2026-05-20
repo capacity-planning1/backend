@@ -3,9 +3,9 @@ from uuid import UUID
 
 from fastapi import APIRouter
 
+from app.dependencies.auth import CurrentStudentDep
 from app.dependencies.services import TaskChangeRequestServiceDep
-from app.dependencies.auth import CurrentUserPermissionsDep
-from app.models.sprints import (
+from app.models.sprints.task_change_request import (
     TaskChangeRequestCreate,
     TaskChangeRequestPublic,
     TaskChangeRequestUpdate,
@@ -20,7 +20,7 @@ router = APIRouter(
 
 @router.get('/change-requests')
 async def get_task_change_requests(
-    permissions: CurrentUserPermissionsDep,
+    _student: CurrentStudentDep,
     task_change_request_service: TaskChangeRequestServiceDep,
     project_id: UUID,
     filters: TaskChangeRequestFilters,
@@ -32,9 +32,9 @@ async def get_task_change_requests(
 
 @router.post('/tasks/{task_id}/change-requests')
 async def create_task_change_request(
-    permissions: CurrentUserPermissionsDep,
+    _student: CurrentStudentDep,
     task_change_request_service: TaskChangeRequestServiceDep,
-    project_id: UUID,
+    _project_id: UUID,
     task_id: UUID,
     task_change_request_create: TaskChangeRequestCreate,
 ) -> TaskChangeRequestPublic:
@@ -46,9 +46,9 @@ async def create_task_change_request(
 
 @router.get('/change-requests/{request_id}')
 async def get_task_change_request(
-    permissions: CurrentUserPermissionsDep,
+    _student: CurrentStudentDep,
     task_change_request_service: TaskChangeRequestServiceDep,
-    project_id: UUID,
+    _project_id: UUID,
     request_id: UUID,
 ) -> Optional[TaskChangeRequestPublic]:
     return await task_change_request_service.get_task_change_request(request_id)
@@ -56,9 +56,9 @@ async def get_task_change_request(
 
 @router.put('/change-requests/{request_id}')
 async def update_task_change_request(
-    permissions: CurrentUserPermissionsDep,
+    _student: CurrentStudentDep,
     task_change_request_service: TaskChangeRequestServiceDep,
-    project_id: UUID,
+    _project_id: UUID,
     request_id: UUID,
     task_change_request_update: TaskChangeRequestUpdate,
 ) -> Optional[TaskChangeRequestPublic]:
@@ -69,9 +69,9 @@ async def update_task_change_request(
 
 @router.delete('/change-requests/{request_id}')
 async def delete_task_change_request(
-    permissions: CurrentUserPermissionsDep,
+    _student: CurrentStudentDep,
     task_change_request_service: TaskChangeRequestServiceDep,
-    project_id: UUID,
+    _project_id: UUID,
     request_id: UUID,
 ) -> Optional[TaskChangeRequestPublic]:
     return await task_change_request_service.delete_task_change_request(request_id)

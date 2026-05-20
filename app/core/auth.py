@@ -1,42 +1,28 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 from uuid import UUID, uuid4
+
 import jwt
-
-
 
 from app.core.config import settings
 
 
-def create_access_token(student_id: UUID) -> str:
-    now = datetime.now(timezone.utc)
-    delta = timedelta(settings.auth.access_token_lifetime_seconds)
-    exp = now + delta
-    payload = {
-        'sub': str(student_id),
-        'exp': int(exp.timestamp()),
-        'jti': str(uuid4()),
-        'iat': int(now.timestamp())
-    }
-
-    private_key = settings.auth.get_private_key()
-    return jwt.encode(payload, private_key, algorithm=settings.auth.algorithm)
-
-
-def create_refresh_token(
-    student_id: UUID, expires_delta: timedelta | None = None
+def create_token(
+    student_id: UUID,
+    token_lifetime_seconds: int,
+    expires_delta: timedelta | None = None,
 ) -> str:
     now = datetime.now(timezone.utc)
     if expires_delta:
         exp = now + expires_delta
     else:
-        exp = now + timedelta(settings.auth.refresh_token_lifetime_seconds)
+        exp = now + timedelta(token_lifetime_seconds)
 
     payload = {
         'sub': str(student_id),
         'exp': int(exp.timestamp()),
         'jti': str(uuid4()),
-        'iat': int(now.timestamp())
+        'iat': int(now.timestamp()),
     }
 
     private_key = settings.auth.get_private_key()

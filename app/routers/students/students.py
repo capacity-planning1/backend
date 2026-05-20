@@ -3,8 +3,9 @@ from uuid import UUID
 
 from fastapi import APIRouter, Query
 
+from app.dependencies.auth import CurrentStudentDep
 from app.dependencies.services import StudentServiceDep
-from app.models.students import (
+from app.models.students.student import (
     StudentPublic,
     StudentUpdate,
 )
@@ -21,14 +22,15 @@ router.include_router(busy_slots.router)
 
 @router.get('/')
 async def get_students(
-    student_service: StudentServiceDep,
-    filters: Annotated[StudentFilters, Query()]
+    _student: CurrentStudentDep,
+    student_service: StudentServiceDep, filters: Annotated[StudentFilters, Query()]
 ) -> Sequence[StudentPublic]:
     return await student_service.get_students(filters)
 
 
 @router.get('/profile')
 async def get_student_own_profile(
+    _student: CurrentStudentDep,
     student_service: StudentServiceDep, student_id: UUID
 ) -> Optional[StudentPublic]:
     return await student_service.get_student(student_id)
@@ -36,6 +38,7 @@ async def get_student_own_profile(
 
 @router.get('/{student_id}')
 async def get_student_profile(
+    _student: CurrentStudentDep,
     student_service: StudentServiceDep, student_id: UUID
 ) -> Optional[StudentPublic]:
     return await student_service.get_student(student_id)
@@ -43,15 +46,15 @@ async def get_student_profile(
 
 @router.put('/{student_id}')
 async def update_student(
-    student_service: StudentServiceDep,
-    student_update: StudentUpdate,
-    student_id: UUID
+    _student: CurrentStudentDep,
+    student_service: StudentServiceDep, student_update: StudentUpdate, student_id: UUID
 ) -> Optional[StudentPublic]:
     return await student_service.update_student(student_update, student_id)
 
 
 @router.delete('/{student_id}')
 async def detele_student(
+    _student: CurrentStudentDep,
     student_service: StudentServiceDep, student_id: UUID
 ) -> Optional[StudentPublic]:
     return await student_service.delete_student(student_id)

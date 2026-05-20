@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from uuid import UUID, uuid4
 from typing import TYPE_CHECKING
+from uuid import UUID
 
+from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Text
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.base import BaseModel
-
 
 if TYPE_CHECKING:
     from app.models.projects.project_member import ProjectMemberModel
@@ -49,11 +49,17 @@ class TaskChangeRequestUpdate(SQLModel):
 class TaskChangeRequestModel(TaskChangeRequestPublic, table=True):
     __tablename__ = 'taskchangerequest'
 
-    task_assignment: "TaskAssignmentModel" = Relationship(
-        back_populates="change_requests",
-        sa_relationship_kwargs={"lazy": "selectin"},
+    task_assignment: 'TaskAssignmentModel' = Relationship(
+        sa_relationship=relationship(
+            "TaskAssignmentModel",
+            back_populates='change_requests',
+            lazy="selectin",
+        )
     )
-    requested_by_member: "ProjectMemberModel" = Relationship(
-        back_populates="change_requests",
-        sa_relationship_kwargs={"lazy": "selectin"},
+    requested_by_member: 'ProjectMemberModel' = Relationship(
+        sa_relationship=relationship(
+            "ProjectMemberModel",
+            back_populates='change_requests',
+            lazy="selectin",
+        )
     )

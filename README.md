@@ -25,25 +25,25 @@ REST API на FastAPI, которое помогает тимлидам студ
 
 | Название переменной | Тип    | Описание                                                   | Значение по умолчанию |
 |---------------------|--------|------------------------------------------------------------|-----------------------|
-| DB_POSTGRES_SCHEME     | string | Схема подключения к PostgreSQL с асинхронным драйвером.    | postgresql+asyncpg    |
-| DB_POSTGRES_HOST       | string | Хост локальной базы PostgreSQL.                            | localhost             |
-| DB_POSTGRES_PORT       | int    | Порт подключения к PostgreSQL.                             | 5432                  |
-| DB_POSTGRES_DB         | string | Имя базы данных для приложения.                            | capacity_planning     |
-| DB_POSTGRES_USER       | string | Пользователь PostgreSQL с правами на базу.                 | postgres              |
-| DB_POSTGRES_PASSWORD   | string | Пароль пользователя PostgreSQL.                            | postgres              |
-| DB_ECHO             | bool   | Включить логирование SQL (True/False).                     | False                 |
-| AUTH_PRIVATE_KEY_PATH | string | Путь к секретному ключу для подписи JWT-токенов | private.pem |
-| AUTH_PUBLIC_KEY_PATH | string | Путь к публичному ключу для расшифровки JWT-токенов | public.pem |
-| AUTH_ALGORITHM           | string | Алгоритм шифрования JWT.                                   | RS256                 |
-| AUTH_ACCESS_TOKEN_LIFETIME_SECONDS | int | Время жизни access-токена в секундах. | 600                  |
-| AUTH_REFRESH_TOKEN_LIFETIME_SECONDS | int | Время жизни refresh-токена в секундах. | 3600                  |
-| ROLE_ADMIN_EMAIL    | string | Email администратора | admin@example.com |
-| ROLE_ADMIN_PASSWORD | string  | Пароль администратора | Admin123! |
-| ROLE_ADMIN_FIRST_NAME | string | Имя администратора | Admin |
-| ROLE_ADMIN_LAST_NAME | string | Фамилия администратора | Admin |
-| ROLE_ADMIN_SKILLS | string | Скиллы администратора | System Admin |
-| ROLE_ADMIN_ROLE_CODE | string | Код роли администратора | admin |
-| ROLE_DEFAULT_USER_ROLE_CODE | string | Роль по умолчанию для новых пользователей | user |
+| DB__POSTGRES_SCHEME     | string | Схема подключения к PostgreSQL с асинхронным драйвером.    | postgresql+asyncpg    |
+| DB__POSTGRES_HOST       | string | Хост локальной базы PostgreSQL.                            | localhost             |
+| DB__POSTGRES_PORT       | int    | Порт подключения к PostgreSQL.                             | 5432                  |
+| DB__POSTGRES_DB         | string | Имя базы данных для приложения.                            | capacity_planning     |
+| DB__POSTGRES_USER       | string | Пользователь PostgreSQL с правами на базу.                 | postgres              |
+| DB__POSTGRES_PASSWORD   | string | Пароль пользователя PostgreSQL.                            | postgres              |
+| DB__ECHO             | bool   | Включить логирование SQL (True/False).                     | False                 |
+| AUTH__PRIVATE_KEY_PATH | string | Путь к секретному ключу для подписи JWT-токенов | private.pem |
+| AUTH__PUBLIC_KEY_PATH | string | Путь к публичному ключу для расшифровки JWT-токенов | public.pem |
+| AUTH__ALGORITHM           | string | Алгоритм шифрования JWT.                                   | RS256                 |
+| AUTH__ACCESS_TOKEN_LIFETIME_SECONDS | int | Время жизни access-токена в секундах. | 600                  |
+| AUTH__REFRESH_TOKEN_LIFETIME_SECONDS | int | Время жизни refresh-токена в секундах. | 3600                  |
+| ROLE__ADMIN_EMAIL    | string | Email администратора | admin@example.com |
+| ROLE__ADMIN_PASSWORD | string  | Пароль администратора | Admin123! |
+| ROLE__ADMIN_FIRST_NAME | string | Имя администратора | Admin |
+| ROLE__ADMIN_LAST_NAME | string | Фамилия администратора | Admin |
+| ROLE__ADMIN_SKILLS | string | Скиллы администратора | System Admin |
+| ROLE__ADMIN_ROLE_CODE | string | Код роли администратора | admin |
+| ROLE__DEFAULT_USER_ROLE_CODE | string | Роль по умолчанию для новых пользователей | user |
 | BOOTSTRAP_ENABLED | Включить автоматическое создание ролей и администратора при запуске | true |
 
 ## Генерация JWT ключей (для асимметричного шифрования RS256)
