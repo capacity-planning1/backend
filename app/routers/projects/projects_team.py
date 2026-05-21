@@ -1,9 +1,10 @@
 from typing import Optional, Sequence
 from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.dependencies.auth import CurrentStudentDep
+from app.core.config import settings
+from app.dependencies.auth import CurrentStudentDep, MemberRole, ProjectRoleDep
 from app.dependencies.services import (
     TeamMembershipServiceDep,
     TeamServiceDep,
@@ -27,65 +28,101 @@ router = APIRouter(
 
 @router.get('/')
 async def get_team(
-    _role: CurrentStudentDep,
-    team_service: TeamServiceDep, _project_id: UUID, team_id: UUID
+    student: CurrentStudentDep,
+    project_role: ProjectRoleDep,
+    team_service: TeamServiceDep,
+    team_id: UUID
 ) -> Optional[TeamPublic]:
+    if (
+        student.role == settings.role.default_user_role_code
+        and project_role == MemberRole.OTHER
+    ):
+        raise HTTPException(status=status.HTTP_403_FORBIDDEN)
+
     return await team_service.get_team(team_id)
 
 
 @router.put('/')
 async def update_team(
-    _role: CurrentStudentDep,
+    student: CurrentStudentDep,
+    project_role: ProjectRoleDep,
     team_service: TeamServiceDep,
-    _project_id: UUID,
     team_id: UUID,
     team_update: TeamUpdate,
 ) -> Optional[TeamPublic]:
+    if (
+        student.role == settings.role.default_user_role_code
+        and project_role != MemberRole.TEAMLEAD
+    ):
+        raise HTTPException(status=status.HTTP_403_FORBIDDEN)
+
     return await team_service.update_team(team_id, team_update)
 
 
 @router.delete('/')
 async def delete_team(
-    _role: CurrentStudentDep,
+    student: CurrentStudentDep,
+    project_role: ProjectRoleDep,
     team_service: TeamServiceDep,
-    _project_id: UUID,
     team_id: UUID,
 ) -> Optional[TeamPublic]:
+    if (
+        student.role == settings.role.default_user_role_code
+        and project_role != MemberRole.TEAMLEAD
+    ):
+        raise HTTPException(status=status.HTTP_403_FORBIDDEN)
+
     return await team_service.delete_team(team_id)
 
 
 @router.get('/members')
 async def get_team_members(
-    _role: CurrentStudentDep,
+    student: CurrentStudentDep,
+    project_role: ProjectRoleDep,
     team_membership_service: TeamMembershipServiceDep,
-    _project_id: UUID,
     team_id: UUID,
     filters: TeamMembershipFilters,
 ) -> Sequence[TeamMembershipPublic]:
+    if (
+        student.role == settings.role.default_user_role_code
+        and project_role == MemberRole.OTHER
+    ):
+        raise HTTPException(status=status.HTTP_403_FORBIDDEN)
     filters.team_id = team_id
     return await team_membership_service.get_members(filters)
 
 
 @router.post('/members')
 async def create_team_member(
-    _role: CurrentStudentDep,
+    student: CurrentStudentDep,
+    project_role: ProjectRoleDep,
     team_membership_service: TeamMembershipServiceDep,
-    _project_id: UUID,
     team_id: UUID,
     tm_create: TeamMembershipCreate,
 ) -> TeamMembershipPublic:
+    if (
+        student.role == settings.role.default_user_role_code
+        and project_role != MemberRole.TEAMLEAD
+    ):
+        raise HTTPException(status=status.HTTP_403_FORBIDDEN)
+
     tm_create.team_id = team_id
     return await team_membership_service.create_membership(tm_create)
 
 
 @router.get('/members/{student_id}')
 async def get_member(
-    _role: CurrentStudentDep,
+    student: CurrentStudentDep,
+    project_role: ProjectRoleDep,
     team_membership_service: TeamMembershipServiceDep,
-    _project_id: UUID,
     team_id: UUID,
     student_id: UUID,
 ) -> Optional[TeamMembershipPublic]:
+    if (
+        student.role == settings.role.default_user_role_code
+        and project_role == MemberRole.OTHER
+    ):
+        raise HTTPException(status=status.HTTP_403_FORBIDDEN)
     filters = TeamMembershipFilters
     filters.team_id = team_id
     filters.project_member_id = student_id
@@ -94,13 +131,22 @@ async def get_member(
 
 @router.put('/members/{student_id}')
 async def update_team_member(
-    _student: CurrentStudentDep,
+    student: CurrentStudentDep,
+    project_role: ProjectRoleDep,
     team_membership_service: TeamMembershipServiceDep,
-    _project_id: UUID,
     team_id: UUID,
     student_id: UUID,
     tm_update: TeamMembershipUpdate,
 ) -> Optional[TeamMembershipPublic]:
+    if (
+        student.role == settings.role.default_user_role_code
+        and project_role == MemberRole.OTHER
+    ):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
+    if student.id != student_id or student.role != MemberRole.TEAMLEAD:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
     filters = TeamMembershipFilters()
     filters.team_id = team_id
     filters.project_member_id = student_id
@@ -109,12 +155,18 @@ async def update_team_member(
 
 @router.delete('/members/{student_id}')
 async def delete_membership(
-    _student: CurrentStudentDep,
+    student: CurrentStudentDep,
+    project_role: ProjectRoleDep,
     team_membership_service: TeamMembershipServiceDep,
-    _project_id: UUID,
     team_id: UUID,
     student_id: UUID,
 ) -> Optional[TeamMembershipPublic]:
+    if (
+        student.role == settings.role.default_user_role_code
+        and project_role != MemberRole.TEAMLEAD
+    ):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
     filters = TeamMembershipFilters()
     filters.team_id = team_id
     filters.project_member_id = student_id

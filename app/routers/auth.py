@@ -1,7 +1,6 @@
-from datetime import datetime, timezone
-
 from fastapi import (
     APIRouter,
+    Depends,
     HTTPException,
     Request,
     Response,
@@ -9,11 +8,10 @@ from fastapi import (
 )
 from fastapi.security import HTTPBearer
 
-from app.core.auth import create_token, decode_token
+from app.core.auth import decode_token
 from app.core.config import settings
-from app.dependencies.auth import CurrentStudentDep, authenticate_student
-from app.dependencies.services import RefreshSessionServiceDep, StudentServiceDep
-from app.models.auth.refresh_session import RefreshSessionModel
+from app.dependencies.auth import CurrentStudentDep
+from app.dependencies.services import StudentServiceDep, StudentSessionServiceDep
 from app.models.students.student import StudentCreate
 from app.schemas.auth import (
     LoginRequest,
@@ -29,9 +27,14 @@ security = HTTPBearer()
 
 
 @router.post(
-    '/register', response_model=RegisterResponse, status_code=status.HTTP_201_CREATED
+    '/register',
+    response_model=RegisterResponse,
+    status_code=status.HTTP_201_CREATED
 )
-async def register(register_data: RegisterRequest, student_service: StudentServiceDep):
+async def register(
+    register_data: RegisterRequest,
+    student_service: StudentServiceDep
+):
     existing_student = await student_service.get_student_by_email(register_data.email)
 
     if existing_student:
@@ -55,7 +58,7 @@ async def register(register_data: RegisterRequest, student_service: StudentServi
         email=student.email,
         first_name=student.first_name,
         last_name=student.last_name,
-        skills=student.skills,
+        skills=student.skills
     )
 
 
@@ -64,53 +67,33 @@ async def login(
     request: Request,
     response: Response,
     login_data: LoginRequest,
-    student_service: StudentServiceDep,
-    refresh_session_service: RefreshSessionServiceDep,
+    student_session_service: StudentSessionServiceDep
 ):
-    student = await authenticate_student(
-        login_data.email, login_data.password, student_service
+    (access_token, refresh_token) = await student_session_service.login(
+        email=login_data.email,
+        password=login_data.password,
+        user_agent=request.headers.get("user-agent"),
+        ip_address=request.client.host if request.client else None
     )
-
-    if not student:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Invalid email or password',
-        )
-
-    access_token = create_token(student.id, settings.auth.access_token_lifetime_seconds)
-    refresh_token = create_token(
-        student.id, settings.auth.refresh_token_lifetime_seconds
-    )
-
-    refresh_payload = decode_token(refresh_token)
-
-    if not refresh_payload:
-        raise HTTPException(status_code=500, detail='Invalid token payload')
-
-    refresh_session = RefreshSessionModel(
-        jti=refresh_payload.get('jti'),
-        student_id=student.id,
-        expires_at=datetime.fromtimestamp(
-            float(refresh_payload['exp']), tz=timezone.utc
-        ),
-        user_agent=request.headers.get('user-agent'),
-        ip_address=request.client.host if request.client else None,
-    )
-
-    await refresh_session_service.create_session(refresh_session)
 
     response.set_cookie(
-        key='refresh_token',
+        key="refresh_token",
         value=refresh_token,
         httponly=True,
-        samesite='lax',
-        max_age=settings.auth.refresh_token_lifetime,
+        secure=True,
+        samesite="lax",
+        max_age=settings.auth.refresh_token_lifetime_seconds
     )
-    return TokenResponse(access_token=access_token, token_type='bearer')
+    return TokenResponse(
+        access_token=access_token,
+        token_type="bearer"
+    )
 
 
 @router.get('/me', response_model=UserResponse)
-async def get_current_user(current_student: CurrentStudentDep):
+async def get_current_user(
+    current_student: CurrentStudentDep
+):
     return current_student
 
 
@@ -118,64 +101,77 @@ async def get_current_user(current_student: CurrentStudentDep):
 async def refresh(
     request: Request,
     response: Response,
-    refresh_session_service: RefreshSessionServiceDep,
+    student_session_service: StudentSessionServiceDep
 ):
-    refresh_token = request.cookies.get('refresh_token')
+    refresh_token = request.cookies.get("refresh_token")
 
     if not refresh_token:
-        raise HTTPException(status_code=401, detail='Refresh token not found')
+        raise HTTPException(status_code=401, detail="Refresh token not found")
 
-    result = await refresh_session_service.refresh_tokens(
+    result = await student_session_service.refresh_tokens(
         refresh_token,
-        user_agent=request.headers.get('user-agent'),
-        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent"),
+        ip_address=request.client.host if request.client else None
     )
 
     if not result:
-        raise HTTPException(status_code=401, detail='Invalid refresh token')
+        raise HTTPException(status_code=401, detail="Invalid refresh token")
 
     new_access_token, new_refresh_token, _ = result
 
     response.set_cookie(
-        key='refresh_token', value=new_refresh_token, httponly=True, samesite='lax'
+        key="refresh_token",
+        value=new_refresh_token,
+        httponly=True,
+        secure=True,
+        samesite="lax"
     )
 
-    return TokenResponse(access_token=new_access_token, refresh_token=new_refresh_token)
+    return TokenResponse(
+        access_token=new_access_token,
+        token_type="bearer"
+    )
 
 
-@router.post('/logout', response_model=MessageResponse)
+@router.post(
+    '/logout',
+    response_model=MessageResponse,
+    dependencies=[Depends(CurrentStudentDep)]
+)
 async def logout(
-    _student: CurrentStudentDep,
     response: Response,
     request: Request,
-    refresh_session_service: RefreshSessionServiceDep,
+    student_session_service: StudentSessionServiceDep,
 ):
     refresh_token = request.cookies.get('refresh_token')
+    if not refresh_token:
+        raise HTTPException(status_code=401, detail="Token missing")
 
-    if refresh_token:
-        payload = decode_token(refresh_token)
-        if payload:
-            jti = payload.get('jti')
-            if jti:
-                await refresh_session_service.revoke_session(jti)
+    payload = decode_token(refresh_token)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Invalid token structure")
 
-    response.delete_cookie('refresh_token')
+    jti = payload.get('jti')
+    if not jti:
+        raise HTTPException(status_code=401, detail="Missing required jti claim")
+
+    await student_session_service.revoke_session(jti)
+    response.delete_cookie('refresh_token', httponly=True, secure=True)
 
     return MessageResponse(message='Successfully logged out', success=True)
 
 
-@router.post('/logout-all', response_model=MessageResponse)
+@router.post("/logout-all", response_model=MessageResponse)
 async def logout_all_devices(
-    student: CurrentStudentDep,
     response: Response,
-    refresh_session_service: RefreshSessionServiceDep,
+    student_session_service: StudentSessionServiceDep,
+    current_student: CurrentStudentDep
 ):
-    revoked_count = await refresh_session_service.revoke_all_student_sessions(
-        student.id
-    )
+    revoked_count = await student_session_service.revoke_all_student_sessions(current_student.id)
 
-    response.delete_cookie('refresh_token')
+    response.delete_cookie("refresh_token")
 
     return MessageResponse(
-        message=f'Successfully logged out from {revoked_count} devices', success=True
+        message=f"Successfully logged out from {revoked_count} devices",
+        success=True
     )

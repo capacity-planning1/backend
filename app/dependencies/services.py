@@ -5,10 +5,10 @@ from fastapi.params import Depends
 from app.services.busy_slot import BusySlotService
 from app.services.project import ProjectService
 from app.services.project_member import ProjectMemberService
-from app.services.refresh_session import RefreshSessionService
 from app.services.sprint import SprintService
 from app.services.sprint_task import SprintTaskService
 from app.services.student import StudentService
+from app.services.student_session import StudentSessionService
 from app.services.task_assignment import TaskAssignmentService
 from app.services.task_change_request import TaskChangeRequestService
 from app.services.team import TeamService
@@ -40,6 +40,6 @@ TaskChangeRequestServiceDep = Annotated[
     TaskChangeRequestService, Depends(TaskChangeRequestService)
 ]
 
-RefreshSessionServiceDep = Annotated[
-    RefreshSessionService, Depends(RefreshSessionService)
+StudentSessionServiceDep = Annotated[
+    StudentSessionService, Depends(StudentSessionService)
 ]

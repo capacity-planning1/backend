@@ -11,7 +11,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from app.models.students.student import StudentModel
 from app.models.projects.project import ProjectModel
-from app.models.auth.refresh_session import RefreshSessionModel
+from app.models.auth.refresh_session import StudentSessionModel
 from app.models.projects.project_member import ProjectMemberModel
 from app.models.projects.team import TeamModel
 from app.models.projects.team_membership import TeamMembershipModel

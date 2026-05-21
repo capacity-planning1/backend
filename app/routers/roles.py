@@ -3,13 +3,13 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException
 
 from app.dependencies.services import StudentServiceDep
-from app.schemas.auth import AssignRoleRequest
+from app.schemas.auth import AssignRoleRequest, MessageResponse
 from app.core.config import settings
 
 router = APIRouter(prefix='/roles', tags=['roles'])
 
 
-@router.post('/assign/{student_id}', response_model=dict)
+@router.post('/assign/{student_id}', response_model=MessageResponse)
 async def assign_role_to_user(
     student_id: UUID,
     request: AssignRoleRequest,
@@ -26,10 +26,12 @@ async def assign_role_to_user(
     if not success:
         raise HTTPException(status_code=400, detail='Failed to assign role')
 
-    return {'message': f'Role {request.role_code} assigned to user {student_id}'}
+    return MessageResponse(
+        message=f'Role {request.role_code} assigned to user {student_id}'
+    )
 
 
-@router.delete('/remove/{student_id}', response_model=dict)
+@router.delete('/{student_id}', response_model=MessageResponse)
 async def remove_role_from_user(
     student_id: UUID,
     request: AssignRoleRequest,
@@ -45,4 +47,6 @@ async def remove_role_from_user(
     if not success:
         raise HTTPException(status_code=400, detail='Failed to remove role')
 
-    return {'message': f'Role {request.role_code} removed from user {student_id}'}
+    return MessageResponse(
+        message=f'Role {request.role_code} removed from user {student_id}'
+    )

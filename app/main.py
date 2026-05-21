@@ -8,7 +8,7 @@ from app.bootstrap import create_admin_user
 from app.core.config import settings
 from app.routers import auth, projects, roles, sprints, students
 
-from app.models.auth.refresh_session import RefreshSessionModel
+from app.models.auth.refresh_session import StudentSessionModel
 from app.models.projects.project import ProjectModel
 from app.models.projects.project_member import ProjectMemberModel
 from app.models.projects.team import TeamModel

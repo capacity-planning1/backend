@@ -8,11 +8,6 @@ from app.models.students.student import StudentPublic
 from app.schemas.base import CommonListFilters
 
 
-class AuthBase(BaseModel):
-    email: EmailStr
-    password: str
-
-
 class RegisterRequest(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8, max_length=100)
@@ -51,7 +46,7 @@ class AssignRoleRequest(BaseModel):
     role_code: str = Field(..., description='Role code to assign')
 
 
-class RefreshSessionFilters(CommonListFilters):
+class StudentSessionFilters(CommonListFilters):
     jti: Optional[str] = None
     student_id: Optional[UUID] = None
     expires_at: Optional[datetime] = None

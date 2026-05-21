@@ -31,7 +31,7 @@ async def get_project_members(
         student.role == settings.role.default_user_role_code
         and project_role == MemberRole.OTHER
     ):
-        raise HTTPException(status=status.HTTP_403_FORBIDDEN)
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     filters.project_id = project_id
     return await project_member_service.get_projects_members(filters)
@@ -49,7 +49,7 @@ async def create_project_members(
         student.role == settings.role.default_user_role_code
         and project_role != MemberRole.TEAMLEAD
     ):
-        raise HTTPException(status=status.HTTP_403_FORBIDDEN)
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     pm_create.project_id = project_id
     return await project_member_service.add_member_to_project(pm_create)
@@ -67,7 +67,7 @@ async def get_project_member(
         student.role == settings.role.default_user_role_code
         and project_role == MemberRole.OTHER
     ):
-        raise HTTPException(status=status.HTTP_403_FORBIDDEN)
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     filters = ProjectMembersFilters()
     filters.project_id = project_id
@@ -88,10 +88,10 @@ async def update_project_member(  # noqa: PLR0913
         student.role == settings.role.default_user_role_code
         and project_role == MemberRole.OTHER
     ):
-        raise HTTPException(status=status.HTTP_403_FORBIDDEN)
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     if student.id != student_id or student.role != MemberRole.TEAMLEAD:
-        raise HTTPException(status=status.HTTP_403_FORBIDDEN)
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     filters = ProjectMembersFilters()
     filters.student_id = student_id
@@ -104,11 +104,20 @@ async def update_project_member(  # noqa: PLR0913
 @router.delete('/{student_id}')
 async def delete_project_member(
     student: CurrentStudentDep,
-    _project_role: ProjectRoleDep,
+    project_role: ProjectRoleDep,
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,
     student_id: UUID,
 ) -> Optional[ProjectMemberPublic]:
+    if (
+        student.role == settings.role.default_user_role_code
+        and project_role == MemberRole.OTHER
+    ):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
+    if student.id != student_id or student.role != MemberRole.TEAMLEAD:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
     filters = ProjectMembersFilters()
     filters.project_id = project_id
     filters.student_id = student_id

@@ -8,7 +8,7 @@ from sqlmodel import Field, Index, SQLModel
 from app.models.base import BaseModel
 
 
-class RefreshSessionModel(BaseModel, table=True):
+class StudentSessionModel(BaseModel, table=True):
     __tablename__ = 'refresh_session'
 
     jti: str = Field(unique=True, nullable=False, max_length=255)
@@ -27,11 +27,11 @@ class RefreshSessionModel(BaseModel, table=True):
     )
 
 
-class RefreshSessionCreate(RefreshSessionModel):
+class RefreshSessionCreate(StudentSessionModel):
     pass
 
 
-class RefreshSessionUpdate(SQLModel):
+class StudentSessionUpdate(SQLModel):
     jti: str | None = None
     expires_at: datetime | None = None
     is_revoked: bool | None = None

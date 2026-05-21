@@ -5,7 +5,7 @@ from fastapi import Depends
 from app.utils.repository import Repository
 
 from app.dependencies.session import SessionDep
-from app.models.auth.refresh_session import RefreshSessionModel
+from app.models.auth.refresh_session import StudentSessionModel
 from app.models.projects.project import ProjectModel
 from app.models.projects.project_member import ProjectMemberModel
 from app.models.projects.team import TeamModel
@@ -109,10 +109,10 @@ StudentRepositoryDep = Annotated[StudentRepository, Depends(get_student_reposito
 
 
 async def get_refresh_session_repository(session: SessionDep):
-    yield Repository[RefreshSessionModel](session)
+    yield Repository[StudentSessionModel](session)
 
 
-RefreshSessionRepository: TypeAlias = Repository[RefreshSessionModel]
-RefreshSessionRepositoryDep = Annotated[
+RefreshSessionRepository: TypeAlias = Repository[StudentSessionModel]
+StudentSessionRepositoryDep = Annotated[
     RefreshSessionRepository, Depends(get_refresh_session_repository)
 ]

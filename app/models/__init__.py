@@ -1,5 +1,5 @@
 from app.models.auth.refresh_session import (
-    RefreshSessionModel,
+    StudentSessionModel,
 )
 from app.models.base import BaseModel
 from app.models.projects.project import (
@@ -133,5 +133,5 @@ __all__ = [
     'StatusType',
     'TaskPriority',
     'TaskChangeRequestStatus',
-    'RefreshSessionModel',
+    'StudentSessionModel',
 ]

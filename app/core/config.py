@@ -70,6 +70,8 @@ class RoleSettings(BaseSettings):
     admin_role_code: str = 'admin'
     default_user_role_code: str = 'user'
 
+    bootstrap_enabled: bool = True
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -79,11 +81,9 @@ class Settings(BaseSettings):
         env_nested_delimiter='__',
     )
 
-    db: DbSettings = DbSettings()
-    auth: AuthSettings = AuthSettings()
-    role: RoleSettings = RoleSettings()
-
-    bootstrap_enabled: bool = True
+    db: DbSettings
+    auth: AuthSettings
+    role: RoleSettings
 
     @property
     def database_url(self) -> str:
