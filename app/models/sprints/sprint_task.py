@@ -1,19 +1,19 @@
 from __future__ import annotations
 
 from enum import Enum
-from uuid import UUID, uuid4
 from typing import TYPE_CHECKING
+from uuid import UUID
 
+from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Text
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.base import BaseModel
 
-
 if TYPE_CHECKING:
-    from app.models.project import ProjectModel
-    from app.models.sprint import SprintModel
-    from app.models.task_assignment import TaskAssignmentModel
+    from app.models.projects.project import ProjectModel
+    from app.models.sprints.sprint import SprintModel
+    from app.models.sprints.task_assignment import TaskAssignmentModel
 
 
 class StatusType(str, Enum):
@@ -29,10 +29,6 @@ class TaskPriority(str, Enum):
     MEDIUM = 'MEDIUM'
     HIGH = 'HIGH'
     CRITICAL = 'CRITICAL'
-
-
-class SprintTask(SQLModel, table=True):
-    id: UUID = Field(default_factory=uuid4, primary_key=True)
 
 
 class SprintTaskBase(SQLModel):
@@ -62,15 +58,24 @@ class SprintTaskUpdate(SQLModel):
 class SprintTaskModel(SprintTaskPublic, table=True):
     __tablename__ = 'sprinttask'
 
-    sprint: SprintModel = Relationship(
-        back_populates="tasks",
-        sa_relationship_kwargs={"lazy": "selectin"},
+    sprint: 'SprintModel' = Relationship(
+        sa_relationship=relationship(
+            "SprintModel",
+            back_populates='tasks',
+            lazy="selectin",
+        )
     )
-    project: ProjectModel = Relationship(
-        back_populates="tasks",
-        sa_relationship_kwargs={"lazy": "selectin"},
+    project: 'ProjectModel' = Relationship(
+        sa_relationship=relationship(
+            "ProjectModel",
+            back_populates='tasks',
+            lazy="selectin",
+        )
     )
-    assignments: list[TaskAssignmentModel] = Relationship(
-        back_populates="task",
-        sa_relationship_kwargs={"lazy": "selectin"},
+    assignments: list['TaskAssignmentModel'] = Relationship(
+        sa_relationship=relationship(
+            "TaskAssignmentModel",
+            back_populates='task',
+            lazy="selectin",
+        )
     )

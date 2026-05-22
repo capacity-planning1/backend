@@ -1,15 +1,12 @@
 from typing import Optional, Sequence
 from uuid import UUID
 
-from app.dependencies.repositories import (
-    ProjectRepository,
-    ProjectRepositoryDep
-)
+from app.dependencies.repositories import ProjectRepository, ProjectRepositoryDep
 from app.models.projects.project import (
     ProjectCreate,
     ProjectModel,
-    ProjectUpdate,
     ProjectPublic,
+    ProjectUpdate,
 )
 from app.schemas.projects import ProjectFilters
 

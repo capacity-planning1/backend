@@ -4,7 +4,7 @@ from app.dependencies.repositories import (
     TeamMembershipRepository,
     TeamMembershipRepositoryDep,
 )
-from app.models.projects.project import (
+from app.models.projects.team_membership import (
     TeamMembershipCreate,
     TeamMembershipModel,
     TeamMembershipPublic,

@@ -1,10 +1,12 @@
 from typing import Optional, Sequence
 from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
 
+from app.core.config import settings
+from app.dependencies.auth import CurrentStudentDep, MemberRole, ProjectRoleDep
 from app.dependencies.services import SprintTaskServiceDep
-from app.models.sprints import (
+from app.models.sprints.sprint_task import (
     SprintTaskCreate,
     SprintTaskPublic,
     SprintTaskUpdate,
@@ -19,42 +21,84 @@ router = APIRouter(
 
 @router.get('/')
 async def get_tasks(
+    student: CurrentStudentDep,
+    project_role: ProjectRoleDep,
     sprint_task_service: SprintTaskServiceDep,
     project_id: UUID,
     filters: SprintTaskFilters,
 ) -> Sequence[SprintTaskPublic]:
+    if (
+        student.role == settings.role.default_user_role_code
+        and project_role == MemberRole.OTHER
+    ):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
     filters.project_id = project_id
     return await sprint_task_service.get_tasks(filters)
 
+
 @router.post('/')
 async def create_task(
+    student: CurrentStudentDep,
+    project_role: ProjectRoleDep,
     sprint_task_service: SprintTaskServiceDep,
     project_id: UUID,
     task_create: SprintTaskCreate,
 ) -> SprintTaskPublic:
+    if (
+        student.role == settings.role.default_user_role_code
+        and project_role != MemberRole.TEAMLEAD
+    ):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
     task_create.project_id = project_id
     return await sprint_task_service.create_task(task_create)
 
 
 @router.get('/{task_id}')
 async def get_task(
-    sprint_task_service: SprintTaskServiceDep, project_id: UUID, task_id: UUID
+    student: CurrentStudentDep,
+    project_role: ProjectRoleDep,
+    sprint_task_service: SprintTaskServiceDep,
+    task_id: UUID,
 ) -> Optional[SprintTaskPublic]:
+    if (
+        student.role == settings.role.default_user_role_code
+        and project_role == MemberRole.OTHER
+    ):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
     return await sprint_task_service.get_task(task_id)
 
 
 @router.put('/{task_id}')
 async def update_task(
+    student: CurrentStudentDep,
+    project_role: ProjectRoleDep,
     sprint_task_service: SprintTaskServiceDep,
-    project_id: UUID,
     task_id: UUID,
     task_update: SprintTaskUpdate,
 ) -> Optional[SprintTaskPublic]:
+    if (
+        student.role == settings.role.default_user_role_code
+        and project_role == MemberRole.OTHER
+    ):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
     return await sprint_task_service.update_task(task_id, task_update)
 
 
 @router.delete('/{task_id}')
 async def dekete_task(
-    sprint_task_service: SprintTaskServiceDep, project_id: UUID, task_id: UUID
+    student: CurrentStudentDep,
+    project_role: ProjectRoleDep,
+    sprint_task_service: SprintTaskServiceDep,
+    task_id: UUID,
 ) -> Optional[SprintTaskPublic]:
+    if (
+        student.role == settings.role.default_user_role_code
+        and project_role != MemberRole.TEAMLEAD
+    ):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
     return await sprint_task_service.delete_task(task_id)
