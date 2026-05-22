@@ -1,6 +1,8 @@
 from fastapi import (
     APIRouter,
+    Cookie,
     Depends,
+    Header,
     HTTPException,
     Request,
     Response,
@@ -64,7 +66,7 @@ async def register(
 
 @router.post('/login', response_model=TokenResponse)
 async def login(
-    request: Request,
+    headers: Header,
     response: Response,
     login_data: LoginRequest,
     student_session_service: StudentSessionServiceDep
@@ -72,8 +74,7 @@ async def login(
     (access_token, refresh_token) = await student_session_service.login(
         email=login_data.email,
         password=login_data.password,
-        user_agent=request.headers.get("user-agent"),
-        ip_address=request.client.host if request.client else None
+        user_agent=headers.get("user-agent")
     )
 
     response.set_cookie(
@@ -99,19 +100,19 @@ async def get_current_user(
 
 @router.post('/refresh', response_model=TokenResponse)
 async def refresh(
-    request: Request,
+    cookies: Cookie,
+    headers: Header,
     response: Response,
     student_session_service: StudentSessionServiceDep
 ):
-    refresh_token = request.cookies.get("refresh_token")
+    refresh_token = cookies.get("refresh_token")
 
     if not refresh_token:
         raise HTTPException(status_code=401, detail="Refresh token not found")
 
     result = await student_session_service.refresh_tokens(
         refresh_token,
-        user_agent=request.headers.get("user-agent"),
-        ip_address=request.client.host if request.client else None
+        user_agent=headers.get("user-agent")
     )
 
     if not result:
@@ -139,11 +140,11 @@ async def refresh(
     dependencies=[Depends(CurrentStudentDep)]
 )
 async def logout(
+    cookies: Cookie,
     response: Response,
-    request: Request,
     student_session_service: StudentSessionServiceDep,
 ):
-    refresh_token = request.cookies.get('refresh_token')
+    refresh_token = cookies.get('refresh_token')
     if not refresh_token:
         raise HTTPException(status_code=401, detail="Token missing")
 

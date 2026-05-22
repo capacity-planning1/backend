@@ -18,7 +18,6 @@ class StudentSessionModel(BaseModel, table=True):
     )
     is_revoked: bool = Field(default=False, nullable=False)
     user_agent: str | None = Field(default=None, nullable=True)
-    ip_address: str | None = Field(default=None, nullable=True)
 
     __table_args__ = (
         Index('ix_refresh_session_jti', 'jti'),

@@ -24,10 +24,7 @@ from app.core.config import settings
 
 config = context.config
 
-database_url = settings.database_url
-config.set_main_option("sqlalchemy.url", database_url)
-
-print(database_url)
+config.set_main_option("sqlalchemy.url", settings.db.database_url)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
@@ -52,7 +49,8 @@ def run_migrations_offline() -> None:
 def do_run_migrations(connection) -> None:
     context.configure(
         connection=connection,
-        target_metadata=target_metadata
+        target_metadata=target_metadata,
+        compare_type=True,
     )
 
     with context.begin_transaction():

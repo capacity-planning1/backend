@@ -59,6 +59,17 @@ class DbSettings(BaseSettings):
     postgres_password: str = 'postgres'
     database_echo: bool = False
 
+    @property
+    def database_url(self) -> str:
+        return URL.create(
+            drivername=self.postgres_scheme,
+            username=self.postgres_user,
+            password=self.postgres_password,
+            host=self.postgres_host,
+            port=self.postgres_port,
+            database=self.postgres_db,
+        ).render_as_string(hide_password=False)
+
 
 class RoleSettings(BaseSettings):
     admin_email: str = 'admin@example.com'
@@ -84,17 +95,6 @@ class Settings(BaseSettings):
     db: DbSettings
     auth: AuthSettings
     role: RoleSettings
-
-    @property
-    def database_url(self) -> str:
-        return URL.create(
-            drivername='postgresql+asyncpg',
-            username=self.db.postgres_user,
-            password=self.db.postgres_password,
-            host=self.db.postgres_host,
-            port=self.db.postgres_port,
-            database=self.db.postgres_db,
-        ).render_as_string(hide_password=False)
 
 
 @lru_cache

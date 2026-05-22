@@ -24,7 +24,6 @@ class StudentSessionService:
         email: str,
         password: str,
         user_agent: str,
-        ip_address: str | None,
         student_service: StudentServiceDep
     ):
         student = await authenticate_student(email, password, student_service)
@@ -44,8 +43,7 @@ class StudentSessionService:
             jti=refresh_payload.get("jti"),
             student_id=student.id,
             expires_at=datetime.fromtimestamp(float(refresh_payload["exp"]), tz=timezone.utc),
-            user_agent=user_agent,
-            ip_address=ip_address
+            user_agent=user_agent
         )
 
         return (access_token, refresh_token)
@@ -98,8 +96,7 @@ class StudentSessionService:
     async def refresh_tokens(
         self,
         old_refresh_token: str,
-        user_agent: str | None = None,
-        ip_address: str | None = None,
+        user_agent: str | None = None
     ) -> tuple[str, str, str] | None:
         result = await self.validate_session(old_refresh_token)
         if not result:
@@ -131,8 +128,7 @@ class StudentSessionService:
             jti=new_jti,
             student_id=student_id,
             expires_at=new_exp,
-            user_agent=user_agent,
-            ip_address=ip_address,
+            user_agent=user_agent
         )
 
         await self.__repo.save(session)
