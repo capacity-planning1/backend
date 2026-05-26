@@ -1,7 +1,7 @@
-from typing import Optional, Sequence
+from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Request, status
 
 from app.core.config import settings
 from app.dependencies.auth import CurrentStudentDep, MemberRole, ProjectRoleDep
@@ -12,6 +12,7 @@ from app.models.projects.project_member import (
     ProjectMemberUpdate,
 )
 from app.schemas.projects import ProjectMembersFilters
+from app.utils.pagination import ListResponse
 
 router = APIRouter(
     prefix='/{project_id}/members',
@@ -21,12 +22,13 @@ router = APIRouter(
 
 @router.get('/')
 async def get_project_members(
+    _request: Request,
     student: CurrentStudentDep,
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,
     filters: ProjectMembersFilters,
     project_role: ProjectRoleDep,
-) -> Sequence[ProjectMemberPublic]:
+) -> ListResponse[ProjectMemberPublic]:
     if (
         student.role == settings.role.default_user_role_code
         and project_role == MemberRole.OTHER
@@ -34,11 +36,12 @@ async def get_project_members(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     filters.project_id = project_id
-    return await project_member_service.get_projects_members(filters)
+    return await project_member_service.get_project_member(filters)
 
 
 @router.post('/')
 async def create_project_members(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     project_member_service: ProjectMemberServiceDep,
@@ -57,6 +60,7 @@ async def create_project_members(
 
 @router.get('/{student_id}')
 async def get_project_member(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     project_member_service: ProjectMemberServiceDep,
@@ -77,6 +81,7 @@ async def get_project_member(
 
 @router.put('/{student_id}')
 async def update_project_member(  # noqa: PLR0913
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     project_member_service: ProjectMemberServiceDep,
@@ -103,6 +108,7 @@ async def update_project_member(  # noqa: PLR0913
 
 @router.delete('/{student_id}')
 async def delete_project_member(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     project_member_service: ProjectMemberServiceDep,

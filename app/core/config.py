@@ -1,8 +1,10 @@
 from datetime import timedelta
 from functools import lru_cache
 from pathlib import Path
+from typing import List
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from slowapi.extension import StrOrCallableStr
 from sqlalchemy.engine import URL
 
 MINIMAL_KEY_LENGTH = 32
@@ -84,6 +86,10 @@ class RoleSettings(BaseSettings):
     bootstrap_enabled: bool = True
 
 
+class LimiterSettings(BaseSettings):
+    default_limits: List[StrOrCallableStr] = ['10/minute']
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file='.env',
@@ -95,6 +101,7 @@ class Settings(BaseSettings):
     db: DbSettings
     auth: AuthSettings
     role: RoleSettings
+    limiter: LimiterSettings
 
 
 @lru_cache

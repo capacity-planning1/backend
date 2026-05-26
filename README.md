@@ -45,6 +45,7 @@ REST API на FastAPI, которое помогает тимлидам студ
 | ROLE__ADMIN_ROLE_CODE | string | Код роли администратора | admin |
 | ROLE__DEFAULT_USER_ROLE_CODE | string | Роль по умолчанию для новых пользователей | user |
 | ROLE__BOOTSTRAP_ENABLED | Включить автоматическое создание ролей и администратора при запуске | true |
+|LIMITER__DEFAULT_LIMITS| List[str] | Количество запросов пользователя на один ресурс в единицу времени | ["10/minute"] |
 
 ## Генерация JWT ключей (для асимметричного шифрования RS256)
 

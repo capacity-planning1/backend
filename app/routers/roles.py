@@ -1,16 +1,17 @@
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 
+from app.core.config import settings
 from app.dependencies.services import StudentServiceDep
 from app.schemas.auth import AssignRoleRequest, MessageResponse
-from app.core.config import settings
 
 router = APIRouter(prefix='/roles', tags=['roles'])
 
 
 @router.post('/assign/{student_id}', response_model=MessageResponse)
 async def assign_role_to_user(
+    _request: Request,
     student_id: UUID,
     request: AssignRoleRequest,
     student_service: StudentServiceDep,
@@ -33,9 +34,10 @@ async def assign_role_to_user(
 
 @router.delete('/{student_id}', response_model=MessageResponse)
 async def remove_role_from_user(
+    _request: Request,
     student_id: UUID,
     request: AssignRoleRequest,
-    student_service: StudentServiceDep
+    student_service: StudentServiceDep,
 ):
     student = await student_service.get_student(student_id)
     if not student:

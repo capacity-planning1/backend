@@ -1,41 +1,33 @@
-from contextlib import asynccontextmanager
-
-from app.db.database import engine
 from fastapi import APIRouter, FastAPI
-from sqlmodel.ext.asyncio.session import AsyncSession
+from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIASGIMiddleware
 
-from app.bootstrap import create_admin_user
-from app.core.config import settings
+from app.core.limiter import limiter
 from app.routers import auth, projects, roles, sprints, students
-
-from app.models.auth.refresh_session import StudentSessionModel
-from app.models.projects.project import ProjectModel
-from app.models.projects.project_member import ProjectMemberModel
-from app.models.projects.team import TeamModel
-from app.models.projects.team_membership import TeamMembershipModel
-from app.models.sprints.sprint import SprintModel
-from app.models.sprints.sprint_task import SprintTaskModel
-from app.models.sprints.task_assignment import TaskAssignmentModel
-from app.models.sprints.task_change_request import TaskChangeRequestModel
-from app.models.students.busy_slot import BusySlotModel
-from app.models.students.student import StudentModel
-
-@asynccontextmanager
-async def lifespan(_app: FastAPI):
-    if settings.bootstrap_enabled:
-        async with AsyncSession(engine) as session:
-            await create_admin_user(session)
-
-    yield
-
 
 app = FastAPI(
     title='Capacity Planning API',
     version='1.0.0',
-    lifespan=lifespan,
 )
 
 api_prefix = '/api'
+
+origins = ['http://localhost:8080']
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+app.add_middleware(SlowAPIASGIMiddleware)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origin=origins,
+    allow_credentials=True,
+    allow_methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allow_headers=['Authorization', 'Content-Type', 'X-Requested-With', 'user-agent'],
+    max_age=3600,
+)
 
 app_router = APIRouter(prefix=f'{api_prefix}/v1')
 app_router.include_router(projects)

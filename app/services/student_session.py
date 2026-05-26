@@ -6,14 +6,15 @@ from fastapi import HTTPException, status
 
 from app.core.auth import create_token, decode_token
 from app.core.config import settings
+from app.dependencies.auth import authenticate_student
 from app.dependencies.repositories import StudentSessionRepositoryDep
+from app.dependencies.services import StudentServiceDep
 from app.models.auth.refresh_session import (
     StudentSessionModel,
     StudentSessionUpdate,
 )
 from app.schemas.auth import StudentSessionFilters
-from app.dependencies.services import StudentServiceDep
-from app.dependencies.auth import authenticate_student
+
 
 class StudentSessionService:
     def __init__(self, refresh_session_repo: StudentSessionRepositoryDep):
@@ -24,7 +25,7 @@ class StudentSessionService:
         email: str,
         password: str,
         user_agent: str,
-        student_service: StudentServiceDep
+        student_service: StudentServiceDep,
     ):
         student = await authenticate_student(email, password, student_service)
 
@@ -34,16 +35,22 @@ class StudentSessionService:
                 detail='User with this email already exists',
             )
 
-        access_token = create_token(student.id, settings.auth.access_token_lifetime_seconds)
-        refresh_token = create_token(student.id, settings.auth.refresh_token_lifetime_seconds)
+        access_token = create_token(
+            student.id, settings.auth.access_token_lifetime_seconds
+        )
+        refresh_token = create_token(
+            student.id, settings.auth.refresh_token_lifetime_seconds
+        )
 
         refresh_payload = decode_token(refresh_token)
 
         self.create_session(
-            jti=refresh_payload.get("jti"),
+            jti=refresh_payload.get('jti'),
             student_id=student.id,
-            expires_at=datetime.fromtimestamp(float(refresh_payload["exp"]), tz=timezone.utc),
-            user_agent=user_agent
+            expires_at=datetime.fromtimestamp(
+                float(refresh_payload['exp']), tz=timezone.utc
+            ),
+            user_agent=user_agent,
         )
 
         return (access_token, refresh_token)
@@ -68,7 +75,7 @@ class StudentSessionService:
 
         sessions = await self.__repo.fetch(filters)
         active_sessions = [
-            s for s in sessions if s.expires_at > datetime.now(timezone.utc)
+            s for s in sessions.items if s.expires_at > datetime.now(timezone.utc)
         ]
 
         if len(active_sessions) == 0:
@@ -94,9 +101,7 @@ class StudentSessionService:
         )
 
     async def refresh_tokens(
-        self,
-        old_refresh_token: str,
-        user_agent: str | None = None
+        self, old_refresh_token: str, user_agent: str | None = None
     ) -> tuple[str, str, str] | None:
         result = await self.validate_session(old_refresh_token)
         if not result:
@@ -128,7 +133,7 @@ class StudentSessionService:
             jti=new_jti,
             student_id=student_id,
             expires_at=new_exp,
-            user_agent=user_agent
+            user_agent=user_agent,
         )
 
         await self.__repo.save(session)

@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from typing import Optional
 from uuid import UUID
 
 from app.dependencies.repositories import (
@@ -12,6 +12,7 @@ from app.models.projects.team import (
     TeamUpdate,
 )
 from app.schemas.projects import TeamFilters
+from app.utils.pagination import ListResponse
 
 
 class TeamService:
@@ -20,7 +21,7 @@ class TeamService:
     def __init__(self, team_repository: TeamRepositoryDep):
         self.__team_repository = team_repository
 
-    async def get_teams(self, filters: TeamFilters) -> Sequence[TeamPublic]:
+    async def get_teams(self, filters: TeamFilters) -> ListResponse[TeamPublic]:
         return await self.__team_repository.fetch(filters)
 
     async def create_team(self, team_create: TeamCreate) -> TeamPublic:
