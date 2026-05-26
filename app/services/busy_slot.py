@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from typing import Optional
 from uuid import UUID
 
 from app.dependencies.repositories import (
@@ -12,6 +12,7 @@ from app.models.students.busy_slot import (
     BusySlotUpdate,
 )
 from app.schemas.students import BusySlotFilters
+from app.utils.pagination import ListResponse
 
 
 class BusySlotService:
@@ -22,7 +23,7 @@ class BusySlotService:
 
     async def get_busy_slots(
         self, filters: BusySlotFilters
-    ) -> Sequence[BusySlotPublic]:
+    ) -> ListResponse[BusySlotPublic]:
         return await self.__busy_slot_repository.fetch(filters)
 
     async def create_busy_slot(self, bs_create: BusySlotCreate) -> BusySlotPublic:

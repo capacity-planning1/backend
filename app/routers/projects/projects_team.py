@@ -1,7 +1,7 @@
-from typing import Optional, Sequence
+from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, Request, status
 
 from app.core.config import settings
 from app.dependencies.auth import CurrentStudentDep, MemberRole, ProjectRoleDep
@@ -19,6 +19,7 @@ from app.models.projects.team_membership import (
     TeamMembershipUpdate,
 )
 from app.schemas.projects import TeamMembershipFilters
+from app.utils.pagination import ListResponse
 
 router = APIRouter(
     prefix='/{project_id}/teams/{team_id}',
@@ -28,11 +29,12 @@ router = APIRouter(
 
 @router.get('/')
 async def get_team(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     team_service: TeamServiceDep,
-    team_id: UUID
-) -> Optional[TeamPublic]:
+    team_id: UUID,
+) -> ListResponse[TeamPublic]:
     if (
         student.role == settings.role.default_user_role_code
         and project_role == MemberRole.OTHER
@@ -44,6 +46,7 @@ async def get_team(
 
 @router.put('/')
 async def update_team(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     team_service: TeamServiceDep,
@@ -61,6 +64,7 @@ async def update_team(
 
 @router.delete('/')
 async def delete_team(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     team_service: TeamServiceDep,
@@ -77,12 +81,13 @@ async def delete_team(
 
 @router.get('/members')
 async def get_team_members(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     team_membership_service: TeamMembershipServiceDep,
     team_id: UUID,
     filters: TeamMembershipFilters,
-) -> Sequence[TeamMembershipPublic]:
+) -> ListResponse[TeamMembershipPublic]:
     if (
         student.role == settings.role.default_user_role_code
         and project_role == MemberRole.OTHER
@@ -94,6 +99,7 @@ async def get_team_members(
 
 @router.post('/members')
 async def create_team_member(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     team_membership_service: TeamMembershipServiceDep,
@@ -112,6 +118,7 @@ async def create_team_member(
 
 @router.get('/members/{student_id}')
 async def get_member(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     team_membership_service: TeamMembershipServiceDep,
@@ -130,7 +137,8 @@ async def get_member(
 
 
 @router.put('/members/{student_id}')
-async def update_team_member(
+async def update_team_member(  # noqa: PLR0913
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     team_membership_service: TeamMembershipServiceDep,
@@ -155,6 +163,7 @@ async def update_team_member(
 
 @router.delete('/members/{student_id}')
 async def delete_membership(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     team_membership_service: TeamMembershipServiceDep,

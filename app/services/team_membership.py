@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from typing import Optional
 
 from app.dependencies.repositories import (
     TeamMembershipRepository,
@@ -11,6 +11,7 @@ from app.models.projects.team_membership import (
     TeamMembershipUpdate,
 )
 from app.schemas.projects import TeamMembershipFilters
+from app.utils.pagination import ListResponse
 
 
 class TeamMembershipService:
@@ -21,7 +22,7 @@ class TeamMembershipService:
 
     async def get_members(
         self, filters: TeamMembershipFilters
-    ) -> Sequence[TeamMembershipPublic]:
+    ) -> ListResponse[TeamMembershipPublic]:
         return await self.__team_membership_repository.fetch(filters)
 
     async def create_membership(
@@ -36,27 +37,27 @@ class TeamMembershipService:
     ) -> Optional[TeamMembershipPublic]:
         result = await self.__team_membership_repository.fetch(filters)
 
-        if len(result) == 0:
+        if len(result.items) == 0:
             return None
 
-        return result[0]
+        return result.items[0]
 
     async def update_membership(
         self, filters: TeamMembershipFilters, tm_update: TeamMembershipUpdate
     ) -> Optional[TeamMembershipPublic]:
         tm = await self.__team_membership_repository.fetch(filters)
 
-        if len(tm) == 0:
+        if len(tm.items) == 0:
             return None
 
-        return await self.__team_membership_repository.update(tm[0].id, tm_update)
+        return await self.__team_membership_repository.update(tm.items[0].id, tm_update)
 
     async def delete_membership(
         self, filters: TeamMembershipFilters
     ) -> Optional[TeamMembershipPublic]:
         tm = await self.__team_membership_repository.fetch(filters)
 
-        if len(tm) == 0:
+        if len(tm.items) == 0:
             return None
 
-        return await self.__team_membership_repository.delete(tm[0].id)
+        return await self.__team_membership_repository.delete(tm.items[0].id)

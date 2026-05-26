@@ -1,7 +1,7 @@
-from typing import Optional, Sequence
+from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Request, status
 
 from app.core.config import settings
 from app.dependencies.auth import CurrentStudentDep, MemberRole, ProjectRoleDep
@@ -13,6 +13,7 @@ from app.models.sprints.sprint import (
 )
 from app.routers.sprints import project_tasks, task_assignmets, task_change_requests
 from app.schemas.sprints import SprintFilters
+from app.utils.pagination import ListResponse
 
 router = APIRouter(
     prefix='/projects/{project_id}/sprints',
@@ -26,10 +27,13 @@ router.include_router(project_tasks.router)
 
 @router.get('/')
 async def get_sprints(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
-    sprint_service: SprintServiceDep, project_id: UUID, filters: SprintFilters
-) -> Sequence[SprintPublic]:
+    sprint_service: SprintServiceDep,
+    project_id: UUID,
+    filters: SprintFilters,
+) -> ListResponse[SprintPublic]:
     if (
         student.role == settings.role.default_user_role_code
         and project_role == MemberRole.OTHER
@@ -42,6 +46,7 @@ async def get_sprints(
 
 @router.post('/')
 async def create_sprint(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     sprint_service: SprintServiceDep,
@@ -60,6 +65,7 @@ async def create_sprint(
 
 @router.get('/{sprint_id}')
 async def get_sprint(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     sprint_service: SprintServiceDep,
@@ -76,6 +82,7 @@ async def get_sprint(
 
 @router.put('/{sprint_id}')
 async def update_sprint(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     sprint_service: SprintServiceDep,
@@ -93,6 +100,7 @@ async def update_sprint(
 
 @router.delete('/{sprint_id}')
 async def delete_sprint(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     sprint_service: SprintServiceDep,

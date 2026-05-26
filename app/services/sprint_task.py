@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from typing import Optional
 from uuid import UUID
 
 from app.dependencies.repositories import (
@@ -12,6 +12,7 @@ from app.models.sprints.sprint_task import (
     SprintTaskUpdate,
 )
 from app.schemas.sprints import SprintTaskFilters
+from app.utils.pagination import ListResponse
 
 
 class SprintTaskService:
@@ -20,7 +21,9 @@ class SprintTaskService:
     def __init__(self, sprint_task_repository: SprintTaskRepositoryDep):
         self.__sprint_task_repository = sprint_task_repository
 
-    async def get_tasks(self, filters: SprintTaskFilters) -> Sequence[SprintTaskPublic]:
+    async def get_tasks(
+        self, filters: SprintTaskFilters
+    ) -> ListResponse[SprintTaskPublic]:
         return await self.__sprint_task_repository.fetch(filters)
 
     async def create_task(self, task_create: SprintTaskCreate) -> SprintTaskPublic:

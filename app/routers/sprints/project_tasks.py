@@ -1,7 +1,7 @@
-from typing import Optional, Sequence
+from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Request, status
 
 from app.core.config import settings
 from app.dependencies.auth import CurrentStudentDep, MemberRole, ProjectRoleDep
@@ -12,6 +12,7 @@ from app.models.sprints.sprint_task import (
     SprintTaskUpdate,
 )
 from app.schemas.sprints import SprintTaskFilters
+from app.utils.pagination import ListResponse
 
 router = APIRouter(
     prefix='/tasks',
@@ -21,12 +22,13 @@ router = APIRouter(
 
 @router.get('/')
 async def get_tasks(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     sprint_task_service: SprintTaskServiceDep,
     project_id: UUID,
     filters: SprintTaskFilters,
-) -> Sequence[SprintTaskPublic]:
+) -> ListResponse[SprintTaskPublic]:
     if (
         student.role == settings.role.default_user_role_code
         and project_role == MemberRole.OTHER
@@ -39,6 +41,7 @@ async def get_tasks(
 
 @router.post('/')
 async def create_task(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     sprint_task_service: SprintTaskServiceDep,
@@ -57,6 +60,7 @@ async def create_task(
 
 @router.get('/{task_id}')
 async def get_task(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     sprint_task_service: SprintTaskServiceDep,
@@ -73,6 +77,7 @@ async def get_task(
 
 @router.put('/{task_id}')
 async def update_task(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     sprint_task_service: SprintTaskServiceDep,
@@ -89,7 +94,8 @@ async def update_task(
 
 
 @router.delete('/{task_id}')
-async def dekete_task(
+async def delete_task(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     sprint_task_service: SprintTaskServiceDep,

@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from typing import Optional
 from uuid import UUID
 
 from app.dependencies.repositories import ProjectRepository, ProjectRepositoryDep
@@ -9,6 +9,7 @@ from app.models.projects.project import (
     ProjectUpdate,
 )
 from app.schemas.projects import ProjectFilters
+from app.utils.pagination import ListResponse
 
 
 class ProjectService:
@@ -20,7 +21,9 @@ class ProjectService:
     ):
         self.__project_repository = project_repository
 
-    async def get_projects(self, filters: ProjectFilters) -> Sequence[ProjectPublic]:
+    async def get_projects(
+        self, filters: ProjectFilters
+    ) -> ListResponse[ProjectPublic]:
         return await self.__project_repository.fetch(filters)
 
     async def create_project(self, project_create: ProjectCreate) -> ProjectPublic:

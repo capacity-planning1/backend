@@ -1,7 +1,7 @@
-from typing import Optional, Sequence
+from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Request, status
 
 from app.dependencies.auth import CurrentStudentDep, MemberRole, ProjectRoleDep
 from app.dependencies.services import BusySlotServiceDep
@@ -11,6 +11,7 @@ from app.models.students.busy_slot import (
     BusySlotUpdate,
 )
 from app.schemas.students import BusySlotFilters
+from app.utils.pagination import ListResponse
 
 router = APIRouter(
     prefix='/{student_id}/busy-slots',
@@ -20,16 +21,14 @@ router = APIRouter(
 
 @router.get('/')
 async def get_busy_slots(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     busy_slot_service: BusySlotServiceDep,
     student_id: UUID,
-    filters: BusySlotFilters
-) -> Sequence[BusySlotPublic]:
-    if (
-        student.id != student_id
-        or project_role != MemberRole.TEAMLEAD
-    ):
+    filters: BusySlotFilters,
+) -> ListResponse[BusySlotPublic]:
+    if student.id != student_id or project_role != MemberRole.TEAMLEAD:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     filters.student_id = student_id
@@ -38,16 +37,14 @@ async def get_busy_slots(
 
 @router.post('/')
 async def create_busy_slot(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     busy_slot_service: BusySlotServiceDep,
     student_id: UUID,
-    bs_create: BusySlotCreate
+    bs_create: BusySlotCreate,
 ) -> BusySlotPublic:
-    if (
-        student.id != student_id
-        or project_role != MemberRole.TEAMLEAD
-    ):
+    if student.id != student_id or project_role != MemberRole.TEAMLEAD:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     bs_create.student_id = student_id
@@ -56,17 +53,15 @@ async def create_busy_slot(
 
 @router.get('/{busy_slot_id}')
 async def get_busy_slot(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     busy_slot_service: BusySlotServiceDep,
-    busy_slot_id: UUID
+    busy_slot_id: UUID,
 ) -> Optional[BusySlotPublic]:
     busy_slot = await busy_slot_service.get_busy_slot(busy_slot_id)
 
-    if (
-        student.id != busy_slot.student_id
-        or project_role != MemberRole.TEAMLEAD
-    ):
+    if student.id != busy_slot.student_id or project_role != MemberRole.TEAMLEAD:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     return busy_slot
@@ -74,6 +69,7 @@ async def get_busy_slot(
 
 @router.put('/{busy_slot_id}')
 async def update_busy_slot(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     busy_slot_service: BusySlotServiceDep,
@@ -82,10 +78,7 @@ async def update_busy_slot(
 ) -> Optional[BusySlotPublic]:
     busy_slot = await busy_slot_service.get_busy_slot(busy_slot_id)
 
-    if (
-        student.id != busy_slot.student_id
-        or project_role != MemberRole.TEAMLEAD
-    ):
+    if student.id != busy_slot.student_id or project_role != MemberRole.TEAMLEAD:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     return await busy_slot_service.update_busy_slot(busy_slot_id, bs_update)
@@ -93,17 +86,15 @@ async def update_busy_slot(
 
 @router.delete('/{busy_slot_id}')
 async def delete_busy_slot(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     busy_slot_service: BusySlotServiceDep,
-    busy_slot_id: UUID
+    busy_slot_id: UUID,
 ) -> Optional[BusySlotPublic]:
     busy_slot = await busy_slot_service.get_busy_slot(busy_slot_id)
 
-    if (
-        student.id != busy_slot.student_id
-        or project_role != MemberRole.TEAMLEAD
-    ):
+    if student.id != busy_slot.student_id or project_role != MemberRole.TEAMLEAD:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     return await busy_slot_service.delete_busy_slot(busy_slot_id)

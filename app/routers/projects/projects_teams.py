@@ -1,13 +1,13 @@
-from typing import Sequence
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Request, status
 
 from app.core.config import settings
 from app.dependencies.auth import CurrentStudentDep, MemberRole, ProjectRoleDep
 from app.dependencies.services import TeamServiceDep
 from app.models.projects.team import TeamCreate, TeamPublic
 from app.schemas.projects import TeamFilters
+from app.utils.pagination import ListResponse
 
 router = APIRouter(
     prefix='/projects/{project_id}',
@@ -17,12 +17,13 @@ router = APIRouter(
 
 @router.get('/teams')
 async def get_teams(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     team_service: TeamServiceDep,
     project_id: UUID,
     filters: TeamFilters,
-) -> Sequence[TeamPublic]:
+) -> ListResponse[TeamPublic]:
     if (
         student.role == settings.role.default_user_role_code
         and project_role == MemberRole.OTHER
@@ -35,6 +36,7 @@ async def get_teams(
 
 @router.post('/teams')
 async def create_team(
+    _request: Request,
     student: CurrentStudentDep,
     project_role: ProjectRoleDep,
     team_service: TeamServiceDep,
