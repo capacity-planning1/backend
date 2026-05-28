@@ -2,8 +2,6 @@ from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
 
-from fastapi import HTTPException, status
-
 from app.core.auth import create_token, decode_token
 from app.core.config import settings
 from app.dependencies.auth import authenticate_student
@@ -14,6 +12,7 @@ from app.models.auth.refresh_session import (
     StudentSessionUpdate,
 )
 from app.schemas.auth import StudentSessionFilters
+from app.utils.errors import UnauthorizedError, InternalServerError
 
 
 class StudentSessionService:
@@ -29,11 +28,8 @@ class StudentSessionService:
     ):
         student = await authenticate_student(email, password, student_service)
 
-        if not student:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail='User with this email already exists',
-            )
+        if student is None:
+            raise UnauthorizedError('Wrong email or password')
 
         access_token = create_token(
             student.id, settings.auth.access_token_lifetime_seconds
@@ -61,13 +57,13 @@ class StudentSessionService:
     async def validate_session(self, refresh_token: str) -> Optional[tuple[UUID, str]]:
         payload = decode_token(refresh_token)
         if not payload:
-            return None
+            raise UnauthorizedError()
 
         jti = payload.get('jti')
         student_id_str = payload.get('sub')
 
         if not jti or not student_id_str:
-            return None
+            return UnauthorizedError()
 
         filters = StudentSessionFilters()
         filters.jti = jti
@@ -79,7 +75,7 @@ class StudentSessionService:
         ]
 
         if len(active_sessions) == 0:
-            return None
+            return UnauthorizedError()
 
         return (UUID(student_id_str), jti)
 
@@ -103,11 +99,7 @@ class StudentSessionService:
     async def refresh_tokens(
         self, old_refresh_token: str, user_agent: str | None = None
     ) -> tuple[str, str, str] | None:
-        result = await self.validate_session(old_refresh_token)
-        if not result:
-            return None
-
-        student_id, old_jti = result
+        student_id, old_jti = await self.validate_session(old_refresh_token)
 
         await self.revoke_session(old_jti)
 
@@ -120,14 +112,14 @@ class StudentSessionService:
 
         new_payload = decode_token(new_refresh_token)
         if not new_payload:
-            return None
+            raise InternalServerError()
 
         new_jti = new_payload.get('jti')
         exp_timestamp = new_payload.get('exp')
         if exp_timestamp is not None:
             new_exp = datetime.fromtimestamp(float(exp_timestamp), tz=timezone.utc)
         else:
-            return None
+            raise InternalServerError()
 
         session = StudentSessionModel(
             jti=new_jti,

@@ -12,6 +12,7 @@ from app.models.sprints.sprint import (
     SprintUpdate,
 )
 from app.schemas.sprints import SprintFilters
+from app.utils.errors import NotFoundError
 from app.utils.pagination import ListResponse
 
 
@@ -30,12 +31,21 @@ class SprintService:
         return await self.__sprint_repository.save(sprint)
 
     async def get_sprint(self, sprint_id: UUID) -> Optional[SprintPublic]:
-        return await self.__sprint_repository.get(sprint_id)
+        result = await self.__sprint_repository.get(sprint_id)
+        if result is None:
+            raise NotFoundError()
+        return result
 
     async def update_sprint(
         self, sprint_update: SprintUpdate, sprint_id: UUID
     ) -> Optional[SprintPublic]:
-        return await self.__sprint_repository.update(sprint_id, sprint_update)
+        result = await self.__sprint_repository.update(sprint_id, sprint_update)
+        if result is None:
+            raise NotFoundError()
+        return result
 
     async def delete_sprint(self, sprint_id: UUID) -> Optional[SprintPublic]:
-        return await self.__sprint_repository.delete(sprint_id)
+        result = await self.__sprint_repository.delete(sprint_id)
+        if result is None:
+            raise NotFoundError()
+        return result

@@ -12,6 +12,7 @@ from app.models.students.student import (
     StudentUpdate,
 )
 from app.schemas.students import StudentFilters
+from app.utils.errors import NotFoundError
 from app.utils.hasher import Hasher
 from app.utils.pagination import ListResponse
 
@@ -36,15 +37,24 @@ class StudentService:
         return await self.__student_repository.save(student)
 
     async def get_student(self, student_id: UUID) -> Optional[StudentPublic]:
-        return await self.__student_repository.get(student_id)
+        result = await self.__student_repository.get(student_id)
+        if result is None:
+            raise NotFoundError()
+        return result
 
     async def update_student(
         self, student_update: StudentUpdate, student_id: UUID
     ) -> Optional[StudentPublic]:
-        return await self.__student_repository.update(student_id, student_update)
+        result = await self.__student_repository.update(student_id, student_update)
+        if result is None:
+            raise NotFoundError()
+        return result
 
     async def delete_student(self, student_id: UUID) -> Optional[StudentPublic]:
-        return await self.__student_repository.delete(student_id)
+        result = await self.__student_repository.delete(student_id)
+        if result is None:
+            raise NotFoundError()
+        return result
 
     async def get_student_by_email(self, email: str) -> Optional[StudentPublic]:
         filters = StudentFilters()
@@ -53,6 +63,6 @@ class StudentService:
         students = await self.__student_repository.fetch(filters)
 
         if len(students.items) == 0:
-            return None
+            raise NotFoundError()
 
         return students.items[0]

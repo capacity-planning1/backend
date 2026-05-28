@@ -90,6 +90,10 @@ class LimiterSettings(BaseSettings):
     default_limits: List[StrOrCallableStr] = ['10/minute']
 
 
+class LoggingSettings(BaseSettings):
+    file_name: str = 'my_log.log'
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file='.env',
@@ -102,6 +106,7 @@ class Settings(BaseSettings):
     auth: AuthSettings
     role: RoleSettings
     limiter: LimiterSettings
+    logging: LoggingSettings
 
 
 @lru_cache

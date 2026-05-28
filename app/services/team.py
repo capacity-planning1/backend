@@ -12,6 +12,7 @@ from app.models.projects.team import (
     TeamUpdate,
 )
 from app.schemas.projects import TeamFilters
+from app.utils.errors import NotFoundError
 from app.utils.pagination import ListResponse
 
 
@@ -30,12 +31,21 @@ class TeamService:
         return await self.__team_repository.save(team)
 
     async def get_team(self, team_id: UUID) -> Optional[TeamPublic]:
-        return await self.__team_repository.get(team_id)
+        result = await self.__team_repository.get(team_id)
+        if result is None:
+            raise NotFoundError()
+        return result
 
     async def update_team(
         self, team_id: UUID, team_update: TeamUpdate
     ) -> Optional[TeamPublic]:
-        return await self.__team_repository.update(team_id, team_update)
+        result = await self.__team_repository.update(team_id, team_update)
+        if result is None:
+            raise NotFoundError()
+        return result
 
     async def delete_team(self, team_id: UUID) -> Optional[TeamPublic]:
-        return await self.__team_repository.delete(team_id)
+        result = await self.__team_repository.delete(team_id)
+        if result is None:
+            raise NotFoundError()
+        return result
