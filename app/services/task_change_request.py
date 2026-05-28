@@ -11,6 +11,7 @@ from app.models.sprints.task_change_request import (
     TaskChangeRequestUpdate,
 )
 from app.schemas.sprints import TaskChangeRequestFilters
+from app.utils.errors import NotFoundError
 from app.utils.pagination import ListResponse
 
 
@@ -38,7 +39,7 @@ class TaskChangeRequestService:
         result = await self.__task_change_request_repository.fetch(filters)
 
         if len(result.items) == 0:
-            return None
+            raise NotFoundError()
 
         return result.items[0]
 
@@ -48,7 +49,7 @@ class TaskChangeRequestService:
         tcr = await self.__task_change_request_repository.fetch(filters)
 
         if len(tcr.items) == 0:
-            return None
+            raise NotFoundError()
 
         return await self.__task_change_request_repository.update(
             tcr.items[0].id, tcr_update
@@ -60,6 +61,6 @@ class TaskChangeRequestService:
         tcr = await self.__task_change_request_repository.fetch(filters)
 
         if len(tcr.items) == 0:
-            return None
+            raise NotFoundError()
 
         return await self.__task_change_request_repository.delete(tcr.items[0].id)

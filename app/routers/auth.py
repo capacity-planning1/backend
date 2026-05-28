@@ -3,7 +3,6 @@ from fastapi import (
     Cookie,
     Depends,
     Header,
-    HTTPException,
     Request,
     Response,
     status,
@@ -12,6 +11,7 @@ from fastapi.security import HTTPBearer
 
 from app.core.auth import decode_token
 from app.core.config import settings
+from app.core.responses import get_responses
 from app.dependencies.auth import CurrentStudentDep
 from app.dependencies.services import StudentServiceDep, StudentSessionServiceDep
 from app.models.students.student import StudentCreate
@@ -23,13 +23,17 @@ from app.schemas.auth import (
     TokenResponse,
     UserResponse,
 )
+from app.utils.errors import ConflictError, UnauthorizedError
 
 router = APIRouter(prefix='/auth', tags=['auth'])
 security = HTTPBearer()
 
 
 @router.post(
-    '/register', response_model=RegisterResponse, status_code=status.HTTP_201_CREATED
+    '/register',
+    response_model=RegisterResponse,
+    status_code=status.HTTP_201_CREATED,
+    responses=get_responses(status.HTTP_400_BAD_REQUEST)
 )
 async def register(
     _request: Request,
@@ -39,10 +43,7 @@ async def register(
     existing_student = await student_service.get_student_by_email(register_data.email)
 
     if existing_student:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='User with this email already exists',
-        )
+        raise ConflictError('User with this email already exists')
 
     student_create = StudentCreate(
         email=register_data.email,
@@ -63,7 +64,11 @@ async def register(
     )
 
 
-@router.post('/login', response_model=TokenResponse)
+@router.post(
+    '/login',
+    response_model=TokenResponse,
+    responses=get_responses(status.HTTP_400_BAD_REQUEST)
+)
 async def login(
     _request: Request,
     headers: Header,
@@ -88,12 +93,20 @@ async def login(
     return TokenResponse(access_token=access_token, token_type='bearer')
 
 
-@router.get('/me', response_model=UserResponse)
+@router.get(
+    '/me', response_model=UserResponse,
+    responses=get_responses(status.HTTP_401_UNAUTHORIZED))
 async def get_current_user(_request: Request, current_student: CurrentStudentDep):
     return current_student
 
 
-@router.post('/refresh', response_model=TokenResponse)
+@router.post(
+    '/refresh',
+    response_model=TokenResponse,
+    responses=get_responses(
+        status.HTTP_400_BAD_REQUEST,
+        status.HTTP_401_UNAUTHORIZED)
+    )
 async def refresh(
     _request: Request,
     cookies: Cookie,
@@ -104,14 +117,14 @@ async def refresh(
     refresh_token = cookies.get('refresh_token')
 
     if not refresh_token:
-        raise HTTPException(status_code=401, detail='Refresh token not found')
+        raise UnauthorizedError('Refresh token not found')
 
     result = await student_session_service.refresh_tokens(
         refresh_token, user_agent=headers.get('user-agent')
     )
 
     if not result:
-        raise HTTPException(status_code=401, detail='Invalid refresh token')
+        raise UnauthorizedError('Invalid refresh token')
 
     new_access_token, new_refresh_token, _ = result
 
@@ -127,7 +140,9 @@ async def refresh(
 
 
 @router.post(
-    '/logout', response_model=MessageResponse, dependencies=[Depends(CurrentStudentDep)]
+    '/logout',
+    response_model=MessageResponse,
+    dependencies=[Depends(CurrentStudentDep)]
 )
 async def logout(
     _request: Request,
@@ -137,15 +152,15 @@ async def logout(
 ):
     refresh_token = cookies.get('refresh_token')
     if not refresh_token:
-        raise HTTPException(status_code=401, detail='Token missing')
+        raise UnauthorizedError('Token missing')
 
     payload = decode_token(refresh_token)
     if not payload:
-        raise HTTPException(status_code=401, detail='Invalid token structure')
+        raise UnauthorizedError('Invalid token structure')
 
     jti = payload.get('jti')
     if not jti:
-        raise HTTPException(status_code=401, detail='Missing required jti claim')
+        raise UnauthorizedError('Missing required jti claim')
 
     await student_session_service.revoke_session(jti)
     response.delete_cookie('refresh_token', httponly=True, secure=True)

@@ -4,6 +4,8 @@ from uuid import UUID
 from app.dependencies.repositories import (
     SprintTaskRepository,
     SprintTaskRepositoryDep,
+    SprintRepository,
+    SprintRepositoryDep,
 )
 from app.models.sprints.sprint_task import (
     SprintTaskCreate,
@@ -12,18 +14,28 @@ from app.models.sprints.sprint_task import (
     SprintTaskUpdate,
 )
 from app.schemas.sprints import SprintTaskFilters
+from app.utils.errors import NotFoundError
 from app.utils.pagination import ListResponse
 
 
 class SprintTaskService:
     __sprint_task_repository: SprintTaskRepository
+    __sprint_repository: SprintRepository
 
-    def __init__(self, sprint_task_repository: SprintTaskRepositoryDep):
+    def __init__(
+        self,
+        sprint_task_repository: SprintTaskRepositoryDep,
+        sprint_repository: SprintRepositoryDep,
+    ):
         self.__sprint_task_repository = sprint_task_repository
+        self.__sprint_repository = sprint_repository
 
     async def get_tasks(
         self, filters: SprintTaskFilters
     ) -> ListResponse[SprintTaskPublic]:
+        sprint = await self.__sprint_repository.get(filters.sprint_id)
+        if sprint is None:
+            raise NotFoundError()
         return await self.__sprint_task_repository.fetch(filters)
 
     async def create_task(self, task_create: SprintTaskCreate) -> SprintTaskPublic:
@@ -32,12 +44,21 @@ class SprintTaskService:
         return await self.__sprint_task_repository.save(task)
 
     async def get_task(self, task_id: UUID) -> Optional[SprintTaskPublic]:
-        return await self.__sprint_task_repository.get(task_id)
+        result = await self.__sprint_task_repository.get(task_id)
+        if result is None:
+            raise NotFoundError()
+        return result
 
     async def update_task(
         self, task_id: UUID, task_update: SprintTaskUpdate
     ) -> Optional[SprintTaskPublic]:
-        return await self.__sprint_task_repository.update(task_id, task_update)
+        result = await self.__sprint_task_repository.update(task_id, task_update)
+        if result is None:
+            raise NotFoundError()
+        return result
 
     async def delete_task(self, task_id: UUID) -> Optional[SprintTaskPublic]:
-        return await self.__sprint_task_repository.delete(task_id)
+        result = await self.__sprint_task_repository.delete(task_id)
+        if result is None:
+            raise NotFoundError()
+        return result

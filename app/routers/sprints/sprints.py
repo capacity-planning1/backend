@@ -1,9 +1,10 @@
 from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Request, status
+from fastapi import APIRouter, Request, status
 
 from app.core.config import settings
+from app.core.responses import get_responses
 from app.dependencies.auth import CurrentStudentDep, MemberRole, ProjectRoleDep
 from app.dependencies.services import SprintServiceDep
 from app.models.sprints.sprint import (
@@ -13,11 +14,15 @@ from app.models.sprints.sprint import (
 )
 from app.routers.sprints import project_tasks, task_assignmets, task_change_requests
 from app.schemas.sprints import SprintFilters
+from app.utils.errors import ForbiddenError
 from app.utils.pagination import ListResponse
 
 router = APIRouter(
     prefix='/projects/{project_id}/sprints',
     tags=['sprints'],
+    responses=get_responses(
+        status.HTTP_403_FORBIDDEN,
+        status.HTTP_404_NOT_FOUND)
 )
 
 router.include_router(task_assignmets.router)
@@ -38,13 +43,15 @@ async def get_sprints(
         student.role == settings.role.default_user_role_code
         and project_role == MemberRole.OTHER
     ):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        raise ForbiddenError()
 
     filters.project_id = project_id
     return await sprint_service.get_sprints(filters)
 
 
-@router.post('/')
+@router.post(
+        '/', status_code=status.HTTP_201_CREATED,
+        responses=get_responses(status.HTTP_400_BAD_REQUEST))
 async def create_sprint(
     _request: Request,
     student: CurrentStudentDep,
@@ -57,7 +64,7 @@ async def create_sprint(
         student.role == settings.role.default_user_role_code
         and project_role != MemberRole.TEAMLEAD
     ):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        raise ForbiddenError()
 
     sprint_create.project_id = project_id
     return await sprint_service.create_sprint(sprint_create)
@@ -75,12 +82,12 @@ async def get_sprint(
         student.role == settings.role.default_user_role_code
         and project_role == MemberRole.OTHER
     ):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        raise ForbiddenError()
 
     return await sprint_service.get_sprint(sprint_id)
 
 
-@router.put('/{sprint_id}')
+@router.put('/{sprint_id}', responses=get_responses(status.HTTP_400_BAD_REQUEST))
 async def update_sprint(
     _request: Request,
     student: CurrentStudentDep,
@@ -93,12 +100,12 @@ async def update_sprint(
         student.role == settings.role.default_user_role_code
         and project_role != MemberRole.TEAMLEAD
     ):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        raise ForbiddenError()
 
     return await sprint_service.update_sprint(sprint_update, sprint_id)
 
 
-@router.delete('/{sprint_id}')
+@router.delete('/{sprint_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_sprint(
     _request: Request,
     student: CurrentStudentDep,
@@ -110,6 +117,6 @@ async def delete_sprint(
         student.role == settings.role.default_user_role_code
         and project_role != MemberRole.TEAMLEAD
     ):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        raise ForbiddenError()
 
     return await sprint_service.delete_sprint(sprint_id)

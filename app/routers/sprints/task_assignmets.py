@@ -1,9 +1,10 @@
 from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Request, status
+from fastapi import APIRouter, Request, status
 
 from app.core.config import settings
+from app.core.responses import get_responses
 from app.dependencies.auth import CurrentStudentDep, MemberRole, ProjectRoleDep
 from app.dependencies.services import TaskAssignmentServiceDep
 from app.models.sprints.task_assignment import (
@@ -12,6 +13,7 @@ from app.models.sprints.task_assignment import (
     TaskAssignmentUpdate,
 )
 from app.schemas.sprints import TaskAssignmentFilters
+from app.utils.errors import ForbiddenError
 from app.utils.pagination import ListResponse
 
 router = APIRouter(
@@ -33,13 +35,15 @@ async def get_task_assignments(
         student.role == settings.role.default_user_role_code
         and project_role == MemberRole.OTHER
     ):
-        raise HTTPException(status=status.HTTP_403_FORBIDDEN)
+        raise ForbiddenError()
 
     filters.project_task_id = task_id
     return await task_assignment_service.get_task_assignments(filters)
 
 
-@router.post('/')
+@router.post(
+    '/', status_code=status.HTTP_201_CREATED,
+    responses=get_responses(status.HTTP_400_BAD_REQUEST))
 async def create_task_assignment(
     _request: Request,
     student: CurrentStudentDep,
@@ -52,7 +56,7 @@ async def create_task_assignment(
         student.role == settings.role.default_user_role_code
         and project_role != MemberRole.TEAMLEAD
     ):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        raise ForbiddenError()
 
     task_assignment_create.project_task_id = task_id
     return await task_assignment_service.create_task_assignment(task_assignment_create)
@@ -71,10 +75,10 @@ async def get_task_assignment(
         student.role == settings.role.default_user_role_code
         and project_role != MemberRole.OTHER
     ):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        raise ForbiddenError()
 
     if student.id != project_member_id or project_role != MemberRole.TEAMLEAD:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        raise ForbiddenError()
 
     filters = TaskAssignmentFilters()
     filters.project_member_id = project_member_id
@@ -82,7 +86,9 @@ async def get_task_assignment(
     return await task_assignment_service.get_task_assignment(filters)
 
 
-@router.put('/{project_member_id}')
+@router.put(
+    '/{project_member_id}',
+    responses=get_responses(status.HTTP_400_BAD_REQUEST))
 async def update_task_assignment(  # noqa: PLR0913
     _request: Request,
     student: CurrentStudentDep,
@@ -96,10 +102,10 @@ async def update_task_assignment(  # noqa: PLR0913
         student.role == settings.role.default_user_role_code
         and project_role != MemberRole.OTHER
     ):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        raise ForbiddenError()
 
     if student.id != project_member_id or project_role != MemberRole.TEAMLEAD:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        raise ForbiddenError()
 
     filters = TaskAssignmentFilters()
     filters.project_task_id = task_id
@@ -109,7 +115,7 @@ async def update_task_assignment(  # noqa: PLR0913
     )
 
 
-@router.delete('/{project_member_id}')
+@router.delete('/{project_member_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_task_assignment(
     _request: Request,
     student: CurrentStudentDep,
@@ -122,10 +128,10 @@ async def delete_task_assignment(
         student.role == settings.role.default_user_role_code
         and project_role != MemberRole.OTHER
     ):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        raise ForbiddenError()
 
     if student.id != project_member_id or project_role != MemberRole.TEAMLEAD:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        raise ForbiddenError()
 
     filters = TaskAssignmentFilters()
     filters.project_task_id = task_id

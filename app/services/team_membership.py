@@ -11,6 +11,7 @@ from app.models.projects.team_membership import (
     TeamMembershipUpdate,
 )
 from app.schemas.projects import TeamMembershipFilters
+from app.utils.errors import NotFoundError
 from app.utils.pagination import ListResponse
 
 
@@ -38,7 +39,7 @@ class TeamMembershipService:
         result = await self.__team_membership_repository.fetch(filters)
 
         if len(result.items) == 0:
-            return None
+            raise NotFoundError()
 
         return result.items[0]
 
@@ -48,7 +49,7 @@ class TeamMembershipService:
         tm = await self.__team_membership_repository.fetch(filters)
 
         if len(tm.items) == 0:
-            return None
+            raise NotFoundError()
 
         return await self.__team_membership_repository.update(tm.items[0].id, tm_update)
 
@@ -58,6 +59,6 @@ class TeamMembershipService:
         tm = await self.__team_membership_repository.fetch(filters)
 
         if len(tm.items) == 0:
-            return None
+            raise NotFoundError()
 
         return await self.__team_membership_repository.delete(tm.items[0].id)

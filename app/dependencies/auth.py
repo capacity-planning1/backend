@@ -2,9 +2,10 @@ from enum import Enum
 from typing import Annotated, Optional
 from uuid import UUID
 
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
+import app.utils.hasher
 from app.core.auth import get_student_id_from_token
 from app.dependencies.repositories import (
     ProjectMemberRepositoryDep,
@@ -13,7 +14,7 @@ from app.dependencies.repositories import (
 from app.dependencies.services import StudentServiceDep
 from app.models.students.student import StudentPublic
 from app.schemas.projects import ProjectMembersFilters
-from app.utils.hasher import Hasher
+from app.utils.errors import NotFoundError, UnauthorizedError
 
 oauth2_scheme = HTTPBearer(auto_error=False)
 
@@ -34,7 +35,7 @@ async def authenticate_student(
     if not student:
         return None
 
-    if Hasher.verify_password(password, student.hashed_password):
+    if app.utils.hasher.Hasher.verify_password(password, student.hashed_password):
         return student
 
     return None
@@ -47,22 +48,16 @@ async def get_current_student(
     student_service: StudentServiceDep,
 ) -> StudentPublic:
     if not credentials:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail='Not authenticated'
-        )
+        raise UnauthorizedError()
 
     student_id = get_student_id_from_token(credentials.credentials)
 
     if not student_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token'
-        )
+        raise UnauthorizedError()
 
     student = await student_service.get_student(student_id)
     if not student:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail='User not found'
-        )
+        raise UnauthorizedError()
 
     return student
 
@@ -79,22 +74,18 @@ async def get_student_project_role(
     request: Request,
 ) -> MemberRole:
     if not credentials:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail='Not authenticated'
-        )
+        raise UnauthorizedError()
 
     student_id = get_student_id_from_token(credentials.credentials)
 
     if not student_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token'
-        )
+        raise UnauthorizedError()
 
     project_id = UUID(request.path_params.get('project_id'))
     project = await project_repo.get(project_id)
 
     if not project:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        raise NotFoundError()
 
     if student_id == project.owner_student_id:
         role = MemberRole.TEAMLEAD

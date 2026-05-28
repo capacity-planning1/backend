@@ -11,6 +11,7 @@ from app.models.sprints.task_assignment import (
     TaskAssignmentUpdate,
 )
 from app.schemas.sprints import TaskAssignmentFilters
+from app.utils.errors import NotFoundError
 from app.utils.pagination import ListResponse
 
 
@@ -38,7 +39,7 @@ class TaskAssignmentService:
         result = await self.__task_assignment_repository.fetch(filters)
 
         if len(result.items) == 0:
-            return None
+            raise NotFoundError()
 
         return result.items[0]
 
@@ -48,7 +49,7 @@ class TaskAssignmentService:
         ta = await self.__task_assignment_repository.fetch(filters)
 
         if len(ta.items) == 0:
-            return None
+            raise NotFoundError()
 
         return await self.__task_assignment_repository.update(ta.items[0].id, ta_update)
 
@@ -58,6 +59,6 @@ class TaskAssignmentService:
         ta = await self.__task_assignment_repository.fetch(filters)
 
         if len(ta.items) == 0:
-            return None
+            raise NotFoundError()
 
         return await self.__task_assignment_repository.delete(ta.items[0].id)

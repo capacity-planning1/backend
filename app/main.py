@@ -4,12 +4,16 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIASGIMiddleware
 
+from app.core.responses import GLOBAL_RESPONSES
+from app.core.error_handler import exception_handler
+from app.core.middlewares import request_logging_middleware
 from app.core.limiter import limiter
 from app.routers import auth, projects, roles, sprints, students
 
 app = FastAPI(
     title='Capacity Planning API',
     version='1.0.0',
+    responses=GLOBAL_RESPONSES,
 )
 
 api_prefix = '/api'
@@ -18,8 +22,11 @@ origins = ['http://localhost:8080']
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_exception_handler(
+    exc_class_or_status_code=Exception,
+    handler=exception_handler
+)
 
-app.add_middleware(SlowAPIASGIMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origin=origins,
@@ -28,6 +35,8 @@ app.add_middleware(
     allow_headers=['Authorization', 'Content-Type', 'X-Requested-With', 'user-agent'],
     max_age=3600,
 )
+app.add_middleware(SlowAPIASGIMiddleware)
+app.middleware('http')(request_logging_middleware)
 
 app_router = APIRouter(prefix=f'{api_prefix}/v1')
 app_router.include_router(projects)

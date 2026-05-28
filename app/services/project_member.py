@@ -3,6 +3,8 @@ from typing import Optional
 from app.dependencies.repositories import (
     ProjectMemberRepository,
     ProjectMemberRepositoryDep,
+    ProjectRepository,
+    ProjectRepositoryDep,
 )
 from app.models.projects.project_member import (
     ProjectMemberCreate,
@@ -11,21 +13,28 @@ from app.models.projects.project_member import (
     ProjectMemberUpdate,
 )
 from app.schemas.projects import ProjectMembersFilters
+from app.utils.errors import NotFoundError
 from app.utils.pagination import ListResponse
 
 
 class ProjectMemberService:
     __project_member_repository: ProjectMemberRepository
+    __project_repository: ProjectRepository
 
     def __init__(
         self,
         project_member_repository: ProjectMemberRepositoryDep,
+        project_repository: ProjectRepositoryDep,
     ):
         self.__project_member_repository = project_member_repository
+        self.__project_repository = project_repository
 
     async def add_member_to_project(
         self, project_member_create: ProjectMemberCreate
     ) -> ProjectMemberPublic:
+        project = await self.__project_repository.get(project_member_create.project_id)
+        if project is None:
+            raise NotFoundError('Project with this ID not exists')
         project_member_dump = project_member_create.model_dump()
         project_member = ProjectMemberModel(**project_member_dump)
         return await self.__project_member_repository.save(project_member)
@@ -41,7 +50,7 @@ class ProjectMemberService:
         result = await self.__project_member_repository.fetch(filters)
 
         if len(result.items) == 0:
-            return None
+            raise NotFoundError()
 
         return result.items[0]
 
@@ -51,7 +60,7 @@ class ProjectMemberService:
         pm = await self.__project_member_repository.fetch(filters)
 
         if len(pm.items) == 0:
-            return None
+            raise NotFoundError()
 
         return await self.__project_member_repository.update(pm.items[0].id, pm_update)
 
@@ -61,6 +70,6 @@ class ProjectMemberService:
         pm = await self.__project_member_repository.fetch(filters)
 
         if len(pm.items) == 0:
-            return None
+            raise NotFoundError()
 
         return await self.__project_member_repository.delete(pm.items[0].id)
