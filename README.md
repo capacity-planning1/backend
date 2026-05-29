@@ -46,7 +46,17 @@ REST API на FastAPI, которое помогает тимлидам студ
 | ROLE__DEFAULT_USER_ROLE_CODE | string | Роль по умолчанию для новых пользователей | user |
 | ROLE__BOOTSTRAP_ENABLED | Включить автоматическое создание ролей и администратора при запуске | true |
 | LIMITER__DEFAULT_LIMITS| List[str] | Количество запросов пользователя на один ресурс в единицу времени | ["10/minute"] |
-| LOGGING__FILE_NAME | str | Файл для логгирования | 'my_log.log'|
+| LOGGING__FILE_NAME | str | Файл для логгирования | my_log.log|
+| EMAIL__USERNAME | EmailStr | Почта отправителя | username@gmail.com |
+| EMAIL__PASSWORD | SecretStr | Ключ приложения | secret_password |
+| EMAIL__TITLE | str | Название письма | title |
+| EMAIL__PORT | int | Порт подключения | 587 |
+| EMAIL__SERVER | str | Хост подключения | smpt.gmail.com |
+| EMAIL__FROM_NAME | str | Имя приложения | Capacity Planning|
+| EMAIL__NOTIFICATION_LIFETIME_SECONDS | int | Время, в течение которого сервер пытается подключиться к почтовому сервиру | 3600 |
+| EMAIL__TEMPLATES_DIR | str | Путь к шаблонам почтовых сообщений | templates |
+| EMAIL__BASE_URL | str | Базовый url для ссылок подтверждения | 'http://locallost:8080/'|
+
 
 ## Генерация JWT ключей (для асимметричного шифрования RS256)
 

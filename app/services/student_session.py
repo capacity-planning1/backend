@@ -2,11 +2,14 @@ from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
 
+from fastapi import BackgroundTasks
+
 from app.core.auth import create_token, decode_token
 from app.core.config import settings
 from app.dependencies.auth import authenticate_student
 from app.dependencies.repositories import StudentSessionRepositoryDep
 from app.dependencies.services import StudentServiceDep
+from app.models.students.student import StudentCreate
 from app.models.auth.refresh_session import (
     StudentSessionModel,
     StudentSessionUpdate,
@@ -15,9 +18,17 @@ from app.schemas.auth import StudentSessionFilters
 from app.utils.errors import UnauthorizedError, InternalServerError
 
 
-class StudentSessionService:
-    def __init__(self, refresh_session_repo: StudentSessionRepositoryDep):
+class AuthService:
+    def __init__(
+        self,
+        refresh_session_repo: StudentSessionRepositoryDep
+
+
+    ):
         self.__repo = refresh_session_repo
+
+    async def register(self, student: StudentCreate, background_tasks: BackgroundTasks):
+        
 
     async def login(
         self,

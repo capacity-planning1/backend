@@ -16,6 +16,7 @@ dependencies = [
     "jwt>=1.4.0",
     "pydantic[email]>=2.12.5",
     "slowapi>=0.1.9",
+    "fastapi-mail>=1.6.4",
 ]
 
 [dependency-groups]
