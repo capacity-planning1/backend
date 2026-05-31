@@ -7,7 +7,11 @@ from fastapi import BackgroundTasks
 from app.core.auth import create_token, decode_token
 from app.core.config import settings
 from app.dependencies.auth import authenticate_student
-from app.dependencies.repositories import StudentSessionRepositoryDep
+from app.dependencies.repositories import (
+    StudentSessionRepositoryDep,
+    StudentRepositoryDep,
+    EmailNotificationRepositoryDep,
+)
 from app.dependencies.services import StudentServiceDep
 from app.models.students.student import StudentCreate
 from app.models.auth.refresh_session import (
@@ -15,20 +19,36 @@ from app.models.auth.refresh_session import (
     StudentSessionUpdate,
 )
 from app.schemas.auth import StudentSessionFilters
-from app.utils.errors import UnauthorizedError, InternalServerError
+from app.schemas.students import StudentFilters
+from app.utils.errors import UnauthorizedError, InternalServerError, ConflictError
 
 
 class AuthService:
     def __init__(
         self,
-        refresh_session_repo: StudentSessionRepositoryDep
-
-
+        refresh_session_repo: StudentSessionRepositoryDep,
+        email_notification_repo: EmailNotificationRepositoryDep,
+        student_repo: StudentRepositoryDep
     ):
-        self.__repo = refresh_session_repo
+        self.__refresh_session_repo = refresh_session_repo
+        self.__email_notification_repo = email_notification_repo
+        self.__student_repo = student_repo
 
-    async def register(self, student: StudentCreate, background_tasks: BackgroundTasks):
+    async def register(
+        self, student: StudentCreate, background_tasks: BackgroundTasks
+    ) -> None:
+        filters = StudentFilters(email=student.email)
+        existing = await self.__student_repo.fetch(filters=filters)
+
+        if len(existing) != 0:
+            raise ConflictError(message='User with this email is already exists')
+
+        created_student = await self.__student_repo.save(student)
+
         
+        await self.__email_notification_repo
+
+
 
     async def login(
         self,
@@ -63,7 +83,7 @@ class AuthService:
         return (access_token, refresh_token)
 
     async def create_session(self, refresh_session: StudentSessionModel):
-        return await self.__repo.save(refresh_session)
+        return await self.__refresh_session_repo.save(refresh_session)
 
     async def validate_session(self, refresh_token: str) -> Optional[tuple[UUID, str]]:
         payload = decode_token(refresh_token)
@@ -80,7 +100,7 @@ class AuthService:
         filters.jti = jti
         filters.is_revoked = False
 
-        sessions = await self.__repo.fetch(filters)
+        sessions = await self.__refresh_session_repo.fetch(filters)
         active_sessions = [
             s for s in sessions.items if s.expires_at > datetime.now(timezone.utc)
         ]
@@ -94,7 +114,7 @@ class AuthService:
         filters = StudentSessionFilters()
         filters.jti = jti
         return (
-            await self.__repo.update_by_filters(
+            await self.__refresh_session_repo.update_by_filters(
                 StudentSessionUpdate(is_revoked=True), filters
             )
             > 0
@@ -103,7 +123,7 @@ class AuthService:
     async def revoke_all_student_sessions(self, student_id: UUID) -> int:
         filters = StudentSessionFilters()
         filters.student_id = student_id
-        return await self.__repo.update_by_filters(
+        return await self.__refresh_session_repo.update_by_filters(
             StudentSessionUpdate(is_revoked=True), filters
         )
 
@@ -139,6 +159,6 @@ class AuthService:
             user_agent=user_agent,
         )
 
-        await self.__repo.save(session)
+        await self.__refresh_session_repo.save(session)
 
         return (new_access_token, new_refresh_token, str(student_id))

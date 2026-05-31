@@ -1,5 +1,5 @@
 from datetime import datetime, timezone, timedelta
-from uuid import UUID
+from uuid import UUID, uuid4
 from enum import Enum
 
 from sqlmodel import Field
@@ -8,9 +8,15 @@ from app.core.config import settings
 from app.models.base import BaseModel
 
 
-class EmailAction(int, Enum):
-    VERIFY = 0
-    CHANGE_PASSWORD = 1
+class EmailAction(str, Enum):
+    VERIFY = 'verify'
+    CHANGE_PASSWORD = 'change password'
+
+
+class EmailStatus(str, Enum):
+    PENDING = 'pending'
+    SENT = 'sent'
+    FAILED = 'failed'
 
 
 class EmailNotification(BaseModel, table=True):
@@ -22,4 +28,5 @@ class EmailNotification(BaseModel, table=True):
             datetime.now(timezone.utc)
             + timedelta(seconds=settings.email.notification_lifetime_seconds)
         ))
-    is_used: bool = Field(default=False, nullable=False)
+    status: EmailStatus = Field(default=EmailStatus.PENDING, nullable=False)
+    code: UUID = Field(default_factory=uuid4)

@@ -8,7 +8,7 @@ from app.services.project_member import ProjectMemberService
 from app.services.sprint import SprintService
 from app.services.sprint_task import SprintTaskService
 from app.services.student import StudentService
-from app.services.student_session import AuthService
+from app.services.auth import AuthService
 from app.services.task_assignment import TaskAssignmentService
 from app.services.task_change_request import TaskChangeRequestService
 from app.services.team import TeamService
