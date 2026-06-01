@@ -3,12 +3,15 @@ from functools import lru_cache
 from pathlib import Path
 from typing import List
 
+from pydantic import EmailStr, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from slowapi.extension import StrOrCallableStr
 from sqlalchemy.engine import URL
 
 MINIMAL_KEY_LENGTH = 32
 
+class CommonSettings(BaseSettings):
+    frontend_host: str = 'http://localhost:5555'
 
 class AuthSettings(BaseSettings):
     private_key_path: str = 'private.pem'
@@ -94,6 +97,18 @@ class LoggingSettings(BaseSettings):
     file_name: str = 'my_log.log'
 
 
+class EmailSettings(BaseSettings):
+    username: EmailStr = "default@example.com"
+    password: SecretStr = SecretStr("default")
+    title: str = "Capacity Planning"
+    port: int = 587
+    server: str = 'smtp.gmail.com'
+    from_name: str = 'Capacity Planning'
+    notification_lifetime_seconds: int = 3600
+    templates_dir: str = 'templates'
+    base_url: str = 'http://locallost:8080/'
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file='.env',
@@ -107,6 +122,8 @@ class Settings(BaseSettings):
     role: RoleSettings
     limiter: LimiterSettings
     logging: LoggingSettings
+    email: EmailSettings
+    common: CommonSettings
 
 
 @lru_cache

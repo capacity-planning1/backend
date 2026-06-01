@@ -21,12 +21,9 @@ class LoginRequest(BaseModel):
     password: str
 
 
-class RegisterResponse(BaseModel):
-    id: UUID
-    email: EmailStr
-    first_name: str
-    last_name: str
-    skills: str | None = None
+class ChangePasswordRequest(BaseModel):
+    new_password: str
+    repeat_password: str
 
 
 class TokenResponse(BaseModel):
@@ -46,7 +43,7 @@ class AssignRoleRequest(BaseModel):
     role_code: str = Field(..., description='Role code to assign')
 
 
-class StudentSessionFilters(CommonListFilters):
+class AuthFilters(CommonListFilters):
     jti: Optional[str] = None
     student_id: Optional[UUID] = None
     expires_at: Optional[datetime] = None

@@ -6,6 +6,7 @@ from sqlmodel import Field, SQLModel
 from app.utils.errors import (
     BadRequestError,
     ConflictError,
+    GoneError,
     ForbiddenError,
     InternalServerError,
     NotFoundError,
@@ -51,3 +52,8 @@ class BadRequestErrorSchema(ErrorSchema):
 class ConflictErrorSchema(ErrorSchema):
     _error_cls: ClassVar[type[Exception]] = ConflictError
     message: str = ConflictError.message
+
+
+class GoneErrorSchema(ErrorSchema):
+    _error_cls: ClassVar[type[Exception]] = GoneError
+    message: str = GoneError.message

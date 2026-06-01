@@ -28,6 +28,7 @@ class StudentBase(SQLModel):
     hashed_password: str = Field(nullable=False)
     skills: str | None = Field(default=None, sa_column=Column(Text))
     role: str = Field(default=settings.role.default_user_role_code, nullable=False)
+    is_email_verificated: bool = Field(default=False, nullable=False)
 
 
 class StudentPublic(BaseModel, StudentBase):

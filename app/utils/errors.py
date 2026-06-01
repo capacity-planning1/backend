@@ -32,3 +32,9 @@ class ConflictError(Exception):
     def __init__(self, message: str = 'The request could not be completed because it conflicts with the current state of the resource'):
         self.message = message
         super().__init__(self.message)
+
+
+class GoneError(Exception):
+    def __init__(self, message: str = 'The requested resource is no longer available.'):
+        self.message = message
+        super().__init__(self.message)
