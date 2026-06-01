@@ -258,7 +258,7 @@ class AuthService:
                 or notification.is_used):
             raise GoneError("The code has expired")
 
-        notifications.is_used = True
+        notification.is_used = True
         student.hashed_password = Hasher.get_password_hash(new_password)
         await self.__student_repo.save(student)
 

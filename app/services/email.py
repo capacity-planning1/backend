@@ -1,5 +1,13 @@
+from pathlib import Path
+
 from fastapi import BackgroundTasks
-from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
+from fastapi_mail import (
+    ConnectionConfig,
+    FastMail,
+    MessageSchema,
+    MessageType,
+    NameEmail,
+)
 from pydantic import EmailStr
 
 from app.core.config import settings
@@ -18,21 +26,23 @@ class EmailService:
             MAIL_FROM_NAME=settings.email.from_name,
             MAIL_STARTTLS=True,
             MAIL_SSL_TLS=False,
-            TEMPLATE_FOLDER=settings.email.templates_dir
+            TEMPLATE_FOLDER=Path(settings.email.templates_dir)
         )
 
         self._fast_mail = FastMail(self._conf)
 
-    async def send_email(
+    def send_email(
         self,
         email_to: EmailStr | str,
         subject: str,
         template_name: str,
         template_body: dict
     ) -> None:
+        recipient = NameEmail(name="", email=str(email_to))
+
         message = MessageSchema(
             subject=subject,
-            recipients=[email_to],
+            recipients=[recipient],
             template_body=template_body,
             subtype=MessageType.html
         )
@@ -43,10 +53,10 @@ class EmailService:
             template_name=template_name
         )
 
-    async def send_verification_email(
+    def send_verification_email(
         self, email_to: str, verification_code: str, verification_link: str
     ) -> None:
-        await self.send_email(
+        self.send_email(
             email_to=email_to,
             subject=f'Подтверждение аккаунта. {settings.email.title}',
             template_name='verify_account.html',
@@ -57,10 +67,10 @@ class EmailService:
             },
         )
 
-    async def send_change_password_email(
+    def send_change_password_email(
         self, email_to: str, reset_code: str, reset_link: str
     ) -> None:
-        await self.send_email(
+        self.send_email(
             email_to=email_to,
             subject=f'Смена пароля. {settings.email.title}',
             template_name='change_password.html',
