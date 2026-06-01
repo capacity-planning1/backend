@@ -6,6 +6,7 @@ from app.utils.repository import Repository
 
 from app.dependencies.session import SessionDep
 from app.models.auth.refresh_session import StudentSessionModel
+from app.models.email import EmailNotification
 from app.models.projects.project import ProjectModel
 from app.models.projects.project_member import ProjectMemberModel
 from app.models.projects.team import TeamModel
@@ -115,4 +116,14 @@ async def get_refresh_session_repository(session: SessionDep):
 RefreshSessionRepository: TypeAlias = Repository[StudentSessionModel]
 StudentSessionRepositoryDep = Annotated[
     RefreshSessionRepository, Depends(get_refresh_session_repository)
+]
+
+
+async def get_email_notification_repository(session: SessionDep):
+    yield Repository[EmailNotification](session)
+
+
+EmailNotificationRepository: TypeAlias = Repository[EmailNotification]
+EmailNotificationRepositoryDep = Annotated[
+    EmailNotificationRepository, Depends(get_email_notification_repository)
 ]

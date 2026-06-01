@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from typing import Optional
 
 from app.dependencies.repositories import (
     TaskAssignmentRepository,
@@ -11,6 +11,8 @@ from app.models.sprints.task_assignment import (
     TaskAssignmentUpdate,
 )
 from app.schemas.sprints import TaskAssignmentFilters
+from app.utils.errors import NotFoundError
+from app.utils.pagination import ListResponse
 
 
 class TaskAssignmentService:
@@ -21,7 +23,7 @@ class TaskAssignmentService:
 
     async def get_task_assignments(
         self, filters: TaskAssignmentFilters
-    ) -> Sequence[TaskAssignmentPublic]:
+    ) -> ListResponse[TaskAssignmentPublic]:
         return await self.__task_assignment_repository.fetch(filters)
 
     async def create_task_assignment(
@@ -36,27 +38,27 @@ class TaskAssignmentService:
     ) -> Optional[TaskAssignmentPublic]:
         result = await self.__task_assignment_repository.fetch(filters)
 
-        if len(result) == 0:
-            return None
+        if len(result.items) == 0:
+            raise NotFoundError()
 
-        return result[0]
+        return result.items[0]
 
     async def update_task_assignment(
         self, filters: TaskAssignmentFilters, ta_update: TaskAssignmentUpdate
     ) -> Optional[TaskAssignmentPublic]:
         ta = await self.__task_assignment_repository.fetch(filters)
 
-        if len(ta) == 0:
-            return None
+        if len(ta.items) == 0:
+            raise NotFoundError()
 
-        return await self.__task_assignment_repository.update(ta[0].id, ta_update)
+        return await self.__task_assignment_repository.update(ta.items[0].id, ta_update)
 
     async def delete_task_assignment(
         self, filters: TaskAssignmentFilters
     ) -> Optional[TaskAssignmentPublic]:
         ta = await self.__task_assignment_repository.fetch(filters)
 
-        if len(ta) == 0:
-            return None
+        if len(ta.items) == 0:
+            raise NotFoundError()
 
-        return await self.__task_assignment_repository.delete(ta[0].id)
+        return await self.__task_assignment_repository.delete(ta.items[0].id)

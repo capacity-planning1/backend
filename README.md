@@ -32,6 +32,8 @@ REST API на FastAPI, которое помогает тимлидам студ
 | DB__POSTGRES_USER       | string | Пользователь PostgreSQL с правами на базу.                 | postgres              |
 | DB__POSTGRES_PASSWORD   | string | Пароль пользователя PostgreSQL.                            | postgres              |
 | DB__ECHO             | bool   | Включить логирование SQL (True/False).                     | False                 |
+| COMMON__FRONTEND_HOST | str | Хост фронтенда | http://localhost:5555 |
+| COMMON__BACKEND_HOST | str | Хост фронтенда | http://localhost:5050 |
 | AUTH__PRIVATE_KEY_PATH | string | Путь к секретному ключу для подписи JWT-токенов | private.pem |
 | AUTH__PUBLIC_KEY_PATH | string | Путь к публичному ключу для расшифровки JWT-токенов | public.pem |
 | AUTH__ALGORITHM           | string | Алгоритм шифрования JWT.                                   | RS256                 |
@@ -45,6 +47,17 @@ REST API на FastAPI, которое помогает тимлидам студ
 | ROLE__ADMIN_ROLE_CODE | string | Код роли администратора | admin |
 | ROLE__DEFAULT_USER_ROLE_CODE | string | Роль по умолчанию для новых пользователей | user |
 | ROLE__BOOTSTRAP_ENABLED | Включить автоматическое создание ролей и администратора при запуске | true |
+| LIMITER__DEFAULT_LIMITS| List[str] | Количество запросов пользователя на один ресурс в единицу времени | ["10/minute"] |
+| LOGGING__FILE_NAME | str | Файл для логгирования | my_log.log|
+| EMAIL__USERNAME | EmailStr | Почта отправителя | username@gmail.com |
+| EMAIL__PASSWORD | SecretStr | Ключ приложения | secret_password |
+| EMAIL__TITLE | str | Название письма | title |
+| EMAIL__PORT | int | Порт подключения | 587 |
+| EMAIL__SERVER | str | Хост подключения | smpt.gmail.com |
+| EMAIL__FROM_NAME | str | Имя приложения | Capacity Planning|
+| EMAIL__NOTIFICATION_LIFETIME_SECONDS | int | Время, в течение которого сервер пытается подключиться к почтовому сервиру | 3600 |
+| EMAIL__TEMPLATES_DIR | str | Путь к шаблонам почтовых сообщений | templates |
+| EMAIL__BASE_URL | str | Базовый url для ссылок подтверждения | http://locallost:8080/|
 
 ## Генерация JWT ключей (для асимметричного шифрования RS256)
 

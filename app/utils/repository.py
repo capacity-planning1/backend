@@ -1,14 +1,16 @@
+from math import ceil
 from typing import Any, Generic, Optional, Sequence, TypeAlias, TypeVar
 from uuid import UUID
 
 from pydantic import BaseModel as PydanticBaseModel
 from sqlalchemy import update
 from sqlalchemy.sql._typing import _ColumnExpressionArgument
-from sqlmodel import select
+from sqlmodel import func, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.dependencies.session import SessionDep
 from app.models.base import BaseModel
+from app.utils.pagination import ListResponse, PaginationInfo
 
 FilterType: TypeAlias = _ColumnExpressionArgument[bool] | bool
 
@@ -16,7 +18,6 @@ ModelT = TypeVar('ModelT', bound=BaseModel)
 
 
 class Repository(Generic[ModelT]):
-    # Убираем проперти и магию. Теперь модель передается явно.
     model: type[ModelT]
     __session: AsyncSession
     OFFSET = 0
@@ -31,7 +32,7 @@ class Repository(Generic[ModelT]):
     async def fetch(
         self,
         filters: Optional[PydanticBaseModel] = None,
-    ) -> Sequence[ModelT]:
+    ) -> ListResponse[ModelT]:
         select_statement = select(self.model)
 
         offset = self.OFFSET
@@ -59,9 +60,18 @@ class Repository(Generic[ModelT]):
             offset = getattr(filters, 'offset', self.OFFSET)
             limit = getattr(filters, 'limit', self.LIMIT)
 
+        count_statement = select(func.count()).select_from(select_statement.subquery())
+        total = (await self.__session.exec(count_statement)).one()
+
         select_statement = select_statement.offset(offset).limit(limit)
-        result = await self.__session.execute(select_statement)
-        return result.scalars().all()
+        items = await self.__session.exec(select_statement)
+
+        pages_num = ceil(total / limit)
+        page = (offset // limit) + 1
+
+        pagination_info = PaginationInfo(total=total, page=page, pages_num=pages_num)
+
+        return ListResponse(info=pagination_info, items=items)
 
     async def save(self, instance: ModelT) -> ModelT:
         self.__session.add(instance)
@@ -121,7 +131,6 @@ class Repository(Generic[ModelT]):
             }
         await self.__session.execute(update_statement.values(**update_dict))
         await self.__session.commit()
-
 
     async def fetch_by_related_project(
         self,

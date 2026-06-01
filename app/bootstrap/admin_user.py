@@ -1,6 +1,9 @@
-from sqlmodel.ext.asyncio.session import AsyncSession  # Добавили импорт сессии
+import asyncio
+
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.core.config import settings
+from app.db.database import engine
 from app.models.students.student import StudentModel
 from app.schemas.students import StudentFilters
 from app.utils.hasher import Hasher
@@ -26,6 +29,16 @@ async def create_admin_user(session: AsyncSession):
             role=settings.role.admin_role_code,
         )
         admin = await student_repo.save(admin)
-        print(f"✓ Created admin user: {admin.email}")
+        print(f'✓ Created admin user: {admin.email}')
     else:
-        print(f"✓ Admin user already exists: {existing_admin[0].email}")
+        print(f'✓ Admin user already exists: {existing_admin[0].email}')
+
+
+async def main() -> None:
+    if settings.role.bootstrap_enabled:
+        async with AsyncSession(engine) as session:
+            await create_admin_user(session)
+
+
+if __name__ == '__main__':
+    asyncio.run(main())

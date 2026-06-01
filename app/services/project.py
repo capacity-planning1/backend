@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from typing import Optional
 from uuid import UUID
 
 from app.dependencies.repositories import ProjectRepository, ProjectRepositoryDep
@@ -9,6 +9,8 @@ from app.models.projects.project import (
     ProjectUpdate,
 )
 from app.schemas.projects import ProjectFilters
+from app.utils.errors import NotFoundError
+from app.utils.pagination import ListResponse
 
 
 class ProjectService:
@@ -20,7 +22,9 @@ class ProjectService:
     ):
         self.__project_repository = project_repository
 
-    async def get_projects(self, filters: ProjectFilters) -> Sequence[ProjectPublic]:
+    async def get_projects(
+        self, filters: ProjectFilters
+    ) -> ListResponse[ProjectPublic]:
         return await self.__project_repository.fetch(filters)
 
     async def create_project(self, project_create: ProjectCreate) -> ProjectPublic:
@@ -29,12 +33,21 @@ class ProjectService:
         return await self.__project_repository.save(project)
 
     async def get_project(self, project_id: UUID) -> Optional[ProjectPublic]:
-        return await self.__project_repository.get(project_id)
+        result = await self.__project_repository.get(project_id)
+        if result is None:
+            raise NotFoundError()
+        return result
 
     async def update_project(
         self, project_update: ProjectUpdate, project_id: UUID
     ) -> Optional[ProjectModel]:
-        return await self.__project_repository.update(project_id, project_update)
+        result = await self.__project_repository.update(project_id, project_update)
+        if result is None:
+            raise NotFoundError()
+        return result
 
     async def delete_project(self, project_id: UUID) -> Optional[ProjectPublic]:
-        return await self.__project_repository.delete(project_id)
+        result = await self.__project_repository.delete(project_id)
+        if result is None:
+            raise NotFoundError()
+        return result

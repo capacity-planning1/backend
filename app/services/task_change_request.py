@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from typing import Optional
 
 from app.dependencies.repositories import (
     TaskChangeRequestRepository,
@@ -11,6 +11,8 @@ from app.models.sprints.task_change_request import (
     TaskChangeRequestUpdate,
 )
 from app.schemas.sprints import TaskChangeRequestFilters
+from app.utils.errors import NotFoundError
+from app.utils.pagination import ListResponse
 
 
 class TaskChangeRequestService:
@@ -21,7 +23,7 @@ class TaskChangeRequestService:
 
     async def get_task_change_requests(
         self, filters: TaskChangeRequestFilters
-    ) -> Sequence[TaskChangeRequestPublic]:
+    ) -> ListResponse[TaskChangeRequestPublic]:
         return await self.__task_change_request_repository.fetch(filters)
 
     async def create_task_change_request(
@@ -36,27 +38,29 @@ class TaskChangeRequestService:
     ) -> Optional[TaskChangeRequestPublic]:
         result = await self.__task_change_request_repository.fetch(filters)
 
-        if len(result) == 0:
-            return None
+        if len(result.items) == 0:
+            raise NotFoundError()
 
-        return result[0]
+        return result.items[0]
 
     async def update_task_change_request(
         self, filters: TaskChangeRequestFilters, tcr_update: TaskChangeRequestUpdate
     ) -> Optional[TaskChangeRequestPublic]:
         tcr = await self.__task_change_request_repository.fetch(filters)
 
-        if len(tcr) == 0:
-            return None
+        if len(tcr.items) == 0:
+            raise NotFoundError()
 
-        return await self.__task_change_request_repository.update(tcr[0].id, tcr_update)
+        return await self.__task_change_request_repository.update(
+            tcr.items[0].id, tcr_update
+        )
 
     async def delete_task_change_request(
         self, filters: TaskChangeRequestFilters
     ) -> Optional[TaskChangeRequestPublic]:
         tcr = await self.__task_change_request_repository.fetch(filters)
 
-        if len(tcr) == 0:
-            return None
+        if len(tcr.items) == 0:
+            raise NotFoundError()
 
-        return await self.__task_change_request_repository.delete(tcr[0].id)
+        return await self.__task_change_request_repository.delete(tcr.items[0].id)
