@@ -1,5 +1,6 @@
 from fastapi import BackgroundTasks
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
+from pydantic import EmailStr
 
 from app.core.config import settings
 
@@ -24,7 +25,7 @@ class EmailService:
 
     async def send_email(
         self,
-        email_to: str,
+        email_to: EmailStr | str,
         subject: str,
         template_name: str,
         template_body: dict

@@ -9,7 +9,7 @@ from app.models.base import BaseModel
 
 
 class EmailAction(str, Enum):
-    VERIFY = 'verify'
+    VERIFY_EMAIL = 'verify email'
     CHANGE_PASSWORD = 'change password'
 
 
@@ -30,3 +30,4 @@ class EmailNotification(BaseModel, table=True):
         ))
     status: EmailStatus = Field(default=EmailStatus.PENDING, nullable=False)
     code: UUID = Field(default_factory=uuid4)
+    is_used: bool = Field(default=False, nullable=False)

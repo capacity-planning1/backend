@@ -1,12 +1,13 @@
 from fastapi import status
 
 from app.schemas.errors import (
+    BadRequestErrorSchema,
+    ConflictErrorSchema,
     ForbiddenErrorSchema,
+    GoneErrorSchema,
     InternalServerErrorSchema,
     NotFoundErrorSchema,
     UnauthorizedErrorSchema,
-    ConflictErrorSchema,
-    BadRequestErrorSchema,
 )
 
 ERROR_RESPONSES_REGISTRY = {
@@ -16,6 +17,7 @@ ERROR_RESPONSES_REGISTRY = {
     status.HTTP_404_NOT_FOUND: NotFoundErrorSchema,
     status.HTTP_409_CONFLICT: ConflictErrorSchema,
     status.HTTP_500_INTERNAL_SERVER_ERROR: InternalServerErrorSchema,
+    status.HTTP_410_GONE: GoneErrorSchema,
 }
 
 

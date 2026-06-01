@@ -10,6 +10,8 @@ from sqlalchemy.engine import URL
 
 MINIMAL_KEY_LENGTH = 32
 
+class CommonSettings(BaseSettings):
+    frontend_host: str = 'http://localhost:5555'
 
 class AuthSettings(BaseSettings):
     private_key_path: str = 'private.pem'
@@ -96,9 +98,9 @@ class LoggingSettings(BaseSettings):
 
 
 class EmailSettings(BaseSettings):
-    username: EmailStr
-    password: SecretStr
-    title: str
+    username: EmailStr = "default@example.com"
+    password: SecretStr = SecretStr("default")
+    title: str = "Capacity Planning"
     port: int = 587
     server: str = 'smtp.gmail.com'
     from_name: str = 'Capacity Planning'
@@ -121,6 +123,7 @@ class Settings(BaseSettings):
     limiter: LimiterSettings
     logging: LoggingSettings
     email: EmailSettings
+    common: CommonSettings
 
 
 @lru_cache
