@@ -10,8 +10,11 @@ from sqlalchemy.engine import URL
 
 MINIMAL_KEY_LENGTH = 32
 
+
 class CommonSettings(BaseSettings):
+    backend_host: str = 'http://localhost:5050'
     frontend_host: str = 'http://localhost:5555'
+
 
 class AuthSettings(BaseSettings):
     private_key_path: str = 'private.pem'
