@@ -19,7 +19,7 @@ from app.models.auth.refresh_session import (
 )
 from app.models.email import EmailAction, EmailNotification, EmailStatus
 from app.models.students.student import StudentCreate, StudentModel
-from app.schemas.auth import StudentSessionFilters
+from app.schemas.auth import AuthFilters
 from app.schemas.email import EmailNotificationFilters
 from app.schemas.students import StudentFilters
 from app.services.email import EmailService
@@ -122,7 +122,7 @@ class AuthService:
         if not jti or not student_id_str:
             return UnauthorizedError()
 
-        filters = StudentSessionFilters()
+        filters = AuthFilters()
         filters.jti = jti
         filters.is_revoked = False
 
@@ -137,7 +137,7 @@ class AuthService:
         return (UUID(student_id_str), jti)
 
     async def revoke_session(self, jti: str) -> bool:
-        filters = StudentSessionFilters()
+        filters = AuthFilters()
         filters.jti = jti
         return (
             await self.__refresh_session_repo.update_by_filters(
@@ -147,7 +147,7 @@ class AuthService:
         )
 
     async def revoke_all_student_sessions(self, student_id: UUID) -> int:
-        filters = StudentSessionFilters()
+        filters = AuthFilters()
         filters.student_id = student_id
         return await self.__refresh_session_repo.update_by_filters(
             StudentSessionUpdate(is_revoked=True), filters

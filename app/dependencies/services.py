@@ -40,6 +40,6 @@ TaskChangeRequestServiceDep = Annotated[
     TaskChangeRequestService, Depends(TaskChangeRequestService)
 ]
 
-StudentSessionServiceDep = Annotated[
+AuthServiceDep = Annotated[
     AuthService, Depends(AuthService)
 ]
