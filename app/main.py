@@ -1,13 +1,15 @@
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.utils import get_openapi
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIASGIMiddleware
 
-from app.core.responses import GLOBAL_RESPONSES
+from app.core.config import settings
 from app.core.error_handler import exception_handler
-from app.core.middlewares import request_logging_middleware
 from app.core.limiter import limiter
+from app.core.middlewares import request_logging_middleware
+from app.core.responses import GLOBAL_RESPONSES
 from app.routers import auth, projects, roles, sprints, students
 
 app = FastAPI(
@@ -46,3 +48,27 @@ app_router.include_router(auth)
 app_router.include_router(roles)
 
 app.include_router(app_router)
+
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+
+    openapi_schema = get_openapi(
+        title='Capacity Planning API',
+        version='1.1.0',
+        description='API for planning tasks in students projects',
+        routes=app.routes,
+        servers=[
+            {
+                'url': settings.common.backend_host,
+                'description': 'Local server',
+            },
+        ],
+    )
+
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+
+app.openapi = custom_openapi

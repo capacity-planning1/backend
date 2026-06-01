@@ -33,6 +33,7 @@ REST API на FastAPI, которое помогает тимлидам студ
 | DB__POSTGRES_PASSWORD   | string | Пароль пользователя PostgreSQL.                            | postgres              |
 | DB__ECHO             | bool   | Включить логирование SQL (True/False).                     | False                 |
 | COMMON__FRONTEND_HOST | str | Хост фронтенда | http://localhost:5555 |
+| COMMON__BACKEND_HOST | str | Хост фронтенда | http://localhost:5050 |
 | AUTH__PRIVATE_KEY_PATH | string | Путь к секретному ключу для подписи JWT-токенов | private.pem |
 | AUTH__PUBLIC_KEY_PATH | string | Путь к публичному ключу для расшифровки JWT-токенов | public.pem |
 | AUTH__ALGORITHM           | string | Алгоритм шифрования JWT.                                   | RS256                 |
