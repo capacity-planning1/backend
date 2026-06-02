@@ -12,12 +12,11 @@ from app.dependencies.repositories import (
     StudentRepositoryDep,
     StudentSessionRepositoryDep,
 )
-from app.dependencies.services import StudentServiceDep
 from app.models.auth.refresh_session import (
     StudentSessionModel,
     StudentSessionUpdate,
 )
-from app.models.email import EmailAction, EmailNotification, EmailStatus
+from app.models.email import EmailAction, EmailNotification
 from app.models.students.student import StudentCreate, StudentModel
 from app.schemas.auth import AuthFilters
 from app.schemas.email import EmailNotificationFilters
@@ -81,9 +80,9 @@ class AuthService:
         email: str,
         password: str,
         user_agent: str,
-        student_service: StudentServiceDep,
+        student_repo: StudentRepositoryDep,
     ):
-        student = await authenticate_student(email, password, student_service)
+        student = await authenticate_student(email, password, student_repo)
 
         if student is None:
             raise UnauthorizedError('Wrong email or password')

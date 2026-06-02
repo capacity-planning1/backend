@@ -10,8 +10,8 @@ from app.core.auth import get_student_id_from_token
 from app.dependencies.repositories import (
     ProjectMemberRepositoryDep,
     ProjectRepositoryDep,
+    StudentRepositoryDep
 )
-from app.dependencies.services import StudentServiceDep
 from app.models.students.student import StudentPublic
 from app.schemas.projects import ProjectMembersFilters
 from app.utils.errors import NotFoundError, UnauthorizedError
@@ -28,9 +28,9 @@ class MemberRole(str, Enum):
 
 
 async def authenticate_student(
-    email: str, password: str, student_service: StudentServiceDep
+    email: str, password: str, student_repo: StudentRepositoryDep
 ) -> AuthenticatedStudent:
-    student = await student_service.get_student_by_email(email)
+    student = await student_repo.get_by_email(email)
 
     if not student:
         return None
@@ -45,7 +45,7 @@ async def get_current_student(
     credentials: Annotated[
         Optional[HTTPAuthorizationCredentials], Depends(oauth2_scheme)
     ],
-    student_service: StudentServiceDep,
+    student_repo: StudentRepositoryDep,
 ) -> StudentPublic:
     if not credentials:
         raise UnauthorizedError()
@@ -55,7 +55,7 @@ async def get_current_student(
     if not student_id:
         raise UnauthorizedError()
 
-    student = await student_service.get_student(student_id)
+    student = await student_repo.get(student_id)
     if not student:
         raise UnauthorizedError()
 
@@ -93,7 +93,7 @@ async def get_student_project_role(
         filters = ProjectMembersFilters(project_id=project_id)
         project_members = await project_member_repo.fetch(filters)
         is_in_project = False
-        for project_member in project_members:
+        for project_member in project_members.items:
             if project_member.student_id == student_id:
                 is_in_project = True
         role = MemberRole.MEMBER if is_in_project else MemberRole.OTHER

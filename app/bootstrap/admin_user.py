@@ -17,7 +17,7 @@ async def create_admin_user(session: AsyncSession):
     filters = StudentFilters(email=settings.role.admin_email)
     existing_admin = await student_repo.fetch(filters)
 
-    if len(existing_admin) == 0:
+    if len(existing_admin.items) == 0:
         hashed_password = Hasher.get_password_hash(settings.role.admin_password)
 
         admin = StudentModel(
@@ -31,7 +31,7 @@ async def create_admin_user(session: AsyncSession):
         admin = await student_repo.save(admin)
         print(f'✓ Created admin user: {admin.email}')
     else:
-        print(f'✓ Admin user already exists: {existing_admin[0].email}')
+        print(f'✓ Admin user already exists: {existing_admin.items[0].email}')
 
 
 async def main() -> None:

@@ -16,6 +16,7 @@ app = FastAPI(
     title='Capacity Planning API',
     version='1.0.0',
     responses=GLOBAL_RESPONSES,
+    root_path="/api",
 )
 
 api_prefix = '/api'
@@ -31,7 +32,7 @@ app.add_exception_handler(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origin=origins,
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allow_headers=['Authorization', 'Content-Type', 'X-Requested-With', 'user-agent'],

@@ -19,15 +19,15 @@ ModelT = TypeVar('ModelT', bound=BaseModel)
 
 class Repository(Generic[ModelT]):
     model: type[ModelT]
-    __session: AsyncSession
+    _session: AsyncSession
     OFFSET = 0
     LIMIT = 100
 
     def __init__(self, session: SessionDep):
-        self.__session = session
+        self._session = session
 
     async def get(self, pk: UUID) -> Optional[ModelT]:
-        return await self.__session.get(self.model, pk)
+        return await self._session.get(self.model, pk)
 
     async def fetch(
         self,
@@ -61,37 +61,37 @@ class Repository(Generic[ModelT]):
             limit = getattr(filters, 'limit', self.LIMIT)
 
         count_statement = select(func.count()).select_from(select_statement.subquery())
-        total = (await self.__session.exec(count_statement)).one()
+        total = (await self._session.exec(count_statement)).one()
 
         select_statement = select_statement.offset(offset).limit(limit)
-        items = await self.__session.exec(select_statement)
+        items = (await self._session.exec(select_statement)).all()
 
         pages_num = ceil(total / limit)
         page = (offset // limit) + 1
 
-        pagination_info = PaginationInfo(total=total, page=page, pages_num=pages_num)
+        pagination_info = PaginationInfo(total=total, page=page, page_num=pages_num)
 
         return ListResponse(info=pagination_info, items=items)
 
     async def save(self, instance: ModelT) -> ModelT:
-        self.__session.add(instance)
-        await self.__session.commit()
-        await self.__session.refresh(instance)
+        self._session.add(instance)
+        await self._session.commit()
+        await self._session.refresh(instance)
         return instance
 
     async def save_all(self, instanses: list[ModelT]) -> list[ModelT]:
-        self.__session.add_all(instanses)
-        await self.__session.commit()
+        self._session.add_all(instanses)
+        await self._session.commit()
         for instance in instanses:
-            await self.__session.refresh(instance)
+            await self._session.refresh(instance)
         return instanses
 
     async def delete(self, pk: UUID) -> Optional[ModelT]:
         instance = await self.get(pk)
         if instance is None:
             return instance
-        await self.__session.delete(instance)
-        await self.__session.commit()
+        await self._session.delete(instance)
+        await self._session.commit()
         return instance
 
     async def update(self, pk: UUID, updates: PydanticBaseModel) -> Optional[ModelT]:
@@ -129,8 +129,8 @@ class Repository(Generic[ModelT]):
             update_dict = {
                 k: v for k, v in update_dict.items() if k not in exclude_fields
             }
-        await self.__session.execute(update_statement.values(**update_dict))
-        await self.__session.commit()
+        await self._session.exec(update_statement.values(**update_dict))
+        await self._session.commit()
 
     async def fetch_by_related_project(
         self,
@@ -176,5 +176,5 @@ class Repository(Generic[ModelT]):
             limit = getattr(filters, 'limit', 100)
 
         select_statement = select_statement.offset(offset).limit(limit)
-        result = await self.__session.execute(select_statement)
+        result = await self._session.exec(select_statement)
         return result.scalars().all()

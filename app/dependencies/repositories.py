@@ -17,6 +17,7 @@ from app.models.sprints.task_assignment import TaskAssignmentModel
 from app.models.sprints.task_change_request import TaskChangeRequestModel
 from app.models.students.busy_slot import BusySlotModel
 from app.models.students.student import StudentModel
+from app.repositories.student import StudentRepository
 
 
 async def get_project_repository(session: SessionDep):
@@ -102,10 +103,9 @@ BusySlotRepositoryDep = Annotated[BusySlotRepository, Depends(get_busy_slot_repo
 
 
 async def get_student_repository(session: SessionDep):
-    yield Repository[StudentModel](session)
+    yield StudentRepository(session)
 
 
-StudentRepository: TypeAlias = Repository[StudentModel]
 StudentRepositoryDep = Annotated[StudentRepository, Depends(get_student_repository)]
 
 

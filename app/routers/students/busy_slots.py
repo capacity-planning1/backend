@@ -96,10 +96,10 @@ async def delete_busy_slot(
     project_role: ProjectRoleDep,
     busy_slot_service: BusySlotServiceDep,
     busy_slot_id: UUID,
-) -> Optional[BusySlotPublic]:
+):
     busy_slot = await busy_slot_service.get_busy_slot(busy_slot_id)
 
     if student.id != busy_slot.student_id or project_role != MemberRole.TEAMLEAD:
         raise ForbiddenError()
 
-    return await busy_slot_service.delete_busy_slot(busy_slot_id)
+    await busy_slot_service.delete_busy_slot(busy_slot_id)
