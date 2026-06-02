@@ -112,11 +112,11 @@ async def delete_sprint(
     project_role: ProjectRoleDep,
     sprint_service: SprintServiceDep,
     sprint_id: UUID,
-) -> Optional[SprintPublic]:
+):
     if (
         student.role == settings.role.default_user_role_code
         and project_role != MemberRole.TEAMLEAD
     ):
         raise ForbiddenError()
 
-    return await sprint_service.delete_sprint(sprint_id)
+    await sprint_service.delete_sprint(sprint_id)

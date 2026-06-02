@@ -77,8 +77,8 @@ async def detele_student(
     student: CurrentStudentDep,
     student_service: StudentServiceDep,
     student_id: UUID,
-) -> Optional[StudentPublic]:
+):
     if student.id != student_id or student.role != settings.role.admin_role_code:
         raise ForbiddenError()
 
-    return await student_service.delete_student(student_id)
+    await student_service.delete_student(student_id)

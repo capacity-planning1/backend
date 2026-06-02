@@ -43,7 +43,7 @@ async def get_tasks(
 
 @router.post(
     '/', status_code=status.HTTP_201_CREATED,
-    responses=status.HTTP_400_BAD_REQUEST)
+    responses=get_responses(status.HTTP_400_BAD_REQUEST))
 async def create_task(
     _request: Request,
     student: CurrentStudentDep,
@@ -104,11 +104,11 @@ async def delete_task(
     project_role: ProjectRoleDep,
     sprint_task_service: SprintTaskServiceDep,
     task_id: UUID,
-) -> Optional[SprintTaskPublic]:
+):
     if (
         student.role == settings.role.default_user_role_code
         and project_role != MemberRole.TEAMLEAD
     ):
         raise ForbiddenError()
 
-    return await sprint_task_service.delete_task(task_id)
+    await sprint_task_service.delete_task(task_id)

@@ -131,7 +131,7 @@ async def delete_task_change_request(
     project_role: ProjectRoleDep,
     task_change_request_service: TaskChangeRequestServiceDep,
     request_id: UUID,
-) -> Optional[TaskChangeRequestPublic]:
+):
     if (
         student.role == settings.role.default_user_role_code
         and project_role == MemberRole.OTHER
@@ -148,4 +148,4 @@ async def delete_task_change_request(
     ):
         raise ForbiddenError()
 
-    return await task_change_request_service.delete_task_change_request(request_id)
+    await task_change_request_service.delete_task_change_request(request_id)

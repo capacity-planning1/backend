@@ -114,11 +114,11 @@ async def detele_project(
     project_role: ProjectRoleDep,
     project_member_service: ProjectServiceDep,
     project_id: UUID,
-) -> Optional[ProjectPublic]:
+):
     if (
         student.role == settings.role.default_user_role_code
         and project_role != MemberRole.TEAMLEAD
     ):
         raise ForbiddenError()
 
-    return await project_member_service.delete_project(project_id)
+    await project_member_service.delete_project(project_id)

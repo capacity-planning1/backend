@@ -57,12 +57,9 @@ class StudentService:
         return result
 
     async def get_student_by_email(self, email: str) -> Optional[StudentPublic]:
-        filters = StudentFilters()
-        filters.email = email
+        student = await self.__student_repository.get_by_email(email)
 
-        students = await self.__student_repository.fetch(filters)
-
-        if len(students.items) == 0:
+        if student is None:
             raise NotFoundError()
 
-        return students.items[0]
+        return student
