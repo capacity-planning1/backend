@@ -1,0 +1,6 @@
+{
+  "critical_project": {
+    "name": "Smoke project",
+    "description": "Project created by smoke tests"
+  }
+}

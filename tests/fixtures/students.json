@@ -1,0 +1,9 @@
+{
+  "registered_student": {
+    "email": "smoke.student@example.com",
+    "first_name": "Smoke",
+    "last_name": "Student",
+    "password": "SmokePass123",
+    "skills": "python, testing"
+  }
+}
