@@ -123,7 +123,7 @@ async def delete_task_assignment(
     task_assignment_service: TaskAssignmentServiceDep,
     task_id: UUID,
     project_member_id: UUID,
-) -> Optional[TaskAssignmentPublic]:
+):
     if (
         student.role == settings.role.default_user_role_code
         and project_role != MemberRole.OTHER
@@ -136,6 +136,6 @@ async def delete_task_assignment(
     filters = TaskAssignmentFilters()
     filters.project_task_id = task_id
     filters.project_member_id = project_member_id
-    return await task_assignment_service.delete_task_assignment(
+    await task_assignment_service.delete_task_assignment(
         task_id, project_member_id
     )

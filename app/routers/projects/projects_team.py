@@ -72,14 +72,14 @@ async def delete_team(
     project_role: ProjectRoleDep,
     team_service: TeamServiceDep,
     team_id: UUID,
-) -> Optional[TeamPublic]:
+):
     if (
         student.role == settings.role.default_user_role_code
         and project_role != MemberRole.TEAMLEAD
     ):
         raise ForbiddenError()
 
-    return await team_service.delete_team(team_id)
+    await team_service.delete_team(team_id)
 
 
 @router.get('/members')
@@ -174,7 +174,7 @@ async def delete_membership(
     team_membership_service: TeamMembershipServiceDep,
     team_id: UUID,
     student_id: UUID,
-) -> Optional[TeamMembershipPublic]:
+):
     if (
         student.role == settings.role.default_user_role_code
         and project_role != MemberRole.TEAMLEAD
@@ -184,4 +184,4 @@ async def delete_membership(
     filters = TeamMembershipFilters()
     filters.team_id = team_id
     filters.project_member_id = student_id
-    return await team_membership_service.delete_membership(filters)
+    await team_membership_service.delete_membership(filters)

@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import Annotated
+from typing import Annotated, Optional
 
 from fastapi import (
     APIRouter,
@@ -60,15 +60,15 @@ async def register(
 )
 async def login(
     _request: Request,
-    headers: Header,
     response: Response,
     login_data: LoginRequest,
     student_session_service: AuthServiceDep,
+    user_agent: Annotated[Optional[str], Header()] = None,
 ):
     (access_token, refresh_token) = await student_session_service.login(
         email=login_data.email,
         password=login_data.password,
-        user_agent=headers.get('user-agent'),
+        user_agent=user_agent,
     )
 
     response.set_cookie(
@@ -98,18 +98,16 @@ async def get_current_user(_request: Request, current_student: CurrentStudentDep
     )
 async def refresh(
     _request: Request,
-    cookies: Cookie,
-    headers: Header,
     response: Response,
     student_session_service: AuthServiceDep,
+    refresh_token: Annotated[Optional[str], Cookie()] = None,
+    user_agent: Annotated[Optional[str], Header()] = None,
 ):
-    refresh_token = cookies.get('refresh_token')
-
     if not refresh_token:
         raise UnauthorizedError('Refresh token not found')
 
     result = await student_session_service.refresh_tokens(
-        refresh_token, user_agent=headers.get('user-agent')
+        refresh_token=refresh_token, user_agent=user_agent
     )
 
     if not result:
@@ -135,11 +133,10 @@ async def refresh(
 )
 async def logout(
     _request: Request,
-    cookies: Cookie,
     response: Response,
     student_session_service: AuthServiceDep,
+    refresh_token: Annotated[Optional[str], Cookie()] = None,
 ):
-    refresh_token = cookies.get('refresh_token')
     if not refresh_token:
         raise UnauthorizedError('Token missing')
 

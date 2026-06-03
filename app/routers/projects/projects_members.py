@@ -122,7 +122,7 @@ async def delete_project_member(
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,
     student_id: UUID,
-) -> Optional[ProjectMemberPublic]:
+):
     if (
         student.role == settings.role.default_user_role_code
         and project_role == MemberRole.OTHER
@@ -135,4 +135,4 @@ async def delete_project_member(
     filters = ProjectMembersFilters()
     filters.project_id = project_id
     filters.student_id = student_id
-    return await project_member_service.delete_project_member(filters)
+    await project_member_service.delete_project_member(filters)
