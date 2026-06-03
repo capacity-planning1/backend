@@ -1,6 +1,7 @@
 name: fastapi-compose
 
 x-back-image: &back-image vinwap/capacity-planning-backend:latest
+x-front-image: &front-image nginx:stable-alpine-slim
 
 x-back-common: &back-common
   build: .
@@ -63,7 +64,7 @@ services:
     restart: unless-stopped
 
   reverse-proxy:
-    image: nginx:stable-alpine-slim
+    image: *front-image
     depends_on:
       api:
         condition: service_started
