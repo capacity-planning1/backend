@@ -42,8 +42,10 @@ async def get_tasks(
 
 
 @router.post(
-    '/', status_code=status.HTTP_201_CREATED,
-    responses=get_responses(status.HTTP_400_BAD_REQUEST))
+    '/',
+    status_code=status.HTTP_201_CREATED,
+    responses=get_responses(status.HTTP_400_BAD_REQUEST),
+)
 async def create_task(
     _request: Request,
     student: CurrentStudentDep,

@@ -9,13 +9,15 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.models.schedule import ScheduleModel, WeekDay
 
+HTTP_OK = 200
 
-def parse_schedule_to_dataframe(sheet_id):
+
+def parse_schedule_to_dataframe(sheet_id):  # noqa: C901
     url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=xlsx'
 
     print('загрузка')
     response = requests.get(url)
-    if response.status_code != 200:
+    if response.status_code != HTTP_OK:
         print('не удалось загрузить')
         return None
 
@@ -49,7 +51,7 @@ def parse_schedule_to_dataframe(sheet_id):
         if not raw_day or not time_slot:
             continue
 
-        clean_day_str = str(raw_day).strip().replace("\n", "").capitalize()
+        clean_day_str = str(raw_day).strip().replace('\n', '').capitalize()
 
         try:
             day_enum = WeekDay(clean_day_str)
@@ -60,14 +62,14 @@ def parse_schedule_to_dataframe(sheet_id):
             cell_content = get_cell_value_styled(row, col)
 
             if cell_content:
-                lesson_text = " ".join(str(cell_content).split())
+                lesson_text = ' '.join(str(cell_content).split())
 
                 schedule_data.append(
                     {
-                        "day": day_enum.value, 
-                        "time_slot": str(time_slot).strip(),
-                        "group": group_name,
-                        "lesson_details": lesson_text,
+                        'day': day_enum.value,
+                        'time_slot': str(time_slot).strip(),
+                        'group': group_name,
+                        'lesson_details': lesson_text,
                     }
                 )
 
@@ -78,7 +80,7 @@ async def export_to_postgres(df: pd.DataFrame, session: AsyncSession):
     if df is None or df.empty:
         return
 
-    records = df.to_dict(orient="records")
+    records = df.to_dict(orient='records')
     if records:
         await session.exec(delete(ScheduleModel))
         await session.execute(insert(ScheduleModel), records)

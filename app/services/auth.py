@@ -39,7 +39,7 @@ class AuthService:
         refresh_session_repo: StudentSessionRepositoryDep,
         email_notification_repo: EmailNotificationRepositoryDep,
         student_repo: StudentRepositoryDep,
-        background_tasks: BackgroundTasks
+        background_tasks: BackgroundTasks,
     ):
         self.__refresh_session_repo = refresh_session_repo
         self.__email_notification_repo = email_notification_repo
@@ -47,7 +47,8 @@ class AuthService:
         self.__email_service = EmailService(background_tasks=background_tasks)
 
     async def register(
-        self, student_create: StudentCreate,
+        self,
+        student_create: StudentCreate,
     ):
         filters = StudentFilters(email=student_create.email)
         existing = await self.__student_repo.fetch(filters=filters)
@@ -62,15 +63,16 @@ class AuthService:
 
         notification = await self.__email_notification_repo.save(
             EmailNotification(
-                student_id=created_student.id,
-                action=EmailAction.VERIFY_EMAIL)
+                student_id=created_student.id, action=EmailAction.VERIFY_EMAIL
+            )
         )
 
         self.__email_service.send_verification_email(
             email_to=created_student.email,
             verification_code=notification.code,
             verification_link=self._build_verify_account_url(
-                created_student.id, notification.code)
+                created_student.id, notification.code
+            ),
         )
         return created_student
 
@@ -94,7 +96,7 @@ class AuthService:
 
         refresh_payload = decode_token(refresh_token)
 
-        self.create_session(
+        await self.create_session(
             refresh_session=StudentSessionModel(
                 jti=refresh_payload.get('jti'),
                 student_id=student.id,
@@ -194,18 +196,16 @@ class AuthService:
             raise NotFoundError('Student not found')
 
         filters = EmailNotificationFilters(
-            code=code,
-            student_id=student_id,
-            action=EmailAction.VERIFY)
+            code=code, student_id=student_id, action=EmailAction.VERIFY
+        )
         notifications = await self.__email_notification_repo.fetch(filters)
 
         if len(notifications.items) == 0:
-            raise NotFoundError("No such request exists")
+            raise NotFoundError('No such request exists')
 
         notification = notifications[0]
-        if (notification.expires_at < datetime.now(timezone.utc)
-                or notification.is_used):
-            raise GoneError("The code has expired")
+        if notification.expires_at < datetime.now(timezone.utc) or notification.is_used:
+            raise GoneError('The code has expired')
 
         notification.is_used = True
 
@@ -218,44 +218,36 @@ class AuthService:
             raise NotFoundError('User not found')
 
         notification = await self.__email_notification_repo.save(
-            EmailNotification(
-                student_id=student_id,
-                action=EmailAction.CHANGE_PASSWORD)
+            EmailNotification(student_id=student_id, action=EmailAction.CHANGE_PASSWORD)
         )
 
         self.__email_service.send_change_password_email(
             email_to=student.email,
             reset_code=notification.code,
-            reset_link=self._build_change_password_url(student_id, notification.code)
+            reset_link=self._build_change_password_url(student_id, notification.code),
         )
 
     async def confirm_change_password(
-        self,
-        student_id: UUID,
-        code: UUID,
-        new_password: str,
-        repeat_password: str
+        self, student_id: UUID, code: UUID, new_password: str, repeat_password: str
     ) -> None:
         if new_password != repeat_password:
             raise BadRequestError("Passwords don't match")
 
         student = await self.__student_repo.get(student_id)
         if student is None:
-            raise NotFoundError("User not found")
+            raise NotFoundError('User not found')
 
         filters = EmailNotificationFilters(
-            student_id=student_id,
-            code=code,
-            action=EmailAction.CHANGE_PASSWORD)
+            student_id=student_id, code=code, action=EmailAction.CHANGE_PASSWORD
+        )
         notifications = await self.__email_notification_repo.fetch(filters)
 
         if len(notifications.items) == 0:
-            raise NotFoundError("No such request exists")
+            raise NotFoundError('No such request exists')
 
         notification = notifications[0]
-        if (notification.expires_at < datetime.now(timezone.utc)
-                or notification.is_used):
-            raise GoneError("The code has expired")
+        if notification.expires_at < datetime.now(timezone.utc) or notification.is_used:
+            raise GoneError('The code has expired')
 
         notification.is_used = True
         student.hashed_password = Hasher.get_password_hash(new_password)

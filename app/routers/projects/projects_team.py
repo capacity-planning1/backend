@@ -26,7 +26,7 @@ from app.utils.pagination import ListResponse
 router = APIRouter(
     prefix='/{project_id}/teams/{team_id}',
     tags=['teams'],
-    responses=get_responses(status.HTTP_404_NOT_FOUND)
+    responses=get_responses(status.HTTP_404_NOT_FOUND),
 )
 
 
@@ -101,8 +101,10 @@ async def get_team_members(
 
 
 @router.post(
-    '/members', status_code=status.HTTP_201_CREATED,
-    responses=get_responses(status.HTTP_400_BAD_REQUEST, status.HTTP_409_CONFLICT))
+    '/members',
+    status_code=status.HTTP_201_CREATED,
+    responses=get_responses(status.HTTP_400_BAD_REQUEST, status.HTTP_409_CONFLICT),
+)
 async def create_team_member(
     _request: Request,
     student: CurrentStudentDep,
@@ -141,7 +143,10 @@ async def get_member(
     return await team_membership_service.get_member(filters)
 
 
-@router.put('/members/{student_id}', responses=get_responses(status.HTTP_400_BAD_REQUEST))
+@router.put(
+    '/members/{student_id}',
+    responses=get_responses(status.HTTP_400_BAD_REQUEST),
+)
 async def update_team_member(  # noqa: PLR0913
     _request: Request,
     student: CurrentStudentDep,

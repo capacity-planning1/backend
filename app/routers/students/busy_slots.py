@@ -18,7 +18,7 @@ from app.utils.pagination import ListResponse
 router = APIRouter(
     prefix='/{student_id}/busy-slots',
     tags=['busy_slots'],
-    responses=get_responses(status.HTTP_404_NOT_FOUND)
+    responses=get_responses(status.HTTP_404_NOT_FOUND),
 )
 
 
@@ -38,8 +38,10 @@ async def get_busy_slots(
 
 
 @router.post(
-    '/', status_code=status.HTTP_201_CREATED,
-    responses=get_responses(status.HTTP_400_BAD_REQUEST))
+    '/',
+    status_code=status.HTTP_201_CREATED,
+    responses=get_responses(status.HTTP_400_BAD_REQUEST),
+)
 async def create_busy_slot(
     _request: Request,
     student: CurrentStudentDep,

@@ -30,7 +30,7 @@ class StudentBase(SQLModel):
     skills: str | None = Field(default=None, sa_column=Column(Text))
     role: str = Field(default=settings.role.default_user_role_code, nullable=False)
     is_email_verificated: bool = Field(default=False, nullable=False)
-    group: str = Field(default=None, nullable=True)
+    group: str | None = Field(default=None, nullable=True)
 
 
 class StudentPublic(BaseModel, StudentBase):
@@ -53,30 +53,30 @@ class StudentModel(StudentPublic, table=True):
 
     memberships: list['ProjectMemberModel'] = Relationship(
         sa_relationship=relationship(
-            "ProjectMemberModel",
+            'ProjectMemberModel',
             back_populates='student',
-            lazy="selectin",
+            lazy='selectin',
         )
     )
     owned_projects: list['ProjectModel'] = Relationship(
         sa_relationship=relationship(
-            "ProjectModel",
-            back_populates="owner",
-            lazy="selectin",
+            'ProjectModel',
+            back_populates='owner',
+            lazy='selectin',
         )
     )
     busy_slots: list['BusySlotModel'] = Relationship(
         sa_relationship=relationship(
-            "BusySlotModel",
+            'BusySlotModel',
             back_populates='student',
-            lazy="selectin",
+            lazy='selectin',
         )
     )
 
     email_notifications: list['EmailNotification'] = Relationship(
         sa_relationship=relationship(
-            "EmailNotification",
-            back_populates="student",
-            lazy="selectin",
+            'EmailNotification',
+            back_populates='student',
+            lazy='selectin',
         )
     )

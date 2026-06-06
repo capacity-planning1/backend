@@ -101,9 +101,9 @@ class LoggingSettings(BaseSettings):
 
 
 class EmailSettings(BaseSettings):
-    username: EmailStr = "default@example.com"
-    password: SecretStr = SecretStr("default")
-    title: str = "Capacity Planning"
+    username: EmailStr = 'default@example.com'
+    password: SecretStr = SecretStr('default')
+    title: str = 'Capacity Planning'
     port: int = 587
     server: str = 'smtp.gmail.com'
     from_name: str = 'Capacity Planning'

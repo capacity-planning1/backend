@@ -31,17 +31,19 @@ class EmailNotification(BaseModel, table=True):
     student_id: UUID = Field(foreign_key='student.id', nullable=False, index=True)
     student: 'StudentModel' = Relationship(
         sa_relationship=relationship(
-            "StudentModel",
-            back_populates="email_notifications",
-            lazy="selectin",
+            'StudentModel',
+            back_populates='email_notifications',
+            lazy='selectin',
         )
     )
     action: EmailAction = Field(nullable=False)
-    expires_at: datetime = Field(default_factory=lambda: (
+    expires_at: datetime = Field(
+        default_factory=lambda: (
             datetime.now(timezone.utc)
             + timedelta(seconds=settings.email.notification_lifetime_seconds)
         ),
-        sa_type=DateTime(timezone=True))
+        sa_type=DateTime(timezone=True),
+    )
     status: EmailStatus = Field(default=EmailStatus.PENDING, nullable=False)
     code: UUID = Field(default_factory=uuid4)
     is_used: bool = Field(default=False, nullable=False)

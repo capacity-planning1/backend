@@ -18,17 +18,18 @@ from app.utils.schedule_parser import export_to_postgres, parse_schedule_to_data
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_app: FastAPI):
     try:
-        GOOGLE_SHEET_ID = "13CqvyFsOa5Z5LYCfMCz4IyAnuTIcjYqI0ARgt8-5MpQ"
-        df_schedule = parse_schedule_to_dataframe(GOOGLE_SHEET_ID)
+        google_sheet_id = '13CqvyFsOa5Z5LYCfMCz4IyAnuTIcjYqI0ARgt8-5MpQ'
+        df_schedule = parse_schedule_to_dataframe(google_sheet_id)
 
         if df_schedule is not None and not df_schedule.empty:
             async with AsyncSessionLocal() as session:
                 await export_to_postgres(df_schedule, session)
     except Exception as e:
-        print(f"ошибка загрузки расписания: {e}")
+        print(f'ошибка загрузки расписания: {e}')
     yield
+
 
 app = FastAPI(
     title='Capacity Planning API',
@@ -43,10 +44,7 @@ origins = ['http://localhost:8080']
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-app.add_exception_handler(
-    exc_class_or_status_code=Exception,
-    handler=exception_handler
-)
+app.add_exception_handler(exc_class_or_status_code=Exception, handler=exception_handler)
 
 app.add_middleware(
     CORSMiddleware,

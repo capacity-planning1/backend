@@ -4,8 +4,8 @@ from enum import Enum
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Text
+from sqlalchemy.orm import relationship
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.base import BaseModel
@@ -60,22 +60,22 @@ class SprintTaskModel(SprintTaskPublic, table=True):
 
     sprint: 'SprintModel' = Relationship(
         sa_relationship=relationship(
-            "SprintModel",
+            'SprintModel',
             back_populates='tasks',
-            lazy="selectin",
+            lazy='selectin',
         )
     )
     project: 'ProjectModel' = Relationship(
         sa_relationship=relationship(
-            "ProjectModel",
+            'ProjectModel',
             back_populates='tasks',
-            lazy="selectin",
+            lazy='selectin',
         )
     )
     assignments: list['TaskAssignmentModel'] = Relationship(
         sa_relationship=relationship(
-            "TaskAssignmentModel",
+            'TaskAssignmentModel',
             back_populates='task',
-            lazy="selectin",
+            lazy='selectin',
         )
     )

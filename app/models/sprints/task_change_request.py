@@ -5,8 +5,8 @@ from enum import Enum
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Text
+from sqlalchemy.orm import relationship
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.base import BaseModel
@@ -51,15 +51,15 @@ class TaskChangeRequestModel(TaskChangeRequestPublic, table=True):
 
     task_assignment: 'TaskAssignmentModel' = Relationship(
         sa_relationship=relationship(
-            "TaskAssignmentModel",
+            'TaskAssignmentModel',
             back_populates='change_requests',
-            lazy="selectin",
+            lazy='selectin',
         )
     )
     requested_by_member: 'ProjectMemberModel' = Relationship(
         sa_relationship=relationship(
-            "ProjectMemberModel",
+            'ProjectMemberModel',
             back_populates='change_requests',
-            lazy="selectin",
+            lazy='selectin',
         )
     )

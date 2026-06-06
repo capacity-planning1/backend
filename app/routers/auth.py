@@ -1,14 +1,14 @@
-from uuid import UUID
 from typing import Annotated, Optional
+from uuid import UUID
 
 from fastapi import (
     APIRouter,
     Cookie,
     Depends,
     Header,
+    Query,
     Request,
     Response,
-    Query,
     status,
 )
 from fastapi.security import HTTPBearer
@@ -16,8 +16,7 @@ from fastapi.security import HTTPBearer
 from app.core.auth import decode_token
 from app.core.config import settings
 from app.core.responses import get_responses
-from app.utils.hasher import Hasher
-from app.dependencies.auth import CurrentStudentDep
+from app.dependencies.auth import CurrentStudentDep, get_current_student
 from app.dependencies.services import AuthServiceDep, ScheduleServiceDep
 from app.models.students.student import StudentCreate
 from app.schemas.auth import (
@@ -29,6 +28,7 @@ from app.schemas.auth import (
     UserResponse,
 )
 from app.utils.errors import UnauthorizedError
+from app.utils.hasher import Hasher
 
 router = APIRouter(prefix='/auth', tags=['auth'])
 security = HTTPBearer()
@@ -37,7 +37,7 @@ security = HTTPBearer()
 @router.post(
     '/register',
     status_code=status.HTTP_201_CREATED,
-    responses=get_responses(status.HTTP_409_CONFLICT)
+    responses=get_responses(status.HTTP_409_CONFLICT),
 )
 async def register(
     _request: Request,
@@ -58,7 +58,8 @@ async def register(
 
     if created_student.group is not None:
         await schedule_service.fill_student_schedule(
-            created_student.id, created_student.group)
+            created_student.id, created_student.group
+        )
 
     return Response(status_code=status.HTTP_201_CREATED)
 
@@ -66,7 +67,7 @@ async def register(
 @router.post(
     '/login',
     response_model=TokenResponse,
-    responses=get_responses(status.HTTP_400_BAD_REQUEST)
+    responses=get_responses(status.HTTP_400_BAD_REQUEST),
 )
 async def login(
     _request: Request,
@@ -93,8 +94,10 @@ async def login(
 
 
 @router.get(
-    '/me', response_model=UserResponse,
-    responses=get_responses(status.HTTP_401_UNAUTHORIZED))
+    '/me',
+    response_model=UserResponse,
+    responses=get_responses(status.HTTP_401_UNAUTHORIZED),
+)
 async def get_current_user(_request: Request, current_student: CurrentStudentDep):
     return current_student
 
@@ -102,10 +105,8 @@ async def get_current_user(_request: Request, current_student: CurrentStudentDep
 @router.post(
     '/refresh',
     response_model=TokenResponse,
-    responses=get_responses(
-        status.HTTP_400_BAD_REQUEST,
-        status.HTTP_401_UNAUTHORIZED)
-    )
+    responses=get_responses(status.HTTP_400_BAD_REQUEST, status.HTTP_401_UNAUTHORIZED),
+)
 async def refresh(
     _request: Request,
     response: Response,
@@ -139,7 +140,7 @@ async def refresh(
 @router.post(
     '/logout',
     response_model=MessageResponse,
-    dependencies=[Depends(CurrentStudentDep)]
+    dependencies=[Depends(get_current_student)],
 )
 async def logout(
     _request: Request,
@@ -178,50 +179,46 @@ async def logout_all_devices(
     response.delete_cookie('refresh_token')
 
     return MessageResponse(
-        message=f'Successfully logged out from {revoked_count} devices',
-        success=True
+        message=f'Successfully logged out from {revoked_count} devices', success=True
     )
 
 
-@router.post('/verify-email', responses=get_responses(
-    status.HTTP_404_NOT_FOUND,
-    status.HTTP_410_GONE)
+@router.post(
+    '/verify-email',
+    responses=get_responses(status.HTTP_404_NOT_FOUND, status.HTTP_410_GONE),
 )
 async def verify_email(
     _request: Request,
     student_id: Annotated[UUID, Query()],
     code: Annotated[UUID, Query()],
-    auth_service: AuthServiceDep
+    auth_service: AuthServiceDep,
 ):
     await auth_service.verify_email(student_id=student_id, code=code)
 
 
 @router.post(
-    '/{student_id}/change-password',
-    responses=get_responses(status.HTTP_404_NOT_FOUND)
+    '/{student_id}/change-password', responses=get_responses(status.HTTP_404_NOT_FOUND)
 )
 async def change_password(
-    _request: Request,
-    student_id: UUID,
-    auth_serivce: AuthServiceDep
+    _request: Request, student_id: UUID, auth_serivce: AuthServiceDep
 ):
     await auth_serivce.send_change_password_code(student_id)
 
 
 @router.post(
     '/confirm-change-password',
-    responses=get_responses(status.HTTP_404_NOT_FOUND, status.HTTP_410_GONE)
+    responses=get_responses(status.HTTP_404_NOT_FOUND, status.HTTP_410_GONE),
 )
 async def confirm_change_password(
     _request: Request,
     student_id: Annotated[UUID, Query()],
     code: Annotated[UUID, Query()],
     change_password_data: ChangePasswordRequest,
-    auth_service: AuthServiceDep
+    auth_service: AuthServiceDep,
 ):
     await auth_service.confirm_change_password(
         student_id=student_id,
         code=code,
         new_password=change_password_data.new_password,
-        repeat_password=change_password_data.repeat_password
+        repeat_password=change_password_data.repeat_password,
     )

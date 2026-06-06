@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Text
+from sqlalchemy.orm import relationship
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.base import BaseModel
@@ -40,36 +40,36 @@ class ProjectModel(ProjectPublic, table=True):
 
     owner: 'StudentModel' = Relationship(
         sa_relationship=relationship(
-            "StudentModel",
+            'StudentModel',
             back_populates='owned_projects',
-            lazy="selectin",
+            lazy='selectin',
         )
     )
     members: list['ProjectMemberModel'] = Relationship(
         sa_relationship=relationship(
-            "ProjectMemberModel",
+            'ProjectMemberModel',
             back_populates='project',
-            lazy="selectin",
+            lazy='selectin',
         )
     )
     teams: list['TeamModel'] = Relationship(
         sa_relationship=relationship(
-            "TeamModel",
+            'TeamModel',
             back_populates='project',
-            lazy="selectin",
+            lazy='selectin',
         )
     )
     sprints: list['SprintModel'] = Relationship(
         sa_relationship=relationship(
-            "SprintModel",
+            'SprintModel',
             back_populates='project',
-            lazy="selectin",
+            lazy='selectin',
         )
     )
     tasks: list['SprintTaskModel'] = Relationship(
         sa_relationship=relationship(
-            "SprintTaskModel",
+            'SprintTaskModel',
             back_populates='project',
-            lazy="selectin",
+            lazy='selectin',
         )
     )

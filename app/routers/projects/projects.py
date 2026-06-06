@@ -1,11 +1,16 @@
 from typing import Annotated, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Request, status
+from fastapi import APIRouter, Depends, Request, status
 
 from app.core.config import settings
 from app.core.responses import get_responses
-from app.dependencies.auth import CurrentStudentDep, MemberRole, ProjectRoleDep
+from app.dependencies.auth import (
+    CurrentStudentDep,
+    MemberRole,
+    ProjectRoleDep,
+    get_current_student,
+)
 from app.dependencies.services import (
     ProjectMemberServiceDep,
     ProjectServiceDep,
@@ -27,7 +32,7 @@ from app.utils.pagination import ListResponse
 router = APIRouter(
     prefix='/projects',
     tags=['projects'],
-    responses=get_responses(status.HTTP_403_FORBIDDEN)
+    responses=get_responses(status.HTTP_403_FORBIDDEN),
 )
 
 router.include_router(projects_team.router)
@@ -35,22 +40,21 @@ router.include_router(projects_teams.router)
 router.include_router(projects_members.router)
 
 
-@router.get('/', dependencies=[Depends(CurrentStudentDep)])
+@router.get('/', dependencies=[Depends(get_current_student)])
 async def get_projects(
     _request: Request,
     project_service: ProjectServiceDep,
-    filters: Annotated[ProjectFilters, Query()],
+    filters: Annotated[ProjectFilters, Depends()],
 ) -> ListResponse[ProjectPublic]:
     return await project_service.get_projects(filters)
 
 
 @router.post(
-    '/', status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(CurrentStudentDep)],
-    responses=get_responses(
-        status.HTTP_400_BAD_REQUEST,
-        status.HTTP_404_NOT_FOUND)
-    )
+    '/',
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(get_current_student)],
+    responses=get_responses(status.HTTP_400_BAD_REQUEST, status.HTTP_404_NOT_FOUND),
+)
 async def create_project(
     _request: Request, project_service: ProjectServiceDep, project_create: ProjectCreate
 ) -> ProjectPublic:
@@ -58,12 +62,13 @@ async def create_project(
 
 
 @router.post(
-    '/join', status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(CurrentStudentDep)],
+    '/join',
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(get_current_student)],
     responses=get_responses(
-        status.HTTP_400_BAD_REQUEST,
-        status.HTTP_404_NOT_FOUND,
-        status.HTTP_409_CONFLICT))
+        status.HTTP_400_BAD_REQUEST, status.HTTP_404_NOT_FOUND, status.HTTP_409_CONFLICT
+    ),
+)
 async def join_project(
     _request: Request,
     project_member_service: ProjectMemberServiceDep,
@@ -74,8 +79,9 @@ async def join_project(
 
 @router.get(
     '/{project_id}',
-    dependencies=[Depends(CurrentStudentDep)],
-    responses=get_responses(status.HTTP_404_NOT_FOUND))
+    dependencies=[Depends(get_current_student)],
+    responses=get_responses(status.HTTP_404_NOT_FOUND),
+)
 async def get_project(
     _request: Request, project_service: ProjectServiceDep, project_id: UUID
 ) -> Optional[ProjectPublic]:
@@ -84,9 +90,7 @@ async def get_project(
 
 @router.put(
     '/{project_id}',
-    responses=get_responses(
-        status.HTTP_400_BAD_REQUEST,
-        status.HTTP_404_NOT_FOUND)
+    responses=get_responses(status.HTTP_400_BAD_REQUEST, status.HTTP_404_NOT_FOUND),
 )
 async def update_project(
     _request: Request,
@@ -106,8 +110,10 @@ async def update_project(
 
 
 @router.delete(
-    '/{project_id}', status_code=status.HTTP_204_NO_CONTENT,
-    responses=get_responses(status.HTTP_404_NOT_FOUND))
+    '/{project_id}',
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses=get_responses(status.HTTP_404_NOT_FOUND),
+)
 async def detele_project(
     _request: Request,
     student: CurrentStudentDep,

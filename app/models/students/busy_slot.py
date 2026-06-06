@@ -5,8 +5,8 @@ from enum import Enum
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Text
+from sqlalchemy.orm import relationship
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.models.base import BaseModel
@@ -52,15 +52,15 @@ class BusySlotModel(BusySlotPublic, table=True):
 
     student: 'StudentModel' = Relationship(
         sa_relationship=relationship(
-            "StudentModel",
+            'StudentModel',
             back_populates='busy_slots',
-            lazy="selectin",
+            lazy='selectin',
         )
     )
     task_assignment: 'TaskAssignmentModel' = Relationship(
         sa_relationship=relationship(
-            "TaskAssignmentModel",
+            'TaskAssignmentModel',
             back_populates='busy_slots',
-            lazy="selectin",
+            lazy='selectin',
         )
     )

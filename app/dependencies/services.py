@@ -2,18 +2,18 @@ from typing import Annotated
 
 from fastapi.params import Depends
 
+from app.services.auth import AuthService
 from app.services.busy_slot import BusySlotService
 from app.services.project import ProjectService
 from app.services.project_member import ProjectMemberService
+from app.services.schedules import ScheduleService
 from app.services.sprint import SprintService
 from app.services.sprint_task import SprintTaskService
 from app.services.student import StudentService
-from app.services.auth import AuthService
 from app.services.task_assignment import TaskAssignmentService
 from app.services.task_change_request import TaskChangeRequestService
 from app.services.team import TeamService
 from app.services.team_membership import TeamMembershipService
-from app.services.schedules import ScheduleService
 
 BusySlotServiceDep = Annotated[BusySlotService, Depends(BusySlotService)]
 
@@ -41,8 +41,6 @@ TaskChangeRequestServiceDep = Annotated[
     TaskChangeRequestService, Depends(TaskChangeRequestService)
 ]
 
-AuthServiceDep = Annotated[
-    AuthService, Depends(AuthService)
-]
+AuthServiceDep = Annotated[AuthService, Depends(AuthService)]
 
 ScheduleServiceDep = Annotated[ScheduleService, Depends(ScheduleService)]

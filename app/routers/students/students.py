@@ -1,11 +1,11 @@
 from typing import Annotated, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Request, status
+from fastapi import APIRouter, Depends, Request, status
 
 from app.core.config import settings
 from app.core.responses import get_responses
-from app.dependencies.auth import CurrentStudentDep
+from app.dependencies.auth import CurrentStudentDep, get_current_student
 from app.dependencies.services import StudentServiceDep
 from app.models.students.student import (
     StudentPublic,
@@ -19,17 +19,17 @@ from app.utils.pagination import ListResponse
 router = APIRouter(
     prefix='/students',
     tags=['students'],
-    responses=get_responses(status.HTTP_403_FORBIDDEN)
+    responses=get_responses(status.HTTP_403_FORBIDDEN),
 )
 
 router.include_router(busy_slots.router)
 
 
-@router.get('/', dependencies=[Depends(CurrentStudentDep)])
+@router.get('/', dependencies=[Depends(get_current_student)])
 async def get_students(
     _request: Request,
     student_service: StudentServiceDep,
-    filters: Annotated[StudentFilters, Query()],
+    filters: Annotated[StudentFilters, Depends()],
 ) -> ListResponse[StudentPublic]:
     return await student_service.get_students(filters)
 
@@ -51,10 +51,9 @@ async def get_student_profile(
 @router.put(
     '/{student_id}',
     responses=get_responses(
-        status.HTTP_400_BAD_REQUEST,
-        status.HTTP_404_NOT_FOUND,
-        status.HTTP_409_CONFLICT)
-    )
+        status.HTTP_400_BAD_REQUEST, status.HTTP_404_NOT_FOUND, status.HTTP_409_CONFLICT
+    ),
+)
 async def update_student(
     _request: Request,
     student: CurrentStudentDep,
@@ -71,7 +70,8 @@ async def update_student(
 @router.delete(
     '/{student_id}',
     status_code=status.HTTP_204_NO_CONTENT,
-    responses=get_responses(status.HTTP_404_NOT_FOUND))
+    responses=get_responses(status.HTTP_404_NOT_FOUND),
+)
 async def detele_student(
     _request: Request,
     student: CurrentStudentDep,

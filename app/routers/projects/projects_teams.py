@@ -15,7 +15,7 @@ from app.utils.pagination import ListResponse
 router = APIRouter(
     prefix='/projects/{project_id}',
     tags=['projects'],
-    responses=get_responses(status.HTTP_404_NOT_FOUND)
+    responses=get_responses(status.HTTP_404_NOT_FOUND),
 )
 
 
@@ -39,8 +39,10 @@ async def get_teams(
 
 
 @router.post(
-    '/teams', status_code=status.HTTP_201_CREATED,
-    responses=get_responses(status.HTTP_400_BAD_REQUEST))
+    '/teams',
+    status_code=status.HTTP_201_CREATED,
+    responses=get_responses(status.HTTP_400_BAD_REQUEST),
+)
 async def create_team(
     _request: Request,
     student: CurrentStudentDep,

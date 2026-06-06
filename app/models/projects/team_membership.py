@@ -34,15 +34,15 @@ class TeamMembershipModel(TeamMembershipPublic, table=True):
 
     team: 'TeamModel' = Relationship(
         sa_relationship=relationship(
-            "TeamModel",
+            'TeamModel',
             back_populates='memberships',
-            lazy="selectin",
+            lazy='selectin',
         )
     )
     project_member: 'ProjectMemberModel' = Relationship(
         sa_relationship=relationship(
-            "ProjectMemberModel",
+            'ProjectMemberModel',
             back_populates='team_memberships',
-            lazy="selectin",
+            lazy='selectin',
         )
     )

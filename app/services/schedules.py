@@ -5,28 +5,29 @@ from sqlmodel import select
 
 from app.dependencies.repositories import BusySlotRepositoryDep
 from app.dependencies.session import SessionDep
+from app.models.schedule import ScheduleModel, WeekDay
 from app.models.students.busy_slot import BusySlotModel, SlotType
-from app.models.schedule import WeekDay, ScheduleModel
 
-WEEKDAY_TO_NUM ={
+WEEKDAY_TO_NUM = {
     WeekDay.MONDAY: 0,
     WeekDay.TUESDAY: 1,
     WeekDay.WEDNESDAY: 2,
     WeekDay.THURSDAY: 3,
     WeekDay.FRIDAY: 4,
     WeekDay.SATURDAY: 5,
-    WeekDay.SUNDAY:6,
+    WeekDay.SUNDAY: 6,
 }
 
+
 class ScheduleService:
-    def __init__(
-        self, busy_slot_repo: BusySlotRepositoryDep, session: SessionDep
-    ):
+    def __init__(self, busy_slot_repo: BusySlotRepositoryDep, session: SessionDep):
         self.__session = session
         self.__busy_slot_repo = busy_slot_repo
 
     async def fill_student_schedule(self, student_id: UUID, group_name: str) -> None:
-        statement = select(ScheduleModel).where(ScheduleModel.group == group_name.strip())
+        statement = select(ScheduleModel).where(
+            ScheduleModel.group == group_name.strip()
+        )
 
         result = await self.__session.exec(statement)
         lessons = result.all()
@@ -45,13 +46,17 @@ class ScheduleService:
             for lesson in lessons:
                 if WEEKDAY_TO_NUM.get(lesson.day) == weekday_num:
                     try:
-                        clean_time_range = lesson.time_slot.replace(" ", "")
+                        clean_time_range = lesson.time_slot.replace(' ', '')
                         start_str, end_str = clean_time_range.split('-')
                         start_h, start_m = map(int, start_str.split('.'))
                         end_h, end_m = map(int, end_str.split('.'))
 
-                        start_dt = datetime.combine(current_date, datetime.min.time()).replace(hour=start_h, minute=start_m)
-                        end_dt = datetime.combine(current_date, datetime.min.time()).replace(hour=end_h, minute=end_m)
+                        start_dt = datetime.combine(
+                            current_date, datetime.min.time()
+                        ).replace(hour=start_h, minute=start_m)
+                        end_dt = datetime.combine(
+                            current_date, datetime.min.time()
+                        ).replace(hour=end_h, minute=end_m)
 
                         new_slot = BusySlotModel(
                             student_id=student_id,
@@ -59,7 +64,7 @@ class ScheduleService:
                             start_datetime=start_dt,
                             end_datetime=end_dt,
                             description=lesson.lesson_details,
-                            task_assignment_id=None
+                            task_assignment_id=None,
                         )
                         slots_to_create.append(new_slot)
 

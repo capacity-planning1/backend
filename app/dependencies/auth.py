@@ -10,7 +10,7 @@ from app.core.auth import get_student_id_from_token
 from app.dependencies.repositories import (
     ProjectMemberRepositoryDep,
     ProjectRepositoryDep,
-    StudentRepositoryDep
+    StudentRepositoryDep,
 )
 from app.models.students.student import StudentPublic
 from app.schemas.projects import ProjectMembersFilters

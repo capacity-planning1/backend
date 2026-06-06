@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from uuid import UUID
 
+from sqlalchemy import DateTime
 from sqlmodel import Field, Index, SQLModel
 
 from app.models.base import BaseModel
@@ -15,6 +16,7 @@ class StudentSessionModel(BaseModel, table=True):
     student_id: UUID = Field(nullable=False, foreign_key='student.id', index=True)
     expires_at: datetime = Field(
         nullable=False,
+        sa_type=DateTime(timezone=True),
     )
     is_revoked: bool = Field(default=False, nullable=False)
     user_agent: str | None = Field(default=None, nullable=True)

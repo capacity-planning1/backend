@@ -1,8 +1,6 @@
-from typing import TYPE_CHECKING, Annotated, TypeAlias
+from typing import Annotated, TypeAlias
 
 from fastapi import Depends
-
-from app.utils.repository import Repository
 
 from app.dependencies.session import SessionDep
 from app.models.auth.refresh_session import StudentSessionModel
@@ -18,6 +16,7 @@ from app.models.sprints.task_change_request import TaskChangeRequestModel
 from app.models.students.busy_slot import BusySlotModel
 from app.models.students.student import StudentModel
 from app.repositories.student import StudentRepository
+from app.utils.repository import Repository
 
 
 async def get_project_repository(session: SessionDep):

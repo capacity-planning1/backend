@@ -43,8 +43,10 @@ async def get_task_change_requests(
 
 
 @router.post(
-    '/tasks/{task_id}/change-requests', status_code=status.HTTP_201_CREATED,
-    responses=get_responses(status.HTTP_400_BAD_REQUEST))
+    '/tasks/{task_id}/change-requests',
+    status_code=status.HTTP_201_CREATED,
+    responses=get_responses(status.HTTP_400_BAD_REQUEST),
+)
 async def create_task_change_request(
     _request: Request,
     student: CurrentStudentDep,
@@ -94,7 +96,8 @@ async def get_task_change_request(
 
 @router.put(
     '/change-requests/{request_id}',
-    responses=get_responses(status.HTTP_400_BAD_REQUEST))
+    responses=get_responses(status.HTTP_400_BAD_REQUEST),
+)
 async def update_task_change_request(
     _request: Request,
     student: CurrentStudentDep,

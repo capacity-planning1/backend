@@ -2,10 +2,10 @@ from typing import Optional
 from uuid import UUID
 
 from app.dependencies.repositories import (
-    SprintTaskRepository,
-    SprintTaskRepositoryDep,
     SprintRepository,
     SprintRepositoryDep,
+    SprintTaskRepository,
+    SprintTaskRepositoryDep,
 )
 from app.models.sprints.sprint_task import (
     SprintTaskCreate,

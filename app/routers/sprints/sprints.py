@@ -20,9 +20,7 @@ from app.utils.pagination import ListResponse
 router = APIRouter(
     prefix='/projects/{project_id}/sprints',
     tags=['sprints'],
-    responses=get_responses(
-        status.HTTP_403_FORBIDDEN,
-        status.HTTP_404_NOT_FOUND)
+    responses=get_responses(status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND),
 )
 
 router.include_router(task_assignmets.router)
@@ -50,8 +48,10 @@ async def get_sprints(
 
 
 @router.post(
-        '/', status_code=status.HTTP_201_CREATED,
-        responses=get_responses(status.HTTP_400_BAD_REQUEST))
+    '/',
+    status_code=status.HTTP_201_CREATED,
+    responses=get_responses(status.HTTP_400_BAD_REQUEST),
+)
 async def create_sprint(
     _request: Request,
     student: CurrentStudentDep,

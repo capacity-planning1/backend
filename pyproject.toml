@@ -55,6 +55,9 @@ select = [
     "W"
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"alembic/versions/*.py" = ["E501", "W291"]
+
 [tool.ruff.format]
 quote-style = "single"
 indent-style = "space"

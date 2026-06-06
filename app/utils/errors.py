@@ -42,7 +42,10 @@ class BadRequestError(Exception):
 
 
 class ConflictError(Exception):
-    message: str = 'The request could not be completed because it conflicts with the current state of the resource'
+    message: str = (
+        'The request could not be completed because it conflicts '
+        'with the current state of the resource'
+    )
 
     def __init__(self, message: Optional[str] = None):
         self.message = message or self.message

@@ -12,8 +12,8 @@ from app.models.students.busy_slot import (
     BusySlotUpdate,
 )
 from app.schemas.students import BusySlotFilters
-from app.utils.pagination import ListResponse
 from app.utils.errors import NotFoundError
+from app.utils.pagination import ListResponse
 
 
 class BusySlotService:
