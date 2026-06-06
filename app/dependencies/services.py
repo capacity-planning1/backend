@@ -13,6 +13,7 @@ from app.services.task_assignment import TaskAssignmentService
 from app.services.task_change_request import TaskChangeRequestService
 from app.services.team import TeamService
 from app.services.team_membership import TeamMembershipService
+from app.services.schedules import ScheduleService
 
 BusySlotServiceDep = Annotated[BusySlotService, Depends(BusySlotService)]
 
@@ -43,3 +44,5 @@ TaskChangeRequestServiceDep = Annotated[
 AuthServiceDep = Annotated[
     AuthService, Depends(AuthService)
 ]
+
+ScheduleServiceDep = Annotated[ScheduleService, Depends(ScheduleService)]

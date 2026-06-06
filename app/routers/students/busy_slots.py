@@ -1,7 +1,7 @@
-from typing import Optional
+from typing import Annotated, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Depends, Request, status
 
 from app.core.responses import get_responses
 from app.dependencies.auth import CurrentStudentDep, MemberRole, ProjectRoleDep
@@ -26,12 +26,11 @@ router = APIRouter(
 async def get_busy_slots(
     _request: Request,
     student: CurrentStudentDep,
-    project_role: ProjectRoleDep,
     busy_slot_service: BusySlotServiceDep,
     student_id: UUID,
-    filters: BusySlotFilters,
+    filters: Annotated[BusySlotFilters, Depends()],
 ) -> ListResponse[BusySlotPublic]:
-    if student.id != student_id or project_role != MemberRole.TEAMLEAD:
+    if student.id != student_id:
         raise ForbiddenError()
 
     filters.student_id = student_id
@@ -44,12 +43,11 @@ async def get_busy_slots(
 async def create_busy_slot(
     _request: Request,
     student: CurrentStudentDep,
-    project_role: ProjectRoleDep,
     busy_slot_service: BusySlotServiceDep,
     student_id: UUID,
     bs_create: BusySlotCreate,
 ) -> BusySlotPublic:
-    if student.id != student_id or project_role != MemberRole.TEAMLEAD:
+    if student.id != student_id:
         raise ForbiddenError()
 
     bs_create.student_id = student_id

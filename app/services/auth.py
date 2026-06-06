@@ -47,25 +47,23 @@ class AuthService:
         self.__email_service = EmailService(background_tasks=background_tasks)
 
     async def register(
-        self, student_create: StudentCreate
-    ) -> None:
+        self, student_create: StudentCreate,
+    ):
         filters = StudentFilters(email=student_create.email)
         existing = await self.__student_repo.fetch(filters=filters)
 
-        if len(existing) != 0:
+        if len(existing.items) != 0:
             raise ConflictError(message='User with this email is already exists')
 
         student_dump = student_create.model_dump()
-        student_dump['hashed_password'] = Hasher.get_password_hash(
-            student_dump.pop('password')
-        )
         student = StudentModel(**student_dump)
 
         created_student = await self.__student_repo.save(student)
+
         notification = await self.__email_notification_repo.save(
             EmailNotification(
                 student_id=created_student.id,
-                action=EmailAction.VERIFY)
+                action=EmailAction.VERIFY_EMAIL)
         )
 
         self.__email_service.send_verification_email(
@@ -74,15 +72,15 @@ class AuthService:
             verification_link=self._build_verify_account_url(
                 created_student.id, notification.code)
         )
+        return created_student
 
     async def login(
         self,
         email: str,
         password: str,
         user_agent: str,
-        student_repo: StudentRepositoryDep,
     ):
-        student = await authenticate_student(email, password, student_repo)
+        student = await authenticate_student(email, password, self.__student_repo)
 
         if student is None:
             raise UnauthorizedError('Wrong email or password')
@@ -97,12 +95,14 @@ class AuthService:
         refresh_payload = decode_token(refresh_token)
 
         self.create_session(
-            jti=refresh_payload.get('jti'),
-            student_id=student.id,
-            expires_at=datetime.fromtimestamp(
-                float(refresh_payload['exp']), tz=timezone.utc
-            ),
-            user_agent=user_agent,
+            refresh_session=StudentSessionModel(
+                jti=refresh_payload.get('jti'),
+                student_id=student.id,
+                expires_at=datetime.fromtimestamp(
+                    float(refresh_payload['exp']), tz=timezone.utc
+                ),
+                user_agent=user_agent,
+            )
         )
 
         return (access_token, refresh_token)
@@ -199,7 +199,7 @@ class AuthService:
             action=EmailAction.VERIFY)
         notifications = await self.__email_notification_repo.fetch(filters)
 
-        if len(notifications) == 0:
+        if len(notifications.items) == 0:
             raise NotFoundError("No such request exists")
 
         notification = notifications[0]
@@ -249,7 +249,7 @@ class AuthService:
             action=EmailAction.CHANGE_PASSWORD)
         notifications = await self.__email_notification_repo.fetch(filters)
 
-        if len(notifications) == 0:
+        if len(notifications.items) == 0:
             raise NotFoundError("No such request exists")
 
         notification = notifications[0]

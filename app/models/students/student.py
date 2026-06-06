@@ -3,14 +3,15 @@ from __future__ import annotations
 from enum import Enum
 from typing import TYPE_CHECKING
 
-from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Text
+from sqlalchemy.orm import relationship
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.core.config import settings
 from app.models.base import BaseModel
 
 if TYPE_CHECKING:
+    from app.models.email import EmailNotification
     from app.models.projects.project import ProjectModel
     from app.models.projects.project_member import ProjectMemberModel
     from app.models.students.busy_slot import BusySlotModel
@@ -29,6 +30,7 @@ class StudentBase(SQLModel):
     skills: str | None = Field(default=None, sa_column=Column(Text))
     role: str = Field(default=settings.role.default_user_role_code, nullable=False)
     is_email_verificated: bool = Field(default=False, nullable=False)
+    group: str = Field(default=None, nullable=True)
 
 
 class StudentPublic(BaseModel, StudentBase):
@@ -36,7 +38,7 @@ class StudentPublic(BaseModel, StudentBase):
 
 
 class StudentCreate(StudentBase):
-    password: str = Field(min_length=8)
+    pass
 
 
 class StudentUpdate(SQLModel):
@@ -60,13 +62,21 @@ class StudentModel(StudentPublic, table=True):
         sa_relationship=relationship(
             "ProjectModel",
             back_populates="owner",
-            lazy="selectin"
+            lazy="selectin",
         )
     )
     busy_slots: list['BusySlotModel'] = Relationship(
         sa_relationship=relationship(
             "BusySlotModel",
             back_populates='student',
+            lazy="selectin",
+        )
+    )
+
+    email_notifications: list['EmailNotification'] = Relationship(
+        sa_relationship=relationship(
+            "EmailNotification",
+            back_populates="student",
             lazy="selectin",
         )
     )

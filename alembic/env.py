@@ -20,6 +20,8 @@ from app.models.sprints.sprint_task import SprintTaskModel
 from app.models.sprints.task_assignment import TaskAssignmentModel
 from app.models.sprints.task_change_request import TaskChangeRequestModel
 from app.models.students.busy_slot import BusySlotModel
+from app.models.schedule import ScheduleModel
+from app.models.email import EmailNotification
 from app.core.config import settings
 
 config = context.config

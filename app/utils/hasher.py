@@ -6,7 +6,7 @@ class Hasher:
 
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
-        return Hasher.__password_hash(plain_password, hashed_password)
+        return Hasher.__password_hash.verify(plain_password, hashed_password)
 
     @staticmethod
     def get_password_hash(password: str) -> str:

@@ -1,7 +1,7 @@
-from typing import Optional
+from typing import Annotated, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Depends, Request, status
 
 from app.core.config import settings
 from app.core.responses import get_responses
@@ -37,7 +37,7 @@ async def get_sprints(
     project_role: ProjectRoleDep,
     sprint_service: SprintServiceDep,
     project_id: UUID,
-    filters: SprintFilters,
+    filters: Annotated[SprintFilters, Depends()],
 ) -> ListResponse[SprintPublic]:
     if (
         student.role == settings.role.default_user_role_code

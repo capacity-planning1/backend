@@ -15,6 +15,7 @@ from app.schemas.students import BusySlotFilters
 from app.utils.pagination import ListResponse
 from app.utils.errors import NotFoundError
 
+
 class BusySlotService:
     __busy_slot_repository: BusySlotRepository
 

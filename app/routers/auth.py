@@ -16,8 +16,9 @@ from fastapi.security import HTTPBearer
 from app.core.auth import decode_token
 from app.core.config import settings
 from app.core.responses import get_responses
+from app.utils.hasher import Hasher
 from app.dependencies.auth import CurrentStudentDep
-from app.dependencies.services import AuthServiceDep
+from app.dependencies.services import AuthServiceDep, ScheduleServiceDep
 from app.models.students.student import StudentCreate
 from app.schemas.auth import (
     ChangePasswordRequest,
@@ -42,15 +43,24 @@ async def register(
     _request: Request,
     register_data: RegisterRequest,
     auth_service: AuthServiceDep,
+    schedule_service: ScheduleServiceDep,
 ):
+    hashed_password = Hasher.get_password_hash(register_data.password)
     student = StudentCreate(
         email=register_data.email,
         first_name=register_data.first_name,
         last_name=register_data.last_name,
-        password=register_data.password,
-        skills=register_data.skills
+        hashed_password=hashed_password,
+        skills=register_data.skills,
+        group=register_data.group,
     )
-    await auth_service.register(student)
+    created_student = await auth_service.register(student)
+
+    if created_student.group is not None:
+        await schedule_service.fill_student_schedule(
+            created_student.id, created_student.group)
+
+    return Response(status_code=status.HTTP_201_CREATED)
 
 
 @router.post(
@@ -173,13 +183,13 @@ async def logout_all_devices(
     )
 
 
-@router.post('/{student_id}/verify-email', responses=get_responses(
+@router.post('/verify-email', responses=get_responses(
     status.HTTP_404_NOT_FOUND,
     status.HTTP_410_GONE)
 )
 async def verify_email(
     _request: Request,
-    student_id: UUID,
+    student_id: Annotated[UUID, Query()],
     code: Annotated[UUID, Query()],
     auth_service: AuthServiceDep
 ):
@@ -199,12 +209,12 @@ async def change_password(
 
 
 @router.post(
-    '/{student_id}/confirm-change-password',
+    '/confirm-change-password',
     responses=get_responses(status.HTTP_404_NOT_FOUND, status.HTTP_410_GONE)
 )
 async def confirm_change_password(
     _request: Request,
-    student_id: UUID,
+    student_id: Annotated[UUID, Query()],
     code: Annotated[UUID, Query()],
     change_password_data: ChangePasswordRequest,
     auth_service: AuthServiceDep

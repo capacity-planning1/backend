@@ -1,6 +1,7 @@
+from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Depends, Request, status
 
 from app.core.config import settings
 from app.core.responses import get_responses
@@ -25,7 +26,7 @@ async def get_teams(
     project_role: ProjectRoleDep,
     team_service: TeamServiceDep,
     project_id: UUID,
-    filters: TeamFilters,
+    filters: Annotated[TeamFilters, Depends()],
 ) -> ListResponse[TeamPublic]:
     if (
         student.role == settings.role.default_user_role_code

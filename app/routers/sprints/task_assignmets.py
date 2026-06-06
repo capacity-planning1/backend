@@ -1,7 +1,7 @@
-from typing import Optional
+from typing import Annotated, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Depends, Request, status
 
 from app.core.config import settings
 from app.core.responses import get_responses
@@ -29,7 +29,7 @@ async def get_task_assignments(
     project_role: ProjectRoleDep,
     task_assignment_service: TaskAssignmentServiceDep,
     task_id: UUID,
-    filters: TaskAssignmentFilters,
+    filters: Annotated[TaskAssignmentFilters, Depends()],
 ) -> ListResponse[TaskAssignmentPublic]:
     if (
         student.role == settings.role.default_user_role_code

@@ -21,7 +21,7 @@ from app.repositories.student import StudentRepository
 
 
 async def get_project_repository(session: SessionDep):
-    yield Repository[ProjectModel](session)
+    yield Repository[ProjectModel](ProjectModel, session)
 
 
 ProjectRepository: TypeAlias = Repository[ProjectModel]
@@ -29,7 +29,7 @@ ProjectRepositoryDep = Annotated[ProjectRepository, Depends(get_project_reposito
 
 
 async def get_project_member_repository(session: SessionDep):
-    yield Repository[ProjectMemberModel](session)
+    yield Repository[ProjectMemberModel](ProjectMemberModel, session)
 
 
 ProjectMemberRepository: TypeAlias = Repository[ProjectMemberModel]
@@ -39,7 +39,7 @@ ProjectMemberRepositoryDep = Annotated[
 
 
 async def get_team_repository(session: SessionDep):
-    yield Repository[TeamModel](session)
+    yield Repository[TeamModel](TeamModel, session)
 
 
 TeamRepository: TypeAlias = Repository[TeamModel]
@@ -47,7 +47,7 @@ TeamRepositoryDep = Annotated[TeamRepository, Depends(get_team_repository)]
 
 
 async def get_team_membership_repository(session: SessionDep):
-    yield Repository[TeamMembershipModel](session)
+    yield Repository[TeamMembershipModel](TeamMembershipModel, session)
 
 
 TeamMembershipRepository: TypeAlias = Repository[TeamMembershipModel]
@@ -57,7 +57,7 @@ TeamMembershipRepositoryDep = Annotated[
 
 
 async def get_task_assignment_repository(session: SessionDep):
-    yield Repository[TaskAssignmentModel](session)
+    yield Repository[TaskAssignmentModel](TaskAssignmentModel, session)
 
 
 TaskAssignmentRepository: TypeAlias = Repository[TaskAssignmentModel]
@@ -67,7 +67,7 @@ TaskAssignmentRepositoryDep = Annotated[
 
 
 async def get_task_change_request_repository(session: SessionDep):
-    yield Repository[TaskChangeRequestModel](session)
+    yield Repository[TaskChangeRequestModel](TaskChangeRequestModel, session)
 
 
 TaskChangeRequestRepository: TypeAlias = Repository[TaskChangeRequestModel]
@@ -77,7 +77,7 @@ TaskChangeRequestRepositoryDep = Annotated[
 
 
 async def get_sprint_repository(session: SessionDep):
-    yield Repository[SprintModel](session)
+    yield Repository[SprintModel](SprintModel, session)
 
 
 SprintRepository: TypeAlias = Repository[SprintModel]
@@ -85,7 +85,7 @@ SprintRepositoryDep = Annotated[SprintRepository, Depends(get_sprint_repository)
 
 
 async def get_sprint_task_repository(session: SessionDep):
-    yield Repository[SprintTaskModel](session)
+    yield Repository[SprintTaskModel](SprintTaskModel, session)
 
 
 SprintTaskRepository: TypeAlias = Repository[SprintTaskModel]
@@ -95,7 +95,7 @@ SprintTaskRepositoryDep = Annotated[
 
 
 async def get_busy_slot_repository(session: SessionDep):
-    yield Repository[BusySlotModel](session)
+    yield Repository[BusySlotModel](BusySlotModel, session)
 
 
 BusySlotRepository: TypeAlias = Repository[BusySlotModel]
@@ -103,14 +103,14 @@ BusySlotRepositoryDep = Annotated[BusySlotRepository, Depends(get_busy_slot_repo
 
 
 async def get_student_repository(session: SessionDep):
-    yield StudentRepository(session)
+    yield StudentRepository(StudentModel, session)
 
 
 StudentRepositoryDep = Annotated[StudentRepository, Depends(get_student_repository)]
 
 
 async def get_refresh_session_repository(session: SessionDep):
-    yield Repository[StudentSessionModel](session)
+    yield Repository[StudentSessionModel](StudentSessionModel, session)
 
 
 RefreshSessionRepository: TypeAlias = Repository[StudentSessionModel]
@@ -120,7 +120,7 @@ StudentSessionRepositoryDep = Annotated[
 
 
 async def get_email_notification_repository(session: SessionDep):
-    yield Repository[EmailNotification](session)
+    yield Repository[EmailNotification](EmailNotification, session)
 
 
 EmailNotificationRepository: TypeAlias = Repository[EmailNotification]

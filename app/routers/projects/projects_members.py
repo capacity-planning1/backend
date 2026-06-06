@@ -1,7 +1,7 @@
-from typing import Optional
+from typing import Annotated, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Depends, Request, status
 
 from app.core.config import settings
 from app.core.responses import get_responses
@@ -29,7 +29,7 @@ async def get_project_members(
     student: CurrentStudentDep,
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,
-    filters: ProjectMembersFilters,
+    filters: Annotated[ProjectMembersFilters, Depends()],
     project_role: ProjectRoleDep,
 ) -> ListResponse[ProjectMemberPublic]:
     if (
