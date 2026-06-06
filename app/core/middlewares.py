@@ -14,6 +14,6 @@ async def request_logging_middleware(request: Request, call_next):
                 'method': request.method,
                 'client_host': request.client.host,
             },
-            exc_info=True
+            exc_info=True,
         )
         raise exc

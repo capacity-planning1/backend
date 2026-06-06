@@ -10,7 +10,7 @@ from app.core.auth import get_student_id_from_token
 from app.dependencies.repositories import (
     ProjectMemberRepositoryDep,
     ProjectRepositoryDep,
-    StudentRepositoryDep
+    StudentRepositoryDep,
 )
 from app.models.students.student import StudentPublic
 from app.schemas.projects import ProjectMembersFilters
@@ -82,6 +82,9 @@ async def get_student_project_role(
         raise UnauthorizedError()
 
     project_id = UUID(request.path_params.get('project_id'))
+    project_id_param = request.path_params.get('project_id')
+    if not project_id_param:
+        return MemberRole.OTHER
     project = await project_repo.get(project_id)
 
     if not project:

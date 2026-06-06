@@ -1,7 +1,7 @@
-from typing import Optional
+from typing import Annotated, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Depends, Request, status
 
 from app.core.config import settings
 from app.core.responses import get_responses
@@ -29,7 +29,7 @@ async def get_task_assignments(
     project_role: ProjectRoleDep,
     task_assignment_service: TaskAssignmentServiceDep,
     task_id: UUID,
-    filters: TaskAssignmentFilters,
+    filters: Annotated[TaskAssignmentFilters, Depends()],
 ) -> ListResponse[TaskAssignmentPublic]:
     if (
         student.role == settings.role.default_user_role_code
@@ -42,8 +42,10 @@ async def get_task_assignments(
 
 
 @router.post(
-    '/', status_code=status.HTTP_201_CREATED,
-    responses=get_responses(status.HTTP_400_BAD_REQUEST))
+    '/',
+    status_code=status.HTTP_201_CREATED,
+    responses=get_responses(status.HTTP_400_BAD_REQUEST),
+)
 async def create_task_assignment(
     _request: Request,
     student: CurrentStudentDep,
@@ -87,8 +89,8 @@ async def get_task_assignment(
 
 
 @router.put(
-    '/{project_member_id}',
-    responses=get_responses(status.HTTP_400_BAD_REQUEST))
+    '/{project_member_id}', responses=get_responses(status.HTTP_400_BAD_REQUEST)
+)
 async def update_task_assignment(  # noqa: PLR0913
     _request: Request,
     student: CurrentStudentDep,
@@ -136,6 +138,4 @@ async def delete_task_assignment(
     filters = TaskAssignmentFilters()
     filters.project_task_id = task_id
     filters.project_member_id = project_member_id
-    await task_assignment_service.delete_task_assignment(
-        task_id, project_member_id
-    )
+    await task_assignment_service.delete_task_assignment(task_id, project_member_id)

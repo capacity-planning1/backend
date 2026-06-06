@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
@@ -10,13 +12,30 @@ from app.core.error_handler import exception_handler
 from app.core.limiter import limiter
 from app.core.middlewares import request_logging_middleware
 from app.core.responses import GLOBAL_RESPONSES
+from app.db.database import AsyncSessionLocal
 from app.routers import auth, projects, roles, sprints, students
+from app.utils.schedule_parser import export_to_postgres, parse_schedule_to_dataframe
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    try:
+        google_sheet_id = '13CqvyFsOa5Z5LYCfMCz4IyAnuTIcjYqI0ARgt8-5MpQ'
+        df_schedule = parse_schedule_to_dataframe(google_sheet_id)
+
+        if df_schedule is not None and not df_schedule.empty:
+            async with AsyncSessionLocal() as session:
+                await export_to_postgres(df_schedule, session)
+    except Exception as e:
+        print(f'ошибка загрузки расписания: {e}')
+    yield
+
 
 app = FastAPI(
     title='Capacity Planning API',
     version='1.0.0',
     responses=GLOBAL_RESPONSES,
-    root_path="/api",
+    lifespan=lifespan,
 )
 
 api_prefix = '/api'
@@ -25,10 +44,7 @@ origins = ['http://localhost:8080']
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-app.add_exception_handler(
-    exc_class_or_status_code=Exception,
-    handler=exception_handler
-)
+app.add_exception_handler(exc_class_or_status_code=Exception, handler=exception_handler)
 
 app.add_middleware(
     CORSMiddleware,

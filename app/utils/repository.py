@@ -1,5 +1,5 @@
 from math import ceil
-from typing import Any, Generic, Optional, Sequence, TypeAlias, TypeVar
+from typing import Any, Generic, List, Optional, Sequence, TypeAlias, TypeVar
 from uuid import UUID
 
 from pydantic import BaseModel as PydanticBaseModel
@@ -23,8 +23,9 @@ class Repository(Generic[ModelT]):
     OFFSET = 0
     LIMIT = 100
 
-    def __init__(self, session: SessionDep):
+    def __init__(self, model: type[ModelT], session: SessionDep):
         self._session = session
+        self.model = model
 
     async def get(self, pk: UUID) -> Optional[ModelT]:
         return await self._session.get(self.model, pk)
@@ -178,3 +179,10 @@ class Repository(Generic[ModelT]):
         select_statement = select_statement.offset(offset).limit(limit)
         result = await self._session.exec(select_statement)
         return result.scalars().all()
+
+    async def create_many(self, items: List[ModelT]) -> None:
+        if not items:
+            return
+
+        self._session.add_all(items)
+        self._session.commit()

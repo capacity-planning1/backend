@@ -2,6 +2,11 @@ from app.models.auth.refresh_session import (
     StudentSessionModel,
 )
 from app.models.base import BaseModel
+from app.models.email import (
+    EmailAction,
+    EmailNotification,
+    EmailStatus,
+)
 from app.models.projects.project import (
     ProjectBase,
     ProjectCreate,
@@ -134,4 +139,7 @@ __all__ = [
     'TaskPriority',
     'TaskChangeRequestStatus',
     'StudentSessionModel',
+    'EmailAction',
+    'EmailStatus',
+    'EmailNotification',
 ]

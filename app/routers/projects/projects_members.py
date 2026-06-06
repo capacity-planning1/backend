@@ -1,7 +1,7 @@
-from typing import Optional
+from typing import Annotated, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Depends, Request, status
 
 from app.core.config import settings
 from app.core.responses import get_responses
@@ -19,7 +19,7 @@ from app.utils.pagination import ListResponse
 router = APIRouter(
     prefix='/{project_id}/members',
     tags=['projectMembers'],
-    responses=get_responses(status.HTTP_404_NOT_FOUND)
+    responses=get_responses(status.HTTP_404_NOT_FOUND),
 )
 
 
@@ -29,7 +29,7 @@ async def get_project_members(
     student: CurrentStudentDep,
     project_member_service: ProjectMemberServiceDep,
     project_id: UUID,
-    filters: ProjectMembersFilters,
+    filters: Annotated[ProjectMembersFilters, Depends()],
     project_role: ProjectRoleDep,
 ) -> ListResponse[ProjectMemberPublic]:
     if (
@@ -43,8 +43,9 @@ async def get_project_members(
 
 
 @router.post(
-    '/', status_code=status.HTTP_201_CREATED,
-    responses=get_responses(status.HTTP_400_BAD_REQUEST, status.HTTP_409_CONFLICT)
+    '/',
+    status_code=status.HTTP_201_CREATED,
+    responses=get_responses(status.HTTP_400_BAD_REQUEST, status.HTTP_409_CONFLICT),
 )
 async def create_project_members(
     _request: Request,
@@ -85,9 +86,7 @@ async def get_project_member(
     return await project_member_service.get_project_member(filters)
 
 
-@router.put(
-    '/{student_id}',
-    responses=get_responses(status.HTTP_400_BAD_REQUEST))
+@router.put('/{student_id}', responses=get_responses(status.HTTP_400_BAD_REQUEST))
 async def update_project_member(  # noqa: PLR0913
     _request: Request,
     student: CurrentStudentDep,

@@ -42,36 +42,36 @@ class ProjectMemberModel(ProjectMemberPublic, table=True):
 
     project: 'ProjectModel' = Relationship(
         sa_relationship=relationship(
-            "ProjectModel",
+            'ProjectModel',
             back_populates='members',
-            lazy="selectin",
+            lazy='selectin',
         )
     )
     student: 'StudentModel' = Relationship(
         sa_relationship=relationship(
-            "StudentModel",
+            'StudentModel',
             back_populates='memberships',
-            lazy="selectin",
+            lazy='selectin',
         )
     )
     team_memberships: list['TeamMembershipModel'] = Relationship(
         sa_relationship=relationship(
-            "TeamMembershipModel",
+            'TeamMembershipModel',
             back_populates='project_member',
-            lazy="selectin",
+            lazy='selectin',
         )
     )
     assignments: list['TaskAssignmentModel'] = Relationship(
         sa_relationship=relationship(
-            "TaskAssignmentModel",
+            'TaskAssignmentModel',
             back_populates='project_member',
-            lazy="selectin",
+            lazy='selectin',
         )
     )
     change_requests: list['TaskChangeRequestModel'] = Relationship(
         sa_relationship=relationship(
-            "TaskChangeRequestModel",
+            'TaskChangeRequestModel',
             back_populates='requested_by_member',
-            lazy="selectin",
+            lazy='selectin',
         )
     )

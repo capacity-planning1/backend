@@ -6,8 +6,8 @@ from sqlmodel import Field, SQLModel
 from app.utils.errors import (
     BadRequestError,
     ConflictError,
-    GoneError,
     ForbiddenError,
+    GoneError,
     InternalServerError,
     NotFoundError,
     UnauthorizedError,

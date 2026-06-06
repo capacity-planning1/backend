@@ -1,6 +1,7 @@
+from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Depends, Request, status
 
 from app.core.config import settings
 from app.core.responses import get_responses
@@ -14,7 +15,7 @@ from app.utils.pagination import ListResponse
 router = APIRouter(
     prefix='/projects/{project_id}',
     tags=['projects'],
-    responses=get_responses(status.HTTP_404_NOT_FOUND)
+    responses=get_responses(status.HTTP_404_NOT_FOUND),
 )
 
 
@@ -25,7 +26,7 @@ async def get_teams(
     project_role: ProjectRoleDep,
     team_service: TeamServiceDep,
     project_id: UUID,
-    filters: TeamFilters,
+    filters: Annotated[TeamFilters, Depends()],
 ) -> ListResponse[TeamPublic]:
     if (
         student.role == settings.role.default_user_role_code
@@ -38,8 +39,10 @@ async def get_teams(
 
 
 @router.post(
-    '/teams', status_code=status.HTTP_201_CREATED,
-    responses=get_responses(status.HTTP_400_BAD_REQUEST))
+    '/teams',
+    status_code=status.HTTP_201_CREATED,
+    responses=get_responses(status.HTTP_400_BAD_REQUEST),
+)
 async def create_team(
     _request: Request,
     student: CurrentStudentDep,
