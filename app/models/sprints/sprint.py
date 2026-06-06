@@ -62,15 +62,15 @@ class SprintModel(SprintPublic, table=True):
 
     project: 'ProjectModel' = Relationship(
         sa_relationship=relationship(
-            "ProjectModel",
+            'ProjectModel',
             back_populates='sprints',
-            lazy="selectin",
+            lazy='selectin',
         )
     )
     tasks: list['SprintTaskModel'] = Relationship(
         sa_relationship=relationship(
-            "SprintTaskModel",
+            'SprintTaskModel',
             back_populates='sprint',
-            lazy="selectin",
+            lazy='selectin',
         )
     )

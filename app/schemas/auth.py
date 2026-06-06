@@ -14,6 +14,7 @@ class RegisterRequest(BaseModel):
     first_name: str = Field(min_length=1, max_length=100)
     last_name: str = Field(min_length=1, max_length=100)
     skills: str | None = None
+    group: str | None = None
 
 
 class LoginRequest(BaseModel):

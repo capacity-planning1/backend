@@ -23,7 +23,7 @@ ERROR_RESPONSES_REGISTRY = {
 
 def get_responses(*status_codes: int) -> dict:
     return {
-        code: {"model": ERROR_RESPONSES_REGISTRY[code]}
+        code: {'model': ERROR_RESPONSES_REGISTRY[code]}
         for code in status_codes
         if code in ERROR_RESPONSES_REGISTRY
     }

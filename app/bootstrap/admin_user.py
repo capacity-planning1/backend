@@ -11,7 +11,7 @@ from app.utils.repository import Repository
 
 
 async def create_admin_user(session: AsyncSession):
-    student_repo = Repository[StudentModel](session)
+    student_repo = Repository[StudentModel](StudentModel, session)
     student_repo.model = StudentModel
 
     filters = StudentFilters(email=settings.role.admin_email)

@@ -43,29 +43,29 @@ class TaskAssignmentModel(TaskAssignmentPublic, table=True):
 
     task: 'SprintTaskModel' = Relationship(
         sa_relationship=relationship(
-            "SprintTaskModel",
+            'SprintTaskModel',
             back_populates='assignments',
-            lazy="selectin",
+            lazy='selectin',
         )
     )
     project_member: 'ProjectMemberModel' = Relationship(
         sa_relationship=relationship(
-            "ProjectMemberModel",
+            'ProjectMemberModel',
             back_populates='assignments',
-            lazy="selectin",
+            lazy='selectin',
         )
     )
     busy_slots: list['BusySlotModel'] = Relationship(
         sa_relationship=relationship(
-            "BusySlotModel",
+            'BusySlotModel',
             back_populates='task_assignment',
-            lazy="selectin",
+            lazy='selectin',
         )
     )
     change_requests: list['TaskChangeRequestModel'] = Relationship(
         sa_relationship=relationship(
-            "TaskChangeRequestModel",
+            'TaskChangeRequestModel',
             back_populates='task_assignment',
-            lazy="selectin",
+            lazy='selectin',
         )
     )

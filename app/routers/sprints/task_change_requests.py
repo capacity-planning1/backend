@@ -1,7 +1,7 @@
-from typing import Optional
+from typing import Annotated, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Depends, Request, status
 
 from app.core.config import settings
 from app.core.responses import get_responses
@@ -29,7 +29,7 @@ async def get_task_change_requests(
     project_role: ProjectRoleDep,
     task_change_request_service: TaskChangeRequestServiceDep,
     project_id: UUID,
-    filters: TaskChangeRequestFilters,
+    filters: Annotated[TaskChangeRequestFilters, Depends()],
 ) -> ListResponse[TaskChangeRequestPublic]:
     if (
         student.role == settings.role.default_user_role_code
@@ -43,8 +43,10 @@ async def get_task_change_requests(
 
 
 @router.post(
-    '/tasks/{task_id}/change-requests', status_code=status.HTTP_201_CREATED,
-    responses=get_responses(status.HTTP_400_BAD_REQUEST))
+    '/tasks/{task_id}/change-requests',
+    status_code=status.HTTP_201_CREATED,
+    responses=get_responses(status.HTTP_400_BAD_REQUEST),
+)
 async def create_task_change_request(
     _request: Request,
     student: CurrentStudentDep,
@@ -94,7 +96,8 @@ async def get_task_change_request(
 
 @router.put(
     '/change-requests/{request_id}',
-    responses=get_responses(status.HTTP_400_BAD_REQUEST))
+    responses=get_responses(status.HTTP_400_BAD_REQUEST),
+)
 async def update_task_change_request(
     _request: Request,
     student: CurrentStudentDep,

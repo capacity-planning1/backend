@@ -40,7 +40,9 @@ COPY --from=builder --chown=app:app /app/.venv /app/.venv
 COPY --chown=app:app alembic ./alembic
 COPY --chown=app:app app ./app
 COPY --chown=app:app alembic.ini ./
+COPY --chown=app:app private.pem ./
+COPY --chown=app:app public.pem ./
 
 USER app
 
-CMD ["gunicorn", "-c", "app/core/gunicorn_confing.py", "app.main:app"]
+CMD ["gunicorn", "-c", "app/core/gunicorn_config.py", "app.main:app"]
